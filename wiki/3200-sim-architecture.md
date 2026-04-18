@@ -111,9 +111,9 @@ Persistence is mostly inputs and outputs, not per-step state writes.
 
 ## NPM Workflow
 
-- npm run sim:validate -- --scenario <path>
-- npm run sim:run -- --scenario <path> --ticks 365 --seed 42
-- npm run sim:report [-- --run-id <id>]
+- cd src/simulation_engine && npm run sim:validate -- --scenario ../../public/anselm/tuvalu/baseline
+- cd src/simulation_engine && npm run sim:run -- --scenario ../../public/anselm/tuvalu/baseline --ticks 365 --seed 42
+- cd src/simulation_engine && npm run sim:report [-- --run-id <id>]
 
 ## Is This at Odds with 3100-sim-approaches?
 

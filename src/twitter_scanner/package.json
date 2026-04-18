@@ -13,10 +13,7 @@
     "ingest:live": "node index.js ingest-live",
     "analyze": "node index.js analyze",
     "status": "node index.js status",
-    "serve": "node index.js serve",
-    "sim:validate": "node index.js sim-validate",
-    "sim:run": "node index.js sim-run",
-    "sim:report": "node index.js sim-report"
+    "serve": "node index.js serve"
   },
   "dependencies": {
     "dotenv": "^16.4.0",

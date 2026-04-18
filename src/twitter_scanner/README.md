@@ -10,7 +10,6 @@ Collection and analysis are separated:
 - auth helper for user-context Twitter tokens
 - status command
 - small HTTP API service
-- simulation sandbox with manifest-driven agent models
 
 ## Collections
 
@@ -55,18 +54,6 @@ npm run status
 Run local API service:
 
 npm run serve
-
-Validate a simulation scenario manifest and agent modules:
-
-npm run sim:validate -- --scenario ./public/anselm/tuvalu/baseline
-
-Run a simulation (in-memory, deterministic by seed):
-
-npm run sim:run -- --scenario ./public/anselm/tuvalu/baseline --ticks 365 --seed 42
-
-Summarize the latest simulation run artifact:
-
-npm run sim:report
 
 Convenience full pipeline:
 
@@ -153,24 +140,6 @@ http://127.0.0.1:4317
 - --no-likes-api
 - --no-reposts-api
 - --no-posts-api
-
-Simulation flags:
-
-- --scenario ./public/anselm/tuvalu/baseline
-- --ticks 365
-- --dt 1
-- --seed 42
-- --out-dir ./runs/sim
-- --run-id custom-run-id
-
-## Simulation Architecture (Sketch)
-
-- Each run loads one folder-backed manifest from public/....
-- The engine executes fully in RAM and only writes final run artifacts.
-- State updates are double-buffered so all agents read a frozen snapshot each tick.
-- Events are queued per tick; emitted events are delivered at least one tick later.
-- Spatial hash buckets accelerate neighborhood queries for proximity-based behavior.
-- Spawn/despawn requests are staged and committed at tick boundaries.
 
 ## Idempotency Pattern
 
