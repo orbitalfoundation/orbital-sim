@@ -8,6 +8,8 @@ import {
   serveApi
 } from "./lib/core.js";
 import { runAuthFlow } from "./lib/auth.js";
+import { parseSimOptions } from "./lib/sim/options.js";
+import { runScenario, summarizeRun, validateScenario } from "./lib/sim/commands.js";
 
 function printJson(payload) {
   console.log(JSON.stringify(payload, null, 2));
@@ -23,6 +25,9 @@ function printHelp() {
   status
   serve
   scan
+  sim-validate
+  sim-run
+  sim-report
 
 Common flags:
   --db scannerdata
@@ -32,6 +37,14 @@ Common flags:
   --days 14
   --max-analyze 500
   --dry-run
+
+Sim flags:
+  --scenario ./public/anselm/tuvalu/baseline
+  --ticks 365
+  --dt 1
+  --seed 42
+  --out-dir ./runs/sim
+  --run-id 2026-...-tuvalu-baseline-sketch
 `);
 }
 
@@ -40,7 +53,8 @@ async function main() {
   const flagArgs = command === "scan" && (!process.argv[2] || process.argv[2].startsWith("--"))
     ? process.argv.slice(2)
     : process.argv.slice(3);
-  const options = parseOptions(flagArgs);
+  const simCommands = new Set(["sim-validate", "sim-run", "sim-report"]);
+  const options = simCommands.has(command) ? parseSimOptions(flagArgs) : parseOptions(flagArgs);
 
   if (command === "help" || command === "--help" || command === "-h") {
     printHelp();
@@ -80,6 +94,21 @@ async function main() {
 
   if (command === "scan") {
     printJson(await runCompositeScan(options));
+    return;
+  }
+
+  if (command === "sim-validate") {
+    printJson(await validateScenario(options));
+    return;
+  }
+
+  if (command === "sim-run") {
+    printJson(await runScenario(options));
+    return;
+  }
+
+  if (command === "sim-report") {
+    printJson(await summarizeRun(options));
     return;
   }
 

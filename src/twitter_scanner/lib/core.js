@@ -103,7 +103,7 @@ function parseInteger(value, fallback) {
 
 export function parseOptions(args) {
   const options = {
-    dataDir: path.join(PROJECT_ROOT, "data", "twitter", "data"),
+    dataDir: path.join(PROJECT_ROOT, "raw_ingestion_data", "twitter", "data"),
     mongoUri: process.env.MONGO_URI || "mongodb://127.0.0.1:27017",
     dbName: "scannerdata",
     userKey: "anselm",

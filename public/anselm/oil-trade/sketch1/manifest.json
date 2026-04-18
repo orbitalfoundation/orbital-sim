@@ -1,0 +1,70 @@
+{
+  "name": "Oil Trade Routes Sketch",
+  "space": {
+    "cellSize": 100
+  },
+  "agentModules": [
+    {
+      "id": "refinery",
+      "path": "./agents/refinery.js"
+    },
+    {
+      "id": "tanker",
+      "path": "./agents/tanker.js"
+    }
+  ],
+  "instances": [
+    {
+      "id": "refinery-saudi",
+      "agentType": "refinery",
+      "state": {
+        "reserves": 1000,
+        "output": 50
+      },
+      "params": {
+        "baseCapacity": 100,
+        "depletionRate": 0.5
+      },
+      "position": {
+        "x": 50,
+        "y": 50
+      },
+      "tags": ["supplier"]
+    },
+    {
+      "id": "refinery-singapore",
+      "agentType": "refinery",
+      "state": {
+        "reserves": 500,
+        "output": 30
+      },
+      "params": {
+        "baseCapacity": 80,
+        "depletionRate": 0.3
+      },
+      "position": {
+        "x": 200,
+        "y": 100
+      },
+      "tags": ["hub"]
+    },
+    {
+      "id": "tanker-1",
+      "agentType": "tanker",
+      "state": {
+        "cargo": 0,
+        "miles": 0
+      },
+      "params": {
+        "speed": 20,
+        "capacity": 100
+      },
+      "position": {
+        "x": 50,
+        "y": 50
+      },
+      "tags": ["mobile"]
+    }
+  ],
+  "initialEvents": []
+}

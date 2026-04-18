@@ -4,3 +4,5 @@ april 17
 
 3000. simulation - some kind of simulations and modeling; somehow you have to specify the region or subject matter; what nodes participate
 
+3200. sim architecture - concrete architecture for deterministic, in-memory, agent-based simulation runs with manifests, events, spatial indexing, and lifecycle updates
+

@@ -1,0 +1,81 @@
+{
+  "name": "Tuvalu Baseline Sketch",
+  "space": {
+    "cellSize": 1
+  },
+  "agentModules": [
+    {
+      "id": "person",
+      "path": "./agents/person.js"
+    },
+    {
+      "id": "goat",
+      "path": "./agents/goat.js"
+    }
+  ],
+  "instances": [
+    {
+      "id": "person-1",
+      "agentType": "person",
+      "state": {
+        "ageYears": 24,
+        "health": 0.92
+      },
+      "params": {
+        "maxAge": 88,
+        "birthProbabilityPerYear": 0.02,
+        "deathRiskScale": 0.008
+      },
+      "position": {
+        "x": 1,
+        "y": 1
+      },
+      "tags": ["household-a"]
+    },
+    {
+      "id": "person-2",
+      "agentType": "person",
+      "state": {
+        "ageYears": 30,
+        "health": 0.88
+      },
+      "params": {
+        "maxAge": 90,
+        "birthProbabilityPerYear": 0.015,
+        "deathRiskScale": 0.007
+      },
+      "position": {
+        "x": 2,
+        "y": 1
+      },
+      "tags": ["household-a"]
+    },
+    {
+      "id": "goat-1",
+      "agentType": "goat",
+      "state": {
+        "ageYears": 2,
+        "energy": 0.7
+      },
+      "params": {
+        "maxAge": 16,
+        "movementRadius": 1.5
+      },
+      "position": {
+        "x": 1,
+        "y": 2
+      },
+      "tags": ["livestock"]
+    }
+  ],
+  "initialEvents": [
+    {
+      "tick": 0,
+      "type": "rainfall-shock",
+      "target": "*",
+      "payload": {
+        "intensity": 0.2
+      }
+    }
+  ]
+}
