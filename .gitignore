@@ -1,8 +1,8 @@
 old
-data
+raw_ingestion_data
 node_packages
 .env
-
+runs
 
 .DS_Store
 **/.DS_Store
