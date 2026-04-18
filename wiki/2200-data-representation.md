@@ -1,0 +1,3 @@
+
+2) Storage. The database structure itself is very important. I've been trying an ECS (entity component system) pattern where I have formal schemas for every kind of artifact or object, but use a compositional approach - instead of having a type 'oil refinery' as in { name: 'lagos oil refinery', production: 120000 barrels a day } I use an ecs pattern where I have components so { meta: { name: 'lagos oil refinery' }, refinery: { production: 120000 } }. It's a subtle distinction but I can compositionally create new kinds of artifacts and I get around a problem that other canonical entity systems (such as schema.org) run into which is that it is very hard to model the world. I can provide more detailed examples of this.
+
