@@ -1,0 +1,23 @@
+{
+  "name": "twitter-scanner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Twitter scanner suite for archive ingest, live ingest, analysis, auth, and API service",
+  "main": "index.js",
+  "scripts": {
+    "scan": "node index.js scan",
+    "scan:dry": "node index.js scan --dry-run",
+    "auth": "node index.js auth",
+    "ingest:archive": "node index.js ingest-archive",
+    "ingest:live": "node index.js ingest-live",
+    "analyze": "node index.js analyze",
+    "status": "node index.js status",
+    "serve": "node index.js serve"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.0",
+    "mongodb": "^6.12.0",
+    "twitter-api-v2": "^1.23.0"
+  }
+}
