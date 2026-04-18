@@ -1,3 +1,5 @@
+1) Aggregate. Some kind of modular aggregation strategy. We need to collect from Twitter and other sources, and stuff into a database. Aggregators can be a pain in the ass to write. I also really do want to keep everything largely modular, connected primarily by a database. There is some analysis, tagging and categorization required. I
+
 I'd probably actually intially just scan my own bookmarks, favorites and so on.
 
 1) i want to scan and aggregate content from my twitter dataset - data/twitter into mongo; we can invent a new local database called scannerdata in the local mongo instance for now. i made a folder in src/twitter_scanner for this. the raw data is in data/twitter. also i added a .env with the new twitter api token keys for the brand new twitter api if you need it. i strongly prefer js, es6, and if there are any twitter api libraries that might be nice.

@@ -1,1 +1,0 @@
-1) Aggregate. Some kind of modular aggregation strategy. We need to collect from Twitter and other sources, and stuff into a database. Aggregators can be a pain in the ass to write. I also really do want to keep everything largely modular, connected primarily by a database. There is some analysis, tagging and categorization required. I
