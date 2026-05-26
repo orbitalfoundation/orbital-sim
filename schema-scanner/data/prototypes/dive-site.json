@@ -1,0 +1,18 @@
+{
+  "slug": "/_prototype/dive-site",
+  "kind": "prototype",
+  "label": "Dive site",
+  "content": "A named underwater location with documented depth, visibility, biota, and access method. Ben's Blue Hole is an instance.",
+  "components": ["meta", "location", "region", "habitat", "geology", "media"],
+  "expected_relations": [
+    { "predicate": "inhabited_by", "object_kind": "organism", "note": "resident species" },
+    { "predicate": "located_in",   "object_kind": "region" },
+    { "predicate": "accessed_via", "object_kind": "facility", "note": "boat charter / shore entry" }
+  ],
+  "defaults": {
+    "meta":    { "tags": ["dive site", "underwater"] },
+    "habitat": { "environment": "marine" }
+  },
+  "neighbours": ["wreck-site", "reef", "cenote"],
+  "_provenance": { "source": "hand-authored", "evidence": ["2026-05-01T04-04-45-578Z-dive-bens-blue-hole-bahamas"] }
+}

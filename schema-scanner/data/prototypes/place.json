@@ -1,0 +1,15 @@
+{
+  "slug": "/_prototype/place",
+  "kind": "prototype",
+  "label": "Place",
+  "content": "A named geographic location with no further structure (yet). Vancouver, Seattle, Skagit Valley, Tacoma, Marine Drive, Highway 5, Point Roberts are instances. As more is learned a place may grow into a `region`, `facility`, `harbor`, or `dive-site` prototype.",
+  "components": ["meta", "location"],
+  "expected_relations": [
+    { "predicate": "located_in", "object_kind": "region" }
+  ],
+  "defaults": {
+    "meta": { "tags": ["place"] }
+  },
+  "neighbours": ["region", "facility", "harbor", "dive-site"],
+  "_provenance": { "source": "hand-authored", "rationale": "Catch-all for thinly-described place mentions; intentionally weak so the discovery loop has somewhere to put under-specified places without inventing a richer prototype prematurely." }
+}

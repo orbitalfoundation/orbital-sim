@@ -2,5 +2,9 @@
 
 General plusses and minuses of having some bedrock truth to our world.
 
+- consensus reality - we don't have a consensus reality at all
+- didactic - educational tool
+- participation - activate unused brains in our societies
+
 something i've wanted to do for a while is a 'simulate everything' project - i may have discussed this before... i basically want to examine supply chains around the world, and look at the flows of products and services between them - so i can look at the future outcomes of situations - for example the recent issues over the strait of hormuz and the impact on oil flows, and downstream impacts on everything from fertilizers to crop yields ....  i do think i lean towards whole system models, not just say oil or say crops but also including ecosystem impacts and speculative impacts (storms, wars, droughts) my question is really quite brief, which is what are good ways to represent the kinds of artifacts or concepts in such a model, the relationships, and to do predictions, are there any specific tools or technologies that are common for these kinds of models?Show less3:56 PMThis is a well-trodden space in systems modeling — you're essentially describing a global systems simulation that combines supply chain dynamics, geopolitical shocks, and ecological feedbacks. Here's a landscape of the key representation approaches and tooling:
 1000-philosophy.md

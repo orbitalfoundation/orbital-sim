@@ -1,0 +1,19 @@
+{
+  "slug": "/_schema/condition",
+  "components": {
+    "meta": {
+      "label": "condition",
+      "content": "Wear, repair, or operational state of an entity. Orthogonal to identity, location, and ownership.",
+      "tags": ["schema", "component"]
+    },
+    "schema": {
+      "componentName": "condition",
+      "fields": {
+        "state":   { "type": "string", "description": "new | good | fair | worn | damaged | broken | operational | non-operational | derelict" },
+        "since":   { "type": "string", "description": "ISO date the entity entered this state" },
+        "note":    { "type": "string", "description": "Free-text qualifier (e.g. 'engine seized', 'recently restored')" }
+      }
+    }
+  },
+  "_provenance": [{ "action": "refactor", "rationale": "Promoted from artifact.condition; condition is universal across vessels, equipment, buildings, animals, content." }]
+}

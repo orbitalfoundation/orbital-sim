@@ -1,0 +1,18 @@
+{
+  "slug": "/_prototype/fishing-boat",
+  "kind": "prototype",
+  "label": "Fishing boat",
+  "content": "A small-to-medium working vessel used for harvesting fish. The 'three fishing boats' in Bellingham Harbor are unnamed instances.",
+  "components": ["meta", "vessel", "physical", "condition", "location"],
+  "expected_relations": [
+    { "predicate": "owns",       "object_kind": "party",   "note": "captain or company" },
+    { "predicate": "moored_at",  "object_kind": "facility" },
+    { "predicate": "harvests",   "object_kind": "organism" }
+  ],
+  "defaults": {
+    "meta":   { "tags": ["vessel", "fishing boat", "working boat"] },
+    "vessel": { "vessel_type": "fishing_boat", "propulsion": "diesel" }
+  },
+  "neighbours": ["container-ship", "cutter"],
+  "_provenance": { "source": "hand-authored", "evidence": ["2026-05-01T03-46-19-664Z-small-town-port"] }
+}

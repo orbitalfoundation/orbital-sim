@@ -1,0 +1,18 @@
+{
+  "slug": "/_schema/geology",
+  "components": {
+    "meta": {
+      "label": "geology",
+      "content": "Natural geological features: formation type, shape, age. Pairs with `location` and optionally `habitat`.",
+      "tags": ["schema", "component"]
+    },
+    "schema": {
+      "componentName": "geology",
+      "fields": {
+        "formation_type": { "type": "string", "description": "reef | cave | spring | volcano | mountain | canyon | sinkhole | ..." },
+        "shape":          { "type": "string", "description": "Free-form shape descriptor (horseshoe, funnel, cone, ...)" },
+        "age_years":      { "type": "number", "description": "Approximate age of the formation in years" }
+      }
+    }
+  }
+}

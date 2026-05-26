@@ -1,0 +1,1175 @@
+{
+  "sourceId": "2026-05-01T04-04-45-578Z-dive-bens-blue-hole-bahamas",
+  "extracted_at": "2026-05-01T04:06:01.001Z",
+  "entities": [
+    {
+      "name": "Ben's Blue Hole",
+      "kind": "place",
+      "summary": "A horseshoe-shaped reef surrounding a freshwater spring channel dive site off Grand Bahama Island.",
+      "attributes": {
+        "id": "bens-blue-hole-bahamas",
+        "location": "Grand Bahama, Bahamas",
+        "coordinates": [
+          26.52081,
+          -78.58658
+        ],
+        "type": [
+          "reef"
+        ],
+        "entry": [
+          "day boat"
+        ],
+        "maxDepth": 14,
+        "visibility": [
+          20,
+          30
+        ],
+        "weather": [
+          24,
+          30
+        ],
+        "waterTemperature": [
+          24,
+          28
+        ],
+        "current": [
+          0,
+          1
+        ],
+        "confidence": 0.6,
+        "overallScore": 0.7075,
+        "created": "2025-09-09T02:18:28.878330+00:00",
+        "updated": "2025-09-09T02:18:28.878330+00:00"
+      }
+    },
+    {
+      "name": "the blue hole",
+      "kind": "place",
+      "summary": "A funnel-like channel where freshwater emerges into the sea, creating a freshwater-saltwater mixing zone.",
+      "attributes": {
+        "description": "geological marvel",
+        "function": "freshwater spring channel",
+        "depth_range": "13-14 meters"
+      }
+    },
+    {
+      "name": "horseshoe-shaped reef",
+      "kind": "place",
+      "summary": "A distinctive reef structure surrounding the blue hole at Ben's Blue Hole.",
+      "attributes": {
+        "shape": "horseshoe",
+        "features": "coral heads for hopping"
+      }
+    },
+    {
+      "name": "Grand Bahama Island",
+      "kind": "place",
+      "summary": "Island in the Bahamas where Ben's Blue Hole is located.",
+      "attributes": {}
+    },
+    {
+      "name": "Viva Wyndham Fortuna Beach Resort",
+      "kind": "place",
+      "summary": "Resort directly opposite Ben's Blue Hole dive site.",
+      "attributes": {}
+    },
+    {
+      "name": "City of Freeport",
+      "kind": "place",
+      "summary": "City in The Bahamas near Ben's Blue Hole.",
+      "attributes": {
+        "country": "The Bahamas",
+        "country_code": "BS"
+      }
+    },
+    {
+      "name": "The Bahamas",
+      "kind": "place",
+      "summary": "Country where Ben's Blue Hole is located.",
+      "attributes": {
+        "country_code": "BS"
+      }
+    },
+    {
+      "name": "hawksbill turtle",
+      "kind": "organism",
+      "summary": "Regular visitor to Ben's Blue Hole that forages for sponges and other prey.",
+      "attributes": {
+        "behavior": "gracefully navigating the reef structure",
+        "diet": "sponges and other prey"
+      }
+    },
+    {
+      "name": "green moray eel",
+      "kind": "organism",
+      "summary": "Large resident eel species at Ben's Blue Hole.",
+      "attributes": {
+        "size": "large",
+        "residency": "resident"
+      }
+    },
+    {
+      "name": "Nassau grouper",
+      "kind": "organism",
+      "summary": "Frequently encountered fish at Ben's Blue Hole that displays curious behavior toward divers.",
+      "attributes": {
+        "behavior": "curious toward divers"
+      }
+    },
+    {
+      "name": "Caribbean reef shark",
+      "kind": "organism",
+      "summary": "Shark species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "spotted dolphin",
+      "kind": "organism",
+      "summary": "Dolphin species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "nurse shark",
+      "kind": "organism",
+      "summary": "Shark species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "yellowtail snapper",
+      "kind": "organism",
+      "summary": "Fish species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "French angelfish",
+      "kind": "organism",
+      "summary": "Angelfish species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "queen angelfish",
+      "kind": "organism",
+      "summary": "Angelfish species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "stoplight parrotfish",
+      "kind": "organism",
+      "summary": "Parrotfish species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "blue tang",
+      "kind": "organism",
+      "summary": "Fish species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "sergeant major damselfish",
+      "kind": "organism",
+      "summary": "Damselfish species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "foureye butterflyfish",
+      "kind": "organism",
+      "summary": "Butterflyfish species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "trumpetfish",
+      "kind": "organism",
+      "summary": "Fish species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "Caribbean spiny lobster",
+      "kind": "organism",
+      "summary": "Lobster species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "Cottonwick",
+      "kind": "organism",
+      "summary": "Fish species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "Giant Caribbean Anemone",
+      "kind": "organism",
+      "summary": "Anemone species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "Tobaccofish",
+      "kind": "organism",
+      "summary": "Fish species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "Triton's Trumpet",
+      "kind": "organism",
+      "summary": "Marine species found at Ben's Blue Hole.",
+      "attributes": {}
+    },
+    {
+      "name": "haloclines",
+      "kind": "other",
+      "summary": "Visual phenomenon where fresh and salt water masses meet underwater at Ben's Blue Hole.",
+      "attributes": {
+        "cause": "mixing of fresh and salt water"
+      }
+    },
+    {
+      "name": "dive-site-enrichment-system",
+      "kind": "other",
+      "summary": "Author system that created the Ben's Blue Hole dive site record.",
+      "attributes": {
+        "role": "author"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "from": "Ben's Blue Hole",
+      "to": "Grand Bahama Island",
+      "kind": "located_in"
+    },
+    {
+      "from": "Ben's Blue Hole",
+      "to": "The Bahamas",
+      "kind": "located_in"
+    },
+    {
+      "from": "Ben's Blue Hole",
+      "to": "City of Freeport",
+      "kind": "located_in"
+    },
+    {
+      "from": "the blue hole",
+      "to": "Ben's Blue Hole",
+      "kind": "part_of"
+    },
+    {
+      "from": "horseshoe-shaped reef",
+      "to": "Ben's Blue Hole",
+      "kind": "part_of"
+    },
+    {
+      "from": "Grand Bahama Island",
+      "to": "The Bahamas",
+      "kind": "part_of"
+    },
+    {
+      "from": "City of Freeport",
+      "to": "The Bahamas",
+      "kind": "located_in"
+    },
+    {
+      "from": "Viva Wyndham Fortuna Beach Resort",
+      "to": "Grand Bahama Island",
+      "kind": "located_in"
+    },
+    {
+      "from": "hawksbill turtle",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "green moray eel",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "Nassau grouper",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "Caribbean reef shark",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "spotted dolphin",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "nurse shark",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "yellowtail snapper",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "French angelfish",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "queen angelfish",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "stoplight parrotfish",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "blue tang",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "sergeant major damselfish",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "foureye butterflyfish",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "trumpetfish",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "Caribbean spiny lobster",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "Cottonwick",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "Giant Caribbean Anemone",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "Tobaccofish",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "Triton's Trumpet",
+      "to": "Ben's Blue Hole",
+      "kind": "inhabits"
+    },
+    {
+      "from": "haloclines",
+      "to": "the blue hole",
+      "kind": "located_in"
+    },
+    {
+      "from": "dive-site-enrichment-system",
+      "to": "Ben's Blue Hole",
+      "kind": "other",
+      "note": "authored"
+    }
+  ],
+  "decomposition": {
+    "decomposed_at": "2026-05-01T04:07:12.027Z",
+    "entities": [
+      {
+        "name": "Ben's Blue Hole",
+        "components": {
+          "meta": {
+            "label": "Ben's Blue Hole",
+            "tags": [
+              "dive site",
+              "reef",
+              "blue hole"
+            ]
+          },
+          "location": {
+            "lat": 26.52081,
+            "lon": -78.58658,
+            "label": "Grand Bahama, Bahamas"
+          },
+          "dive": {
+            "entry_types": [
+              "day boat"
+            ],
+            "max_depth": 14,
+            "visibility_min": 20,
+            "visibility_max": 30,
+            "water_temp_min": 24,
+            "water_temp_max": 28,
+            "current_min": 0,
+            "current_max": 1,
+            "confidence": 0.6,
+            "overall_score": 0.7075
+          },
+          "geology": {
+            "formation_type": "freshwater spring channel",
+            "shape": "horseshoe"
+          },
+          "facility": {
+            "features": [
+              "reef",
+              "coral heads"
+            ]
+          }
+        }
+      },
+      {
+        "name": "the blue hole",
+        "components": {
+          "meta": {
+            "label": "the blue hole",
+            "content": "geological marvel",
+            "tags": [
+              "geological feature",
+              "freshwater spring"
+            ]
+          },
+          "geology": {
+            "formation_type": "freshwater spring channel",
+            "shape": "funnel",
+            "depth_min": 13,
+            "depth_max": 14
+          }
+        }
+      },
+      {
+        "name": "horseshoe-shaped reef",
+        "components": {
+          "meta": {
+            "label": "horseshoe-shaped reef",
+            "tags": [
+              "reef"
+            ]
+          },
+          "geology": {
+            "shape": "horseshoe"
+          },
+          "facility": {
+            "features": [
+              "coral heads for hopping"
+            ]
+          }
+        }
+      },
+      {
+        "name": "Grand Bahama Island",
+        "components": {
+          "meta": {
+            "label": "Grand Bahama Island",
+            "tags": [
+              "island"
+            ]
+          },
+          "location": {
+            "label": "Grand Bahama Island"
+          }
+        }
+      },
+      {
+        "name": "Viva Wyndham Fortuna Beach Resort",
+        "components": {
+          "meta": {
+            "label": "Viva Wyndham Fortuna Beach Resort",
+            "tags": [
+              "resort"
+            ]
+          },
+          "location": {
+            "label": "opposite Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "City of Freeport",
+        "components": {
+          "meta": {
+            "label": "City of Freeport",
+            "tags": [
+              "city"
+            ]
+          },
+          "location": {
+            "label": "The Bahamas"
+          },
+          "jurisdiction": {
+            "country": "The Bahamas",
+            "country_code": "BS"
+          }
+        }
+      },
+      {
+        "name": "The Bahamas",
+        "components": {
+          "meta": {
+            "label": "The Bahamas",
+            "tags": [
+              "country"
+            ]
+          },
+          "jurisdiction": {
+            "country_code": "BS"
+          }
+        }
+      },
+      {
+        "name": "hawksbill turtle",
+        "components": {
+          "meta": {
+            "label": "hawksbill turtle",
+            "tags": [
+              "turtle",
+              "marine life"
+            ]
+          },
+          "organism": {
+            "behavior": "gracefully navigating the reef structure",
+            "diet": [
+              "sponges",
+              "other prey"
+            ],
+            "residency": "regular visitor"
+          }
+        }
+      },
+      {
+        "name": "green moray eel",
+        "components": {
+          "meta": {
+            "label": "green moray eel",
+            "tags": [
+              "eel",
+              "marine life"
+            ]
+          },
+          "organism": {
+            "size": "large",
+            "residency": "resident"
+          }
+        }
+      },
+      {
+        "name": "Nassau grouper",
+        "components": {
+          "meta": {
+            "label": "Nassau grouper",
+            "tags": [
+              "fish",
+              "marine life"
+            ]
+          },
+          "organism": {
+            "behavior": "curious toward divers",
+            "residency": "frequently encountered"
+          }
+        }
+      },
+      {
+        "name": "Caribbean reef shark",
+        "components": {
+          "meta": {
+            "label": "Caribbean reef shark",
+            "tags": [
+              "organism",
+              "shark",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "common_name": "Caribbean reef shark",
+            "species_type": "shark"
+          },
+          "location": {
+            "label": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "spotted dolphin",
+        "components": {
+          "meta": {
+            "label": "spotted dolphin",
+            "tags": [
+              "organism",
+              "dolphin",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "common_name": "spotted dolphin",
+            "species_type": "dolphin"
+          },
+          "location": {
+            "label": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "nurse shark",
+        "components": {
+          "meta": {
+            "label": "nurse shark",
+            "tags": [
+              "organism",
+              "shark",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "common_name": "nurse shark",
+            "species_type": "shark"
+          },
+          "location": {
+            "label": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "yellowtail snapper",
+        "components": {
+          "meta": {
+            "label": "yellowtail snapper",
+            "tags": [
+              "organism",
+              "fish",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "common_name": "yellowtail snapper",
+            "species_type": "fish"
+          },
+          "location": {
+            "label": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "French angelfish",
+        "components": {
+          "meta": {
+            "label": "French angelfish",
+            "tags": [
+              "organism",
+              "fish",
+              "angelfish",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "common_name": "French angelfish",
+            "species_type": "fish"
+          },
+          "location": {
+            "label": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "queen angelfish",
+        "components": {
+          "meta": {
+            "label": "queen angelfish",
+            "tags": [
+              "organism",
+              "fish",
+              "angelfish",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "common_name": "queen angelfish",
+            "species_type": "fish"
+          },
+          "location": {
+            "label": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "stoplight parrotfish",
+        "components": {
+          "meta": {
+            "label": "stoplight parrotfish",
+            "tags": [
+              "organism",
+              "fish",
+              "parrotfish",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "common_name": "stoplight parrotfish",
+            "species_type": "fish"
+          },
+          "location": {
+            "label": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "blue tang",
+        "components": {
+          "meta": {
+            "label": "blue tang",
+            "tags": [
+              "organism",
+              "fish",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "common_name": "blue tang",
+            "species_type": "fish"
+          },
+          "location": {
+            "label": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "sergeant major damselfish",
+        "components": {
+          "meta": {
+            "label": "sergeant major damselfish",
+            "tags": [
+              "organism",
+              "fish",
+              "damselfish",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "common_name": "sergeant major damselfish",
+            "species_type": "fish"
+          },
+          "location": {
+            "label": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "foureye butterflyfish",
+        "components": {
+          "meta": {
+            "label": "foureye butterflyfish",
+            "tags": [
+              "organism",
+              "fish",
+              "butterflyfish",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "common_name": "foureye butterflyfish",
+            "species_type": "fish"
+          },
+          "location": {
+            "label": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "trumpetfish",
+        "components": {
+          "meta": {
+            "label": "Trumpetfish",
+            "tags": [
+              "organism",
+              "fish",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "kingdom": "Animalia",
+            "common_name": "Trumpetfish"
+          },
+          "habitat": {
+            "location_ref": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "Caribbean spiny lobster",
+        "components": {
+          "meta": {
+            "label": "Caribbean Spiny Lobster",
+            "tags": [
+              "organism",
+              "lobster",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "kingdom": "Animalia",
+            "common_name": "Caribbean spiny lobster"
+          },
+          "habitat": {
+            "location_ref": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "Cottonwick",
+        "components": {
+          "meta": {
+            "label": "Cottonwick",
+            "tags": [
+              "organism",
+              "fish",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "kingdom": "Animalia",
+            "common_name": "Cottonwick"
+          },
+          "habitat": {
+            "location_ref": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "Giant Caribbean Anemone",
+        "components": {
+          "meta": {
+            "label": "Giant Caribbean Anemone",
+            "tags": [
+              "organism",
+              "anemone",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "kingdom": "Animalia",
+            "common_name": "Giant Caribbean Anemone"
+          },
+          "habitat": {
+            "location_ref": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "Tobaccofish",
+        "components": {
+          "meta": {
+            "label": "Tobaccofish",
+            "tags": [
+              "organism",
+              "fish",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "kingdom": "Animalia",
+            "common_name": "Tobaccofish"
+          },
+          "habitat": {
+            "location_ref": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "Triton's Trumpet",
+        "components": {
+          "meta": {
+            "label": "Triton's Trumpet",
+            "tags": [
+              "organism",
+              "marine life"
+            ]
+          },
+          "taxonomy": {
+            "kingdom": "Animalia",
+            "common_name": "Triton's Trumpet"
+          },
+          "habitat": {
+            "location_ref": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "haloclines",
+        "components": {
+          "meta": {
+            "label": "Haloclines",
+            "content": "Visual phenomenon where fresh and salt water masses meet underwater",
+            "tags": [
+              "phenomenon",
+              "underwater",
+              "visual"
+            ]
+          },
+          "phenomenon": {
+            "cause": "mixing of fresh and salt water",
+            "type": "visual"
+          },
+          "habitat": {
+            "location_ref": "Ben's Blue Hole"
+          }
+        }
+      },
+      {
+        "name": "dive-site-enrichment-system",
+        "components": {
+          "meta": {
+            "label": "Dive Site Enrichment System",
+            "tags": [
+              "system",
+              "author"
+            ]
+          },
+          "role": {
+            "title": "author",
+            "context": "Ben's Blue Hole dive site record"
+          }
+        }
+      }
+    ],
+    "componentChanges": {
+      "extended": [],
+      "invented": [
+        {
+          "name": "dive",
+          "label": "Dive site characteristics",
+          "content": "Information specific to underwater diving locations including depth, visibility, conditions, and access methods.",
+          "fields": {
+            "entry_types": {
+              "type": "string[]",
+              "description": "Methods of accessing the dive site (e.g., shore, boat, day boat)"
+            },
+            "max_depth": {
+              "type": "number",
+              "description": "Maximum depth in meters"
+            },
+            "visibility_min": {
+              "type": "number",
+              "description": "Minimum visibility in meters"
+            },
+            "visibility_max": {
+              "type": "number",
+              "description": "Maximum visibility in meters"
+            },
+            "water_temp_min": {
+              "type": "number",
+              "description": "Minimum water temperature in Celsius"
+            },
+            "water_temp_max": {
+              "type": "number",
+              "description": "Maximum water temperature in Celsius"
+            },
+            "current_min": {
+              "type": "number",
+              "description": "Minimum current strength"
+            },
+            "current_max": {
+              "type": "number",
+              "description": "Maximum current strength"
+            },
+            "confidence": {
+              "type": "number",
+              "description": "Confidence score for the dive site data"
+            },
+            "overall_score": {
+              "type": "number",
+              "description": "Overall quality or rating score for the dive site"
+            }
+          },
+          "rationale": "No existing component covers diving-specific characteristics like depth ranges, visibility, water temperature, currents, and entry methods. These are distinct from general location or facility data and form a coherent cluster specific to dive sites."
+        },
+        {
+          "name": "geology",
+          "label": "Geological characteristics",
+          "content": "Natural geological features and formations including shape, type, and physical structure.",
+          "fields": {
+            "formation_type": {
+              "type": "string",
+              "description": "Type of geological formation (e.g., spring channel, cave, reef)"
+            },
+            "shape": {
+              "type": "string",
+              "description": "Physical shape or structure (e.g., horseshoe, funnel, circular)"
+            },
+            "depth_min": {
+              "type": "number",
+              "description": "Minimum depth in meters"
+            },
+            "depth_max": {
+              "type": "number",
+              "description": "Maximum depth in meters"
+            }
+          },
+          "rationale": "Geological formation characteristics are distinct from physical artifacts or facilities. They describe natural earth features and their structural properties, which don't fit into artifact (man-made), facility (infrastructure), or physical (object properties)."
+        },
+        {
+          "name": "organism",
+          "label": "Living organism characteristics",
+          "content": "Biological and behavioral characteristics of living creatures including diet, behavior, size, and habitat patterns.",
+          "fields": {
+            "behavior": {
+              "type": "string",
+              "description": "Behavioral patterns or characteristics"
+            },
+            "diet": {
+              "type": "string[]",
+              "description": "Food sources or dietary preferences"
+            },
+            "size": {
+              "type": "string",
+              "description": "Physical size description"
+            },
+            "residency": {
+              "type": "string",
+              "description": "Residency or visitation pattern (e.g., resident, regular visitor, migratory)"
+            }
+          },
+          "rationale": "Living organisms have unique characteristics (behavior, diet, biological traits) that don't fit into party (which is for people/organizations) or physical (which is for inanimate objects). This is a distinct domain requiring its own component."
+        },
+        {
+          "name": "jurisdiction",
+          "label": "Political jurisdiction",
+          "content": "Political and administrative boundaries including country, region, and governance codes.",
+          "fields": {
+            "country": {
+              "type": "string",
+              "description": "Country name"
+            },
+            "country_code": {
+              "type": "string",
+              "description": "ISO country code"
+            }
+          },
+          "rationale": "Political jurisdiction information is distinct from ownership (who owns) and location (where it is physically). It describes administrative and political boundaries, which is a separate orthogonal concern."
+        },
+        {
+          "name": "taxonomy",
+          "label": "Taxonomic classification",
+          "content": "Biological classification and species identification information for organisms.",
+          "fields": {
+            "common_name": {
+              "type": "string",
+              "description": "Common or vernacular name of the species"
+            },
+            "scientific_name": {
+              "type": "string",
+              "description": "Binomial nomenclature (genus + species)"
+            },
+            "species_type": {
+              "type": "string",
+              "description": "General category (fish, shark, dolphin, etc.)"
+            },
+            "family": {
+              "type": "string",
+              "description": "Taxonomic family"
+            },
+            "order": {
+              "type": "string",
+              "description": "Taxonomic order"
+            }
+          },
+          "rationale": "No existing component captures biological classification and species identification. This is orthogonal to location (where found), meta (general metadata), and party (which is for agents/people). Taxonomy is a fundamental, reusable concept for any organism entity."
+        },
+        {
+          "name": "taxonomy",
+          "label": "Taxonomic classification",
+          "content": "Biological classification and naming information for organisms.",
+          "fields": {
+            "kingdom": {
+              "type": "string",
+              "description": "The taxonomic kingdom (e.g., Animalia, Plantae)"
+            },
+            "phylum": {
+              "type": "string",
+              "description": "The taxonomic phylum"
+            },
+            "class": {
+              "type": "string",
+              "description": "The taxonomic class"
+            },
+            "order": {
+              "type": "string",
+              "description": "The taxonomic order"
+            },
+            "family": {
+              "type": "string",
+              "description": "The taxonomic family"
+            },
+            "genus": {
+              "type": "string",
+              "description": "The taxonomic genus"
+            },
+            "species": {
+              "type": "string",
+              "description": "The taxonomic species"
+            },
+            "common_name": {
+              "type": "string",
+              "description": "Common or vernacular name"
+            },
+            "scientific_name": {
+              "type": "string",
+              "description": "Binomial nomenclature (genus + species)"
+            }
+          },
+          "rationale": "Biological organisms require taxonomic classification data that is distinct from general metadata, origin, or party information. This is a specialized, reusable component for any biological entity."
+        },
+        {
+          "name": "habitat",
+          "label": "Habitat information",
+          "content": "Where an organism lives or a phenomenon occurs in nature.",
+          "fields": {
+            "location_ref": {
+              "type": "string",
+              "description": "Reference to the location entity where this is found"
+            },
+            "environment_type": {
+              "type": "string",
+              "description": "Type of environment (e.g., marine, terrestrial, freshwater)"
+            },
+            "depth_range": {
+              "type": "string",
+              "description": "Depth range where organism is typically found"
+            },
+            "temperature_range": {
+              "type": "string",
+              "description": "Temperature range of the habitat"
+            }
+          },
+          "rationale": "Habitat is distinct from 'location' (which is geographic coordinates) and 'origin' (which is where something comes from). Habitat describes where organisms or phenomena naturally occur and is reusable across biological and environmental entities."
+        },
+        {
+          "name": "phenomenon",
+          "label": "Natural phenomenon",
+          "content": "Characteristics of observable natural events or occurrences.",
+          "fields": {
+            "type": {
+              "type": "string",
+              "description": "Type of phenomenon (e.g., visual, acoustic, chemical)"
+            },
+            "cause": {
+              "type": "string",
+              "description": "What causes or triggers the phenomenon"
+            },
+            "conditions": {
+              "type": "string[]",
+              "description": "Conditions under which the phenomenon occurs"
+            },
+            "duration": {
+              "type": "string",
+              "description": "How long the phenomenon typically lasts"
+            }
+          },
+          "rationale": "Natural phenomena like haloclines, auroras, or tidal bores are neither incidents (which are problems/disruptions) nor events (which are temporal occurrences). They are observable natural occurrences with specific causes and characteristics, requiring their own component."
+        }
+      ]
+    }
+  }
+}

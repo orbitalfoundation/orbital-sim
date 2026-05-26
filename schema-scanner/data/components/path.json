@@ -1,0 +1,20 @@
+{
+  "slug": "/_schema/path",
+  "components": {
+    "meta": {
+      "label": "path",
+      "content": "A linear travel feature: road, highway, trail, sea route, flight corridor.",
+      "tags": ["schema", "component"]
+    },
+    "schema": {
+      "componentName": "path",
+      "fields": {
+        "kind":      { "type": "string",   "description": "road | highway | trail | sea_route | flight_corridor | river | other" },
+        "direction": { "type": "string",   "description": "north | south | east | west | bidirectional | ..." },
+        "length_km": { "type": "number",   "description": "Length in kilometres if known" },
+        "waypoints": { "type": "string[]", "description": "Slugs of locations the path passes through" }
+      }
+    }
+  },
+  "_provenance": [{ "action": "rename", "rationale": "Renamed from `route`; `path` reads better and pairs cleanly with `location` (point) and `region` (area)." }]
+}

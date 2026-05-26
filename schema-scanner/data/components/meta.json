@@ -1,0 +1,38 @@
+{
+  "slug": "/_schema/meta",
+  "components": {
+    "meta": {
+      "label": "meta",
+      "content": "Universal identity / display metadata. Every entity should carry this.",
+      "tags": [
+        "schema",
+        "component"
+      ]
+    },
+    "schema": {
+      "componentName": "meta",
+      "fields": {
+        "label": {
+          "type": "string",
+          "description": "Display name / title"
+        },
+        "content": {
+          "type": "string",
+          "description": "Body / summary (markdown)"
+        },
+        "depiction": {
+          "type": "string",
+          "description": "Primary image URL"
+        },
+        "tags": {
+          "type": "string[]",
+          "description": "Freeform tags / kinds — also where folk-classification labels live (e.g. 'container ship', 'reef')"
+        },
+        "view": {
+          "type": "string",
+          "description": "View hint (list, map, card, ...)"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "slug": "/_schema/group",
+  "components": {
+    "meta": {
+      "label": "group",
+      "content": "A collection or container for other entities.",
+      "tags": [
+        "schema",
+        "component"
+      ]
+    },
+    "schema": {
+      "componentName": "group",
+      "fields": {
+        "description": {
+          "type": "string",
+          "description": "Group description"
+        },
+        "policy": {
+          "type": "string",
+          "description": "Membership policy: open | closed | invite"
+        }
+      }
+    }
+  },
+  "_seed": true,
+  "_provenance": {
+    "source": "public/shared/schema-components",
+    "name": "group"
+  }
+}

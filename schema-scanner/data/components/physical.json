@@ -1,0 +1,22 @@
+{
+  "slug": "/_schema/physical",
+  "components": {
+    "meta": {
+      "label": "physical",
+      "content": "Intrinsic material/physical properties of a tangible thing. Use `quantity` for amounts and `condition` for state.",
+      "tags": ["schema", "component"]
+    },
+    "schema": {
+      "componentName": "physical",
+      "fields": {
+        "material":   { "type": "string",   "description": "Primary material (steel, wood, creosote, fiberglass, ...)" },
+        "weight_kg":  { "type": "number",   "description": "Mass in kilograms" },
+        "length_m":   { "type": "number",   "description": "Length in metres" },
+        "width_m":    { "type": "number",   "description": "Width in metres" },
+        "height_m":   { "type": "number",   "description": "Height in metres" },
+        "color":      { "type": "string",   "description": "Dominant colour" }
+      }
+    }
+  },
+  "_provenance": [{ "action": "refactor", "rationale": "Replaces the old catchall `physical` (which mixed kind/material/quantity/status). `kind` now lives in meta.tags; `quantity` and `condition` are their own components." }]
+}

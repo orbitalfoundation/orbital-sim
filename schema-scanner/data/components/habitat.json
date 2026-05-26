@@ -1,0 +1,24 @@
+{
+  "slug": "/_schema/habitat",
+  "components": {
+    "meta": {
+      "label": "habitat",
+      "content": "Environmental conditions where an organism lives or a site exists. Useful for dive sites, farms, weather stations.",
+      "tags": ["schema", "component"]
+    },
+    "schema": {
+      "componentName": "habitat",
+      "fields": {
+        "environment":      { "type": "string", "description": "marine | freshwater | brackish | terrestrial | atmospheric | subterranean" },
+        "depth_min_m":      { "type": "number", "description": "Minimum depth below surface (m)" },
+        "depth_max_m":      { "type": "number", "description": "Maximum depth below surface (m)" },
+        "visibility_min_m": { "type": "number", "description": "Minimum visibility (m)" },
+        "visibility_max_m": { "type": "number", "description": "Maximum visibility (m)" },
+        "temp_min_c":       { "type": "number", "description": "Minimum temperature (°C)" },
+        "temp_max_c":       { "type": "number", "description": "Maximum temperature (°C)" },
+        "current_min":      { "type": "number", "description": "Minimum current strength (knots)" },
+        "current_max":      { "type": "number", "description": "Maximum current strength (knots)" }
+      }
+    }
+  }
+}

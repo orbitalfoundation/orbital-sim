@@ -1,0 +1,17 @@
+{
+  "slug": "/_prototype/refuel-event",
+  "kind": "prototype",
+  "label": "Refuelling event",
+  "content": "An act of resupplying a vessel or vehicle with fuel. The Meridian Grace taking on 800 gallons of diesel at $4.12/gal is an instance.",
+  "components": ["meta", "event", "quantity", "location"],
+  "expected_relations": [
+    { "predicate": "fuels",      "object_kind": "vessel" },
+    { "predicate": "supplied_by","object_kind": "party",   "note": "fuel supplier" }
+  ],
+  "defaults": {
+    "meta":  { "tags": ["refuel", "event"] },
+    "event": { "kind": "refuel" }
+  },
+  "neighbours": ["incident", "transaction"],
+  "_provenance": { "source": "hand-authored", "evidence": ["2026-05-01T03-46-19-664Z-small-town-port"], "rationale": "Replaces the dropped `refuel` component with an entity composition; price/amount go in `quantity`, supplier and consumer in `relation`." }
+}

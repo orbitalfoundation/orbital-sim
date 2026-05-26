@@ -1,0 +1,21 @@
+{
+  "name": "schema-test",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ECS-style platonic schema discovery from real-world content via Claude.",
+  "scripts": {
+    "seed": "node bin/seed-components.js",
+    "generate": "node bin/generate-fuel.js",
+    "import": "node bin/import-source.js",
+    "extract": "node bin/extract-entities.js",
+    "derive": "node bin/derive-components.js",
+    "ls": "node bin/list.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "slug": "/_schema/quantity",
+  "components": {
+    "meta": {
+      "label": "quantity",
+      "content": "Atomic amount + unit. Use whenever a count, mass, volume, or duration belongs to an entity (e.g. cargo of 42 pallets, 800 gallons of diesel, 3 fishing boats).",
+      "tags": ["schema", "component"]
+    },
+    "schema": {
+      "componentName": "quantity",
+      "fields": {
+        "amount": { "type": "number", "description": "Numeric value", "required": true },
+        "unit":   { "type": "string", "description": "Unit of measure (pallets, tons, gallons, m, kg, count, ...)", "required": true },
+        "min":    { "type": "number", "description": "Lower bound when the quantity is a range" },
+        "max":    { "type": "number", "description": "Upper bound when the quantity is a range" }
+      }
+    }
+  },
+  "_provenance": [{ "action": "split", "rationale": "Extracted from old `physical.quantity` and `cargo.quantity` so any entity can carry a typed amount." }]
+}

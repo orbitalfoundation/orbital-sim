@@ -1,0 +1,38 @@
+{
+  "slug": "/_schema/location",
+  "components": {
+    "meta": {
+      "label": "location",
+      "content": "A point in space. For an area use `region`; for a line use `path`. `label` lets you name a place when coordinates are unknown.",
+      "tags": [
+        "schema",
+        "component"
+      ]
+    },
+    "schema": {
+      "componentName": "location",
+      "fields": {
+        "label": {
+          "type": "string",
+          "description": "Human-readable place name when coordinates are absent or unknown"
+        },
+        "lat": {
+          "type": "number",
+          "description": "Latitude (WGS84)"
+        },
+        "lon": {
+          "type": "number",
+          "description": "Longitude (WGS84)"
+        },
+        "alt": {
+          "type": "number",
+          "description": "Altitude / depth in metres (negative below sea level)"
+        },
+        "rad": {
+          "type": "number",
+          "description": "Radius / accuracy (metres)"
+        }
+      }
+    }
+  }
+}

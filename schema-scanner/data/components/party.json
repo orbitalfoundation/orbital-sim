@@ -1,0 +1,34 @@
+{
+  "slug": "/_schema/party",
+  "components": {
+    "meta": {
+      "label": "party",
+      "content": "An agent — person, organisation, animal, or autonomous software. Roles, employment, and kinship are expressed as `relation` entities, not as fields here.",
+      "tags": [
+        "schema",
+        "component"
+      ]
+    },
+    "schema": {
+      "componentName": "party",
+      "fields": {
+        "name": {
+          "type": "string",
+          "description": "Full name"
+        },
+        "kind": {
+          "type": "string",
+          "description": "person | organisation | animal | agent"
+        },
+        "email": {
+          "type": "string",
+          "description": "Primary email address"
+        },
+        "bio": {
+          "type": "string",
+          "description": "Short biography"
+        }
+      }
+    }
+  }
+}

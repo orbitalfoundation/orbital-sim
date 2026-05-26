@@ -1,0 +1,18 @@
+{
+  "slug": "/_prototype/organism",
+  "kind": "prototype",
+  "label": "Organism",
+  "content": "A living non-human being. The hawksbill turtles and green moray eels at Ben's Blue Hole are instances. Both individual creatures and species-level entities can use this prototype.",
+  "components": ["meta", "party", "taxonomy", "habitat"],
+  "expected_relations": [
+    { "predicate": "inhabits",  "object_kind": "location" },
+    { "predicate": "predates",  "object_kind": "organism" },
+    { "predicate": "owned_by",  "subject_kind": "party",    "note": "for pets / livestock" }
+  ],
+  "defaults": {
+    "meta":  { "tags": ["organism"] },
+    "party": { "kind": "animal" }
+  },
+  "neighbours": ["person", "plant"],
+  "_provenance": { "source": "hand-authored", "evidence": ["2026-05-01T04-04-45-578Z-dive-bens-blue-hole-bahamas"] }
+}
