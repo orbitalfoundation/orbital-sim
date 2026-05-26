@@ -1,0 +1,14 @@
+{
+  "name": "sim-core",
+  "version": "0.1.0",
+  "description": "Minimal pub/sub kernel + manifest loader for agent simulations.",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "sim-core": "./bin/run.js"
+  },
+  "scripts": {
+    "start": "node bin/run.js",
+    "test": "node test/smoke.js"
+  }
+}
