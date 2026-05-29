@@ -1,0 +1,10 @@
+{
+  "name": "@simulate/utils",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Utility package for simulate workspace (logger tests)",
+  "scripts": {
+    "test": "node test/test.js"
+  }
+}
