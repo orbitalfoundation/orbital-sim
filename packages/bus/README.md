@@ -1,6 +1,18 @@
 # @orbital/bus
 
-Minimal pub/sub kernel + manifest loader for agent simulations. Descended from [orbital-sys](https://github.com/orbitalfoundation/orbital-sys).
+A late-binding, declarative event bus for agent simulations. Descended from [orbital-sys](https://github.com/orbitalfoundation/orbital-sys).
+
+`bus.resolve()` is the single entry point for everything: registering handlers, dispatching events, and querying services. Almost nothing is declared ahead of time. The application assembles itself at runtime from manifests — manifests can load other manifests recursively — each one publishing agents that register themselves, claim their namespace via schema events, and install services onto `bus` (e.g. `bus.volume`, `bus.world`). The result is a real-time compilation of cooperating services, all wired through one channel.
+
+`bus.resolve()` is also a query mechanism. Resolvers that return a value stop the chain and hand the result back to the caller:
+
+```js
+// fire-and-forget — all matching handlers run
+await bus.resolve({ tick: 1, t: 3600, dt: 3600 })
+
+// query — first handler with an answer wins, chain stops
+const nearby = await bus.resolve({ volume_query: { lat: 10.2, lon: -61.5, radius: 500 } })
+```
 
 ## Quick start
 
@@ -22,9 +34,6 @@ await bus.resolve({ load: 'manifest', manifest: '/abs/path/to/manifest.js' })
 ```
 
 ## Design
-
-- unrolls arrays
-- uses an await pattern
 
 - `bus.resolve(event)` walks registered resolvers; each whose filter matches is called in order.
 - Agents are objects with `resolve(event, bus)`. Tick: `{ tick, t, dt }`. Load: `{ load: 'manifest', manifest }`. Remove: `{ resolve_remove: id }`.
