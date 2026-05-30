@@ -4,6 +4,7 @@
   "workspaces": [
     "packages/bus",
     "packages/topo",
-    "packages/utils"
+    "packages/utils",
+    "packages/volume"
   ]
 }
