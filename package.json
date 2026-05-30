@@ -6,6 +6,7 @@
     "packages/topo",
     "packages/utils",
     "packages/spatial",
-    "packages/world"
+    "packages/world",
+    "packages/elevation"
   ]
 }

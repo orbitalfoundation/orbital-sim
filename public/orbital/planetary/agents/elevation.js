@@ -12,11 +12,13 @@ const baseAgent = {
   },
 
   resolve(event, bus) {
-    if (!event.load) return;
+    if (!event.registered && !event.tick) return;
     const world = bus.world;
-    if (!world) return;
+    if (!world || this._initialized) return;
+    this._initialized = true;
     for (const cell of world.cells()) {
-      world.setField(cell.token, 'elevation_m', this.sample(cell));
+      const h = bus.elevation?.sample(cell.lon, cell.lat) ?? this.sample(cell);
+      world.setField(cell.token, 'elevation_m', h);
     }
   },
 };

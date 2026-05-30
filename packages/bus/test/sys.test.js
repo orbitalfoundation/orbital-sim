@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import { createBus } from '../index.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 test('resolver registered during resolve does not receive the current event', async (t) => {
   const sim = createBus();
@@ -68,8 +72,8 @@ test('resolve handles arrays of events and registers embedded resolvers', async 
 
 test('manifest loader handles load event', async (t) => {
   const sim = createBus();
-  const result = await sim.resolve({ load: './test/empty-manifest.js' });
+  const result = await sim.resolve({ load: join(__dirname, 'empty-manifest.js') });
 
   assert.strictEqual(result?.agents?.length, 1);
-  assert.strictEqual(sim.has('logger'), true);
+  assert.strictEqual(sim.has('log_activity_agent'), true);
 });

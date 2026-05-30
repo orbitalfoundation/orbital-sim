@@ -17,7 +17,7 @@ A modular agent based simulation scaffold with a focus on environmental modeling
 npm test
 
 # A planetary baseline example — 4 ticks of 6 h walks the sun around the planet
-node packages/bus/run.js public/anselm/planetary/manifest.js --ticks 4 --dt 21600
+node packages/bus/run.js public/orbital/planetary/manifest.js --ticks 4 --dt 21600
 ```
 
 ## Brief Reference Notes

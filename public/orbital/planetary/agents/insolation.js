@@ -35,7 +35,7 @@ const baseAgent = {
     if (!world) return;
 
     if (event.tick) world.advance(event.dt);
-    if (!event.tick && !event.load) return;
+    if (!event.tick && !event.registered) return;
 
     const t = world.time();
     const decl = solarDeclinationRad(t);

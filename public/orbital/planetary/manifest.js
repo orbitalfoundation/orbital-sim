@@ -1,7 +1,7 @@
-// Planetary baseline scenario.
+// Example planetary baseline scenario.
 //
 // Run with:
-//   node packages/bus/run.js public/anselm/planetary/manifest.js --ticks 4 --dt 21600
+//   node packages/bus/run.js public/orbital/planetary/manifest.js --ticks 4 --dt 21600
 //
 // (21600 s = 6 h, so 4 ticks walks a full day around the planet.)
 
@@ -10,7 +10,7 @@
 // Run scripts/fetch-data.mjs to download the file into .data/.
 export const gebco = {
   elevation: {
-    target: 'elevation/gebco-2024.u16',
+    target: 'public/.data/elevation/gebco-2024.u16',
     url: null,
     sha256: null,
     bytes: null,

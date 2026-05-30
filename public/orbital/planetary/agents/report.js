@@ -1,7 +1,7 @@
 // report — prints a table of every cell + every field after each tick.
 // Drop from the manifest if you don't want the output.
 
-export default {
+const baseReport = {
   id: 'report',
   fields: ['elevation_m', 'tsi_w_m2'],
 
@@ -26,3 +26,7 @@ export default {
     }
   },
 };
+
+baseReport.resolve.after = 'insolation';
+
+export default baseReport;

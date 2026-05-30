@@ -79,15 +79,28 @@ async function resolveTarget(t) {
   return [];
 }
 
+// An ECS-style asset component looks like { target, url, sha256, ... }.
+function isAssetComponent(obj) {
+  return obj && typeof obj === 'object' && !Array.isArray(obj)
+    && (obj.url || obj.target)
+    && Object.prototype.hasOwnProperty.call(obj, 'sha256');
+}
+
 // Lazily import a manifest and return { dir, assets[] }.
+// Assets are ECS components that carry downloadable-file metadata.
 async function readManifestAssets(manifestPath) {
   const mod = await import(pathToFileURL(manifestPath).href);
   const assets = [];
-  for (const [name, value] of Object.entries(mod)) {
-    if (name === 'meta') continue;
+  for (const [exportName, value] of Object.entries(mod)) {
+    if (exportName === 'default') continue;
     const items = Array.isArray(value) ? value : [value];
     for (const v of items) {
-      if (v && typeof v === 'object' && v.kind === 'asset') assets.push(v);
+      if (!v || typeof v !== 'object') continue;
+      for (const [compName, comp] of Object.entries(v)) {
+        if (isAssetComponent(comp)) {
+          assets.push({ ...comp, _entity: exportName, _component: compName });
+        }
+      }
     }
   }
   return { dir: dirname(manifestPath), assets };
@@ -99,43 +112,44 @@ async function processManifest(manifestPath, opts) {
   const rel = relative(process.cwd(), manifestPath);
   console.log(`\n[${rel}]  ${assets.length} asset(s)`);
 
-  const dataDir = join(dir, '.data');
-
   for (const a of assets) {
-    if (!a.name) { console.warn(`  skip: asset missing name`); continue; }
-    const dest = join(dataDir, a.target || a.name);
+    const label = `${a._entity}.${a._component}`;
+    // target is relative to project root; url assets fall back to a .data dir
+    const dest = a.target
+      ? resolve(ROOT, a.target)
+      : join(dir, '.data', a._entity);
     const have = await exists(dest);
 
     if (opts.list) {
-      console.log(`  ${a.name.padEnd(24)} -> ${relative(process.cwd(), dest)}${have ? '  [have]' : ''}`);
+      console.log(`  ${label.padEnd(24)} -> ${relative(process.cwd(), dest)}${have ? '  [have]' : ''}`);
       continue;
     }
 
     if (opts.verify) {
-      if (!have) { console.log(`  MISSING  ${a.name}`); continue; }
-      if (!a.sha256) { console.log(`  SKIP     ${a.name} (no sha256)`); continue; }
+      if (!have) { console.log(`  MISSING  ${label}`); continue; }
+      if (!a.sha256) { console.log(`  SKIP     ${label} (no sha256)`); continue; }
       const sum = await sha256File(dest);
-      console.log(`  ${sum === a.sha256 ? 'OK      ' : 'MISMATCH'} ${a.name}`);
+      console.log(`  ${sum === a.sha256 ? 'OK      ' : 'MISMATCH'} ${label}`);
       continue;
     }
 
     if (have && !opts.force) {
       if (a.sha256) {
         const sum = await sha256File(dest);
-        if (sum === a.sha256) { console.log(`  have     ${a.name} (sha256 ok)`); continue; }
-        console.log(`  stale    ${a.name} (sha256 mismatch; re-fetching)`);
+        if (sum === a.sha256) { console.log(`  have     ${label} (sha256 ok)`); continue; }
+        console.log(`  stale    ${label} (sha256 mismatch; re-fetching)`);
       } else {
-        console.log(`  have     ${a.name} (no sha256 to verify; use --force to redownload)`);
+        console.log(`  have     ${label} (no sha256 to verify; use --force to redownload)`);
         continue;
       }
     }
 
     if (!a.url || a.status === 'placeholder') {
-      console.error(`  SKIP     ${a.name}: placeholder/no url — fill in url + sha256 in ${rel}`);
+      console.error(`  SKIP     ${label}: placeholder/no url — fill in url + sha256 in ${rel}`);
       continue;
     }
 
-    console.log(`  fetch    ${a.name} <- ${a.url}`);
+    console.log(`  fetch    ${label} <- ${a.url}`);
     try {
       await fetchTo(a.url, dest);
       if (a.sha256) {
