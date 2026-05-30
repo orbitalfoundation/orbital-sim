@@ -1,35 +1,21 @@
-import assert from 'assert';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import Logger from '../src/logger.js';
+import { mulberry32 } from '../src/random.js';
 
 function captureStdout(fn) {
   const out = [];
   const orig = process.stdout.write;
-  process.stdout.write = (chunk, encoding, cb) => {
-    out.push(String(chunk));
-    if (typeof cb === 'function') cb();
-    return true;
-  };
-  try {
-    fn();
-  } finally {
-    process.stdout.write = orig;
-  }
+  process.stdout.write = (chunk, encoding, cb) => { out.push(String(chunk)); if (typeof cb === 'function') cb(); return true; };
+  try { fn(); } finally { process.stdout.write = orig; }
   return out.join('');
 }
 
 function captureStderr(fn) {
   const out = [];
   const orig = process.stderr.write;
-  process.stderr.write = (chunk, encoding, cb) => {
-    out.push(String(chunk));
-    if (typeof cb === 'function') cb();
-    return true;
-  };
-  try {
-    fn();
-  } finally {
-    process.stderr.write = orig;
-  }
+  process.stderr.write = (chunk, encoding, cb) => { out.push(String(chunk)); if (typeof cb === 'function') cb(); return true; };
+  try { fn(); } finally { process.stderr.write = orig; }
   return out.join('');
 }
 
@@ -37,39 +23,52 @@ function singleNonEmptyLine(s) {
   return s.split('\n').map(l => l.trim()).filter(Boolean);
 }
 
-// 1) Basic log: multiple args and object formatting
-const out1 = captureStdout(() => Logger.log('hello', { a: 1 }, 42));
-console.log('Captured LOG =>', out1.trim());
-assert(out1.includes('LOG'), 'Logger.log should include LOG');
-assert(out1.includes('hello'), 'Logger.log should include message');
-assert(out1.includes('"a":1') || out1.includes('a:1'), 'Logger.log should include JSON of object');
-assert(out1.includes('42'), 'Logger.log should include numeric arg');
-assert(/\[\d{2}:\d{2}:\d{2}\.\d{3}\]/.test(out1), 'Logger.log should include timestamp');
-assert(singleNonEmptyLine(out1).length === 1, 'Logger.log output should be a single line');
+test('Logger.log: timestamp, level, args on one line', () => {
+  const out = captureStdout(() => Logger.log('hello', { a: 1 }, 42));
+  assert.ok(out.includes('LOG'));
+  assert.ok(out.includes('hello'));
+  assert.ok(out.includes('"a":1') || out.includes('a:1'));
+  assert.ok(out.includes('42'));
+  assert.ok(/\[\d{2}:\d{2}:\d{2}\.\d{3}\]/.test(out));
+  assert.equal(singleNonEmptyLine(out).length, 1);
+});
 
-// 2) info/debug behave like log but include level
-const outInfo = captureStdout(() => Logger.info('info!', { ok: true }));
-console.log('Captured INFO =>', outInfo.trim());
-assert(outInfo.includes('INFO'), 'Logger.info should include INFO');
+test('Logger.info includes INFO level', () => {
+  const out = captureStdout(() => Logger.info('info!', { ok: true }));
+  assert.ok(out.includes('INFO'));
+});
 
-const outDebug = captureStdout(() => Logger.debug('dbg', [1,2,3]));
-console.log('Captured DEBUG =>', outDebug.trim());
-assert(outDebug.includes('DEBUG'), 'Logger.debug should include DEBUG');
+test('Logger.debug includes DEBUG level', () => {
+  const out = captureStdout(() => Logger.debug('dbg', [1, 2, 3]));
+  assert.ok(out.includes('DEBUG'));
+});
 
-// 3) warn includes caller file:line and goes to stderr
-const outWarn = captureStderr(() => Logger.warn('watch out', { x: 2 }));
-console.log('Captured WARN =>', outWarn.trim());
-assert(outWarn.includes('WARN'), 'Logger.warn should include WARN');
-const callerRefPattern = /packages\/utils\/test\/test\.js:\d+/;
-assert(callerRefPattern.test(outWarn) || outWarn.includes('test/test.js:'), 'Logger.warn should include caller file:line reference (test/test.js)');
-assert(singleNonEmptyLine(outWarn).length === 1, 'Logger.warn output should be a single line');
+test('Logger.warn goes to stderr with caller file:line', () => {
+  const out = captureStderr(() => Logger.warn('watch out', { x: 2 }));
+  assert.ok(out.includes('WARN'));
+  assert.ok(/test\.js:\d+/.test(out), 'should include caller file:line');
+  assert.equal(singleNonEmptyLine(out).length, 1);
+});
 
-// 4) error with Error object prints error message concisely
-const outErr = captureStderr(() => Logger.error(new Error('boom'), 'extra'));
-console.log('Captured ERROR =>', outErr.trim());
-assert(outErr.includes('ERROR'), 'Logger.error should include ERROR');
-assert(outErr.includes('boom'), 'Logger.error should include error message');
-// ensure no multiline stack traces are emitted in the basic logger
-assert(singleNonEmptyLine(outErr).length === 1, 'Logger.error should be a single concise line (no multiline stack)');
+test('Logger.error with Error prints message on one line', () => {
+  const out = captureStderr(() => Logger.error(new Error('boom'), 'extra'));
+  assert.ok(out.includes('ERROR'));
+  assert.ok(out.includes('boom'));
+  assert.equal(singleNonEmptyLine(out).length, 1);
+});
 
-console.log('All logger tests passed');
+test('mulberry32 produces deterministic sequence', () => {
+  const r = mulberry32(42);
+  const a = [r(), r(), r()];
+  const r2 = mulberry32(42);
+  const b = [r2(), r2(), r2()];
+  assert.deepEqual(a, b);
+});
+
+test('mulberry32 values are in [0, 1)', () => {
+  const r = mulberry32(99);
+  for (let i = 0; i < 100; i++) {
+    const v = r();
+    assert.ok(v >= 0 && v < 1, `value ${v} out of range`);
+  }
+});
