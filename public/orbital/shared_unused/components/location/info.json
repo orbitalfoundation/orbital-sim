@@ -1,0 +1,19 @@
+{
+  "slug": "/_schema/location",
+  "components": {
+    "meta": {
+      "label": "location",
+      "content": "Geographic coordinates.",
+      "tags": ["schema", "component"]
+    },
+    "schema": {
+      "componentName": "location",
+      "fields": {
+        "lat": { "type": "number", "description": "Latitude",  "required": true },
+        "lon": { "type": "number", "description": "Longitude", "required": true },
+        "alt": { "type": "number", "description": "Altitude (meters)" },
+        "rad": { "type": "number", "description": "Radius / accuracy (meters)" }
+      }
+    }
+  }
+}

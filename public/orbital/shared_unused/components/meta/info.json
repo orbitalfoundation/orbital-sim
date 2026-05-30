@@ -1,0 +1,21 @@
+{
+  "slug": "/_schema/meta",
+  "components": {
+    "meta": {
+      "label": "meta",
+      "content": "Common metadata — every entity should have this.",
+      "tags": ["schema", "component"]
+    },
+    "schema": {
+      "componentName": "meta",
+      "version": 1.0,
+      "fields": {
+        "label":     { "type": "string",   "description": "Display name / title" },
+        "content":   { "type": "string",   "description": "Body text (markdown)" },
+        "depiction": { "type": "string",   "description": "Image URL" },
+        "tags":      { "type": "string[]", "description": "Freeform tags / kinds" },
+        "view":      { "type": "string",   "description": "View hint (list, map, card, etc.)" }
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "slug": "/_schema/relation",
+  "components": {
+    "meta": {
+      "label": "relation",
+      "content": "A relationship between two entities.",
+      "tags": ["schema", "component"]
+    },
+    "schema": {
+      "componentName": "relation",
+      "fields": {
+        "subject":   { "type": "string", "description": "Slug of the source entity", "required": true },
+        "predicate": { "type": "string", "description": "Relationship type (childOf, memberOf, etc.)", "required": true },
+        "object":    { "type": "string", "description": "Slug of the target entity", "required": true },
+        "strength":  { "type": "number", "description": "Relationship strength (0-1)" }
+      }
+    }
+  }
+}
