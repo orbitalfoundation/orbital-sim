@@ -1,5 +1,7 @@
 # planetary
 
+May 26 2026
+
 A pack of self-contained agents for the abiotic basics — sun, surface, air,
 water — that everything else in a simulation lives on top of.
 

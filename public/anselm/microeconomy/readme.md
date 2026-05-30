@@ -1,0 +1,1 @@
+this folder is unused - the idea is to simulate a few macro economic domains - may 26 2026

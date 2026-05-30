@@ -1,0 +1,70 @@
+{
+  "name": "Micro Market Sketch",
+  "space": {
+    "cellSize": 1
+  },
+  "agentModules": [
+    {
+      "id": "producer",
+      "path": "./agents/producer.js"
+    },
+    {
+      "id": "consumer",
+      "path": "./agents/consumer.js"
+    }
+  ],
+  "instances": [
+    {
+      "id": "producer-1",
+      "agentType": "producer",
+      "state": {
+        "inventory": 100,
+        "price": 10
+      },
+      "params": {
+        "production": 5,
+        "costPerUnit": 3
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": ["supply"]
+    },
+    {
+      "id": "producer-2",
+      "agentType": "producer",
+      "state": {
+        "inventory": 80,
+        "price": 11
+      },
+      "params": {
+        "production": 4,
+        "costPerUnit": 3.5
+      },
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "tags": ["supply"]
+    },
+    {
+      "id": "consumer-1",
+      "agentType": "consumer",
+      "state": {
+        "cash": 1000,
+        "holdings": 0
+      },
+      "params": {
+        "demandPerDay": 5,
+        "maxPrice": 15
+      },
+      "position": {
+        "x": 1,
+        "y": 1
+      },
+      "tags": ["demand"]
+    }
+  ],
+  "initialEvents": []
+}
