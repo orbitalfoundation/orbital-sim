@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// bus CLI — load a manifest, run ticks, emit done.
+// this is a convenience helper to load and run manifest
 
 import { createBus } from './index.js';
 
@@ -7,7 +7,6 @@ function parseFlags(argv) {
   // Minimal flag parser for positional manifest path plus optional args.
   const out = { ticks: 1, dt: 1, t0: 0 };
   const positional = [];
-
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--ticks') out.ticks = Number(argv[++i]);
@@ -16,7 +15,6 @@ function parseFlags(argv) {
     else if (a === '--help' || a === '-h') out.help = true;
     else positional.push(a);
   }
-
   out.manifest = positional[0];
   return out;
 }
@@ -47,15 +45,19 @@ async function main() {
     ? (isNaN(Date.parse(opts.t0)) ? Number(opts.t0) : new Date(opts.t0).getTime() / 1000)
     : Number(opts.t0) || 0;
 
+  // build a bus and trigger a load event
   const bus = createBus({ tStart });
   const result = await bus.resolve({ load: 'manifest', manifest: opts.manifest });
 
   console.error(`[bus] loaded ${result?.agents?.length ?? 0} agent(s) from ${result?.manifestPath}`);
-  if (result?.meta?.name) console.error(`[bus] scenario: ${result.meta.name}`);
   console.error(`[bus] running ${opts.ticks} tick(s), dt=${opts.dt}s`);
 
+  // run the bus for a while
   await bus.resolve({ run: true, ticks: opts.ticks, dt: opts.dt });
+
+  // @todo it is nice to publish a 'done' event but unnecessary - pollutes the root namespace also
   await bus.resolve({ done: true });
+
 }
 
 main().catch((err) => {
