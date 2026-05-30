@@ -1,78 +1,65 @@
-# Simulate workspace
+# simulate
 
-May 24 2026
-Previous: April 18 2026
+A modular agent-simulation workspace. A minimal pub/sub kernel runs scenarios composed of declarative manifests and small agent files.
 
-# Approach - May 24 2026
+## Structure
 
-    - first try to decompose a set of stereotypical kinds of concepts to model; perhaps by scanning
-    - then try to build representations of those objects
-    - try do macro stellar forces first (irradiation)
+```
+sim-core/           kernel, manifest loader, tick driver, CLI
+scripts/            fetch-data.mjs — downloads declared assets into scenario .data/
+public/             scenarios (one dir per author/scenario)
+  anselm/
+    planetary/      baseline: elevation, insolation, world grid, report
+sim-core-claude/    predecessor engine — preserved as reference, not used
+public-anselm-old/  archived scenarios (microeconomy, oil-trade, tuvalu)
+notes/              design notes
+wiki/               longer-form docs
+```
 
-# Folders - Apr 18 2026
+## How it works
 
-- /public ... a location for independent projects - later surfaced on the web
-- /schema-scanner ... automated schema discovery tests
-- /sim-core-claude ... claudes approach to a simulation engine core
-- /wiki ... some notes - may redistribute later
+**`sim-core`** provides three things:
 
-# Systems to model - Apr 18 2026
+1. **`createSim()`** — a pub/sub resolver chain. Agents are objects with a `resolve(event, sim)` method. Events are plain objects: `{ tick, t, dt }`, `{ load, manifest }`, `{ remove: id }`. Filters are shallow key-existence checks; ordering via `resolve.before` / `resolve.after`.
+2. **`loadManifest(path)`** — ESM files; every named export is an entry (arrays flattened). Entries with `ref` dynamic-import a template and merge overrides. Installs `sim.scenario` (dir, dataDir, assets, assetPath, requireAsset).
+3. **`runTicks(sim, { ticks, dt })`** — opt-in tick driver.
 
-- tenerife futures conference
-- island of tulva
-- macro economic future trends; will world have dead zones?
-- strait of hormuz
+`sim` is passed to every resolver call — not on `globalThis` — so multiple sims can run in parallel and tests are fully isolated.
 
-# Approaches - Apr 18 2026
+## Running
 
-- lower level: 'simjs' core similar to threejs exposing powerful features for an llm
-    - time, weather, oceans, geography
-    - physics
-    - spatial indexing and fast queries
-    - cellular models?
-    - vector models?
+```sh
+# kernel sanity check (no I/O)
+node sim-core/test/smoke.js
 
-- higher level: data wrappers
-    - my ecs schemas
-    - agents
-    - folder concepts for individual sims with reuse across models
+# empty manifest
+node sim-core/src/run.js sim-core/test/empty-manifest.js --ticks 3 --dt 60
 
-# Components to simulate - Apr 18 2026
+# planetary baseline — 4 ticks of 6 h walks the sun around the planet
+node sim-core/src/run.js public/anselm/planetary/manifest.js --ticks 4 --dt 21600
 
-- macroscopic planetary forces
+# list assets any scenario declares
+node scripts/fetch-data.mjs --list
+```
 
-    - sunlight / irradiance
-    - tides
-    - temperature, freezing evaporation; day / night cycles
-    - air, co2
+Verified: June solstice noon UTC peak at 30°N is 1308 W/m² (Cooper 1969).
 
-- geography itself
+## Assets
 
-    - elevation data DEMS
-    - water, salinity, turbidity; river systems, entire oceans
-    - underground water reserves, porosity
-    - soil, earth, rock? different soil types
-    - microbial populations
-    - forests and so on
+Scenarios declare data files in their manifest with `kind: 'asset'`. Run `scripts/fetch-data.mjs` to download them into each scenario's `.data/` (gitignored, sha256-validated). Agents call `sim.scenario.requireAsset(name)` — never raw `fs`.
 
-- animals
-    - fish etc
+## Reserved vocabulary
 
-- human populations
-    - roads, dams, fences, housing
-    - industrial waste
-    - zoning
-    - oil refineries etc
-    - energy consumption
-    - waste products
-    - food consumption
-    - farming
-    - cattle maturation etc
-    - soil exhaustion
-    - economic scarcity
-    - viruses
+| Category | Keys |
+|---|---|
+| Registered objects | `id, ref, resolve, parent, children` |
+| Events | `tick, t, dt, load, remove, done, force_sys_abort` |
+| Manifest exports | `meta` (scenario metadata, not an entry) |
+| Entry kinds | `agent` (default), `asset` |
 
-- scoring
-    - how do we predict food scarcity?
-    - measures of diversity
-    - happiness?
+## What's next
+
+1. Real elevation — replace synthetic cosine in `elevation.js` with a GEBCO raster lookup via a `sim.raster` service.
+2. Atmospheric absorption — Beer–Lambert clear-sky transmissivity agent, then `radiation_balance`.
+3. Agent spatial index — `sim.agents` service bucketing positioned entities by cell.
+4. Snapshotting / replay — JSONL event log agent; replay is free from pub/sub.
