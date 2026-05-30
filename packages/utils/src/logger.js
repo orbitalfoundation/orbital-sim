@@ -1,9 +1,18 @@
 import * as path from 'path';
 
 // Terse standalone logger.
-// - Single-line output
+// - Single-line output with colored prefixes
 // - Captures raw console.* calls when `installConsoleCapture()` is run
 // - Includes caller `file:line` for `warn` and `error` (and when an Error is passed)
+
+const COLORS = {
+  LOG: '\x1b[36m',    // cyan
+  INFO: '\x1b[36m',   // cyan
+  DEBUG: '\x1b[35m',  // magenta
+  WARN: '\x1b[33m',   // yellow
+  ERROR: '\x1b[31m',  // red
+  RESET: '\x1b[0m',
+};
 
 function nowStamp() {
     const d = new Date();
@@ -79,7 +88,9 @@ function make(kind, consoleFn, includeSource) {
             return a;
         });
         const body = singleLine(...parts);
-        const prefix = `[${nowStamp()}] ${kind.toUpperCase()}${src ? ' ' + src : ''}`;
+        const kindUpper = kind.toUpperCase();
+        const color = COLORS[kindUpper] || COLORS.RESET;
+        const prefix = `${color}[${nowStamp()}] ${kindUpper}${src ? ' ' + src : ''}${COLORS.RESET}`;
         consoleFn(prefix + ' ' + body);
     };
 }
