@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/bus",
+    "packages/topo",
+    "packages/utils"
+  ]
+}

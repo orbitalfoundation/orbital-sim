@@ -1,0 +1,18 @@
+{
+  "name": "@orbital/bus",
+  "version": "2.0.0",
+  "type": "module",
+  "main": "src/bus.js",
+  "private": true,
+  "description": "Pub/sub event bus for agent-based simulations",
+  "dependencies": {
+    "@orbital/utils": "file:../utils"
+  },
+  "bin": {
+    "bus": "./run.js"
+  },
+  "scripts": {
+    "test": "node --test test/index.js",
+    "smoke": "node test/smoke.js"
+  }
+}
