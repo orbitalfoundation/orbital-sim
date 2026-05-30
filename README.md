@@ -5,61 +5,53 @@ A modular agent-simulation workspace. A minimal pub/sub kernel runs scenarios co
 ## Structure
 
 ```
-sim-core/           kernel, manifest loader, tick driver, CLI
-scripts/            fetch-data.mjs — downloads declared assets into scenario .data/
-public/             scenarios (one dir per author/scenario)
+packages/
+  bus/        pub/sub kernel — createBus(), manifest loader, tick driver, schema registry
+  spatial/    geographic indexing — bus.spatial, ll/llextent, proximity queries
+  world/      cell grid + field store — bus.world, setField/getField
+  utils/      shared logger + mulberry32 PRNG
+public/
   anselm/
-    planetary/      baseline: elevation, insolation, world grid, report
-sim-core-claude/    predecessor engine — preserved as reference, not used
-public-anselm-old/  archived scenarios (microeconomy, oil-trade, tuvalu)
-notes/              design notes
-wiki/               longer-form docs
+    planetary/  baseline scenario: elevation, insolation, world grid, report
+notes/          design notes
 ```
 
 ## How it works
 
-**`sim-core`** provides three things:
+`bus.resolve(event)` is the single entry point. Agents are objects with `resolve(event, bus)`. The bus walks its resolver list; handlers whose filter matches are called in order. A handler that returns a non-undefined value stops the chain — this doubles as a query mechanism.
 
-1. **`createSim()`** — a pub/sub resolver chain. Agents are objects with a `resolve(event, sim)` method. Events are plain objects: `{ tick, t, dt }`, `{ load, manifest }`, `{ remove: id }`. Filters are shallow key-existence checks; ordering via `resolve.before` / `resolve.after`.
-2. **`loadManifest(path)`** — ESM files; every named export is an entry (arrays flattened). Entries with `ref` dynamic-import a template and merge overrides. Installs `sim.scenario` (dir, dataDir, assets, assetPath, requireAsset).
-3. **`runTicks(sim, { ticks, dt })`** — opt-in tick driver.
+Manifests are ESM files. Each named export becomes an entry. Entries with a `resolve` function are registered as agents; all others are dispatched as bus events for component handlers to process. `inherits: './path/or/package'` loads a template and shallow-merges the entry on top.
 
-`sim` is passed to every resolver call — not on `globalThis` — so multiple sims can run in parallel and tests are fully isolated.
+```js
+// fire-and-forget
+await bus.resolve({ tick: 1, t: 3600, dt: 3600 })
+
+// query — first handler with an answer wins
+const nearby = await bus.resolve({ spatial_query: { near: [-122, 49], radius: 500 } })
+```
 
 ## Running
 
 ```sh
-# kernel sanity check (no I/O)
-node sim-core/test/smoke.js
-
-# empty manifest
-node sim-core/src/run.js sim-core/test/empty-manifest.js --ticks 3 --dt 60
+npm test                    # run all package tests
 
 # planetary baseline — 4 ticks of 6 h walks the sun around the planet
-node sim-core/src/run.js public/anselm/planetary/manifest.js --ticks 4 --dt 21600
-
-# list assets any scenario declares
-node scripts/fetch-data.mjs --list
+node packages/bus/run.js public/anselm/planetary/manifest.js --ticks 4 --dt 21600
 ```
-
-Verified: June solstice noon UTC peak at 30°N is 1308 W/m² (Cooper 1969).
-
-## Assets
-
-Scenarios declare data files in their manifest with `kind: 'asset'`. Run `scripts/fetch-data.mjs` to download them into each scenario's `.data/` (gitignored, sha256-validated). Agents call `sim.scenario.requireAsset(name)` — never raw `fs`.
 
 ## Reserved vocabulary
 
-| Category | Keys |
+| | keys |
 |---|---|
-| Registered objects | `id, ref, resolve, parent, children` |
-| Events | `tick, t, dt, load, remove, done, force_sys_abort` |
-| Manifest exports | `meta` (scenario metadata, not an entry) |
-| Entry kinds | `agent` (default), `asset` |
+| Registered objects | `id, inherits, resolve` |
+| Events | `tick, t, dt, load, obliterate, registered, done, run, schema` |
 
-## What's next
+## Packages
 
-1. Real elevation — replace synthetic cosine in `elevation.js` with a GEBCO raster lookup via a `sim.raster` service.
-2. Atmospheric absorption — Beer–Lambert clear-sky transmissivity agent, then `radiation_balance`.
-3. Agent spatial index — `sim.agents` service bucketing positioned entities by cell.
-4. Snapshotting / replay — JSONL event log agent; replay is free from pub/sub.
+**`@orbital/bus`** — kernel. `createBus()` returns a bus with `resolve`, `register`, `install`, `has`, `get`, `list`. Three built-in handlers auto-registered: manifest loader, schema handler, tick driver.
+
+**`@orbital/spatial`** — geographic index. Register `spatialHandler`, then dispatch `{ id, spatial: { ll: [lon, lat, elev] } }` to index an entity. Query with `{ spatial_query: { near: [lon, lat], radius } }`.
+
+**`@orbital/world`** — cell grid + field store. Use via `inherits: '@orbital/world'` in a manifest entry. Installs `bus.world` on registration.
+
+**`@orbital/utils`** — `Logger` (default export) and `mulberry32(seed)` seeded PRNG.
