@@ -2,7 +2,7 @@
   "name": "@orbital/utils",
   "version": "2.0.0",
   "type": "module",
-  "main": "src/logger.js",
+  "main": "index.js",
   "private": true,
   "description": "Utility package for simulate workspace (logger tests)",
   "scripts": {
