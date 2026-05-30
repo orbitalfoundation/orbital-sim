@@ -68,7 +68,7 @@ test('resolve handles arrays of events and registers embedded resolvers', async 
 
 test('manifest loader handles load event', async (t) => {
   const sim = createBus();
-  const result = await sim.resolve({ load: 'manifest', manifest: './test/empty-manifest.js' });
+  const result = await sim.resolve({ load: './test/empty-manifest.js' });
 
   assert.strictEqual(result?.agents?.length, 1);
   assert.strictEqual(sim.has('logger'), true);

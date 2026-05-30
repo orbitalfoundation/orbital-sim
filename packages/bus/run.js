@@ -47,7 +47,7 @@ async function main() {
 
   // build a bus and trigger a load event
   const bus = createBus({ tStart });
-  const result = await bus.resolve({ load: 'manifest', manifest: opts.manifest });
+  const result = await bus.resolve({ load: opts.manifest });
 
   console.error(`[bus] loaded ${result?.agents?.length ?? 0} agent(s) from ${result?.manifestPath}`);
   console.error(`[bus] running ${opts.ticks} tick(s), dt=${opts.dt}s`);

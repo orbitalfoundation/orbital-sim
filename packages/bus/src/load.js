@@ -1,13 +1,14 @@
 // load — manifest loader for the orbital bus.
 //
-// Responds to: { load: 'manifest', manifest: '<absolute-or-relative-path>' }
+// Responds to: { load: 'path/to/manifest.js' }
+//          or: { load: ['path1.js', 'path2.js'] }
 //
 // For each named export in the manifest:
 //   - entries with a resolve function (after inherits resolution) are registered as agents
 //   - all other entries are dispatched as bus events — component handlers process them
 
 import { pathToFileURL } from 'node:url';
-import { resolve as resolvePath, dirname, isAbsolute, join } from 'node:path';
+import { resolve as resolvePath, dirname, isAbsolute } from 'node:path';
 import logger from '@orbital/utils';
 
 async function resolveInherits(entry, baseDir) {
@@ -36,59 +37,56 @@ function pushFlat(out, value, defaultId) {
   if (value == null) return;
   if (Array.isArray(value)) { for (const v of value) pushFlat(out, v); return; }
   if (typeof value !== 'object') return;
+  // @todo may be better to mutate the source rather than clone — see design notes
   if (defaultId && !value.id && !value.name) value = { ...value, id: defaultId };
   out.push(value);
+}
+
+async function doLoad(manifestPath, bus) {
+  const abs = isAbsolute(manifestPath)
+    ? manifestPath
+    : resolvePath(process.cwd(), manifestPath);
+
+  const mod = await import(pathToFileURL(abs).href);
+  const baseDir = dirname(abs);
+
+  // @todo arrays are unrolled here; harmless but not strictly necessary
+  const entries = [];
+  for (const [name, value] of Object.entries(mod)) {
+    if (name === 'default') pushFlat(entries, value);
+    else pushFlat(entries, value, name);
+  }
+
+  // @todo inherited base files could be cached once per bus — minor optimisation
+  const registered = [];
+  for (const entry of entries) {
+    if (!entry || typeof entry !== 'object') continue;
+    const resolved = await resolveInherits(entry, baseDir);
+    if (!resolved) continue;
+
+    if (typeof resolved.resolve === 'function') {
+      bus.register(resolved);
+      registered.push(resolved);
+    } else {
+      await bus.resolve(resolved);
+    }
+  }
+
+  return { agents: registered, manifestPath: abs };
 }
 
 export const manifestLoader = {
   id: 'bus.manifest-loader',
 
   resolve: async function(event, bus) {
+    // handle { load: 'path' } or { load: ['path1', 'path2'] }
+    if (typeof event.load !== 'string' && !Array.isArray(event.load)) return;
 
-    // @todo it is unclear why something needs both event.load AND a manifest
-    if (event.load !== 'manifest' || event.loaded) return;
-    if (!event.manifest) {
-      logger.error('[bus] load event missing manifest path');
-      return;
+    const paths = Array.isArray(event.load) ? event.load : [event.load];
+    let result;
+    for (const path of paths) {
+      result = await doLoad(path, bus);
     }
-
-    const abs = isAbsolute(event.manifest)
-      ? event.manifest
-      : resolvePath(process.cwd(), event.manifest);
-
-    const mod = await import(pathToFileURL(abs).href);
-    const baseDir = dirname(abs);
-
-    // @todo this line suggests a bus is handling only a single scenario at a time - a major design choice that requires thought
-    bus.scenario = { dir: baseDir, dataDir: join(baseDir, '.data'), manifestPath: abs };
-
-    // @todo i see that we're unrolling arrays here; it isn't absolutely critical to do that here - harmless however so we can leave it
-    // @todo i see that we clone the values and decorate them with their own name/id - may be better to mutate the source
-    const entries = [];
-    for (const [name, value] of Object.entries(mod)) {
-      if (name === 'default') pushFlat(entries, value);
-      else pushFlat(entries, value, name);
-    }
-
-    // here we are doing inherit - @todo we could cache those inherited base files once
-    // @todo i see we have a tendency to call bus.register directly; even though bus.resolve can do that
-    const registered = [];
-    for (const entry of entries) {
-      if (!entry || typeof entry !== 'object') continue;
-      const resolved = await resolveInherits(entry, baseDir);
-      if (!resolved) continue;
-
-      if (typeof resolved.resolve === 'function') {
-        bus.register(resolved);
-        registered.push(resolved);
-      } else {
-        await bus.resolve(resolved);
-      }
-    }
-
-    // @todo i see we call ourselves again with a more complete manifest ... hmmm. feels complicated.
-    // @todo think about the idea of how a scenario is collected as a group
-    await bus.resolve({ load: 'manifest', manifest: abs, count: registered.length, loaded: true });
-    return { agents: registered, manifestPath: abs };
+    return result;
   },
 };
