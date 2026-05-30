@@ -1,28 +1,28 @@
-// volume — spatial indexing service for the orbital bus.
+// spatial — geographic indexing service for the orbital bus.
 //
 // ll: [lon, lat, elevation]  — GeoJSON / cartesian order (x, y, z); elevation in metres
 // llextent: [[lon,lat,elev],[lon,lat,elev]]  — SW corner, NE corner
 //
 // Dynamic entities (no resolve fn) are indexed automatically when they pass through the bus.
-// Resolver-based agents that have a spatial presence should dispatch their own volume on load:
-//   bus.resolve({ id: this.id, volume: this.volume })
+// Resolver-based agents that have a spatial presence should dispatch their own spatial on load:
+//   bus.resolve({ id: this.id, spatial: this.spatial })
 //
-// Query via bus:   const hits = await bus.resolve({ volume_query: { near: [lon,lat], radius: 5000 } })
-// Query directly:  bus.volume.query({ near: [lon,lat], radius: 5000 })
+// Query via bus:   const hits = await bus.resolve({ spatial_query: { near: [lon,lat], radius: 5000 } })
+// Query directly:  bus.spatial.query({ near: [lon,lat], radius: 5000 })
 
 import logger from '@orbital/utils';
 
-const DEG_PER_CELL = 1;          // ~111 km per cell; configurable at createVolumeService()
+const DEG_PER_CELL = 1;          // ~111 km per cell; configurable at createSpatialService()
 const METERS_PER_DEG = 111_000;  // equirectangular approximation
 
 function cellKey(lon, lat, cellDeg) {
   return `${Math.floor(lon / cellDeg)}:${Math.floor(lat / cellDeg)}`;
 }
 
-function center(vol) {
-  if (vol.ll) return vol.ll;
-  if (vol.llextent) {
-    const [a, b] = vol.llextent;
+function center(spatial) {
+  if (spatial.ll) return spatial.ll;
+  if (spatial.llextent) {
+    const [a, b] = spatial.llextent;
     return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, ((a[2] ?? 0) + (b[2] ?? 0)) / 2];
   }
   return null;
@@ -37,12 +37,12 @@ function distMeters(a, b) {
   return R * Math.sqrt(dLat * dLat + (dLon * cosLat) * (dLon * cosLat));
 }
 
-function cellsFor(vol, cellDeg) {
-  if (vol.ll) {
-    return [cellKey(vol.ll[0], vol.ll[1], cellDeg)];
+function cellsFor(spatial, cellDeg) {
+  if (spatial.ll) {
+    return [cellKey(spatial.ll[0], spatial.ll[1], cellDeg)];
   }
-  if (vol.llextent) {
-    const [a, b] = vol.llextent;
+  if (spatial.llextent) {
+    const [a, b] = spatial.llextent;
     const x0 = Math.floor(Math.min(a[0], b[0]) / cellDeg);
     const x1 = Math.floor(Math.max(a[0], b[0]) / cellDeg);
     const y0 = Math.floor(Math.min(a[1], b[1]) / cellDeg);
@@ -56,19 +56,19 @@ function cellsFor(vol, cellDeg) {
   return [];
 }
 
-function createVolumeService(cellDeg = DEG_PER_CELL) {
+function createSpatialService(cellDeg = DEG_PER_CELL) {
   const grid = new Map();     // cellKey → Set<id>
-  const entities = new Map(); // id → { id, volume }
+  const entities = new Map(); // id → { id, spatial }
 
-  function upsert(id, vol) {
+  function upsert(id, spatial) {
     // remove stale index entries for this id
     if (entities.has(id)) {
-      for (const k of cellsFor(entities.get(id).volume, cellDeg)) {
+      for (const k of cellsFor(entities.get(id).spatial, cellDeg)) {
         grid.get(k)?.delete(id);
       }
     }
-    entities.set(id, { id, volume: vol });
-    for (const k of cellsFor(vol, cellDeg)) {
+    entities.set(id, { id, spatial });
+    for (const k of cellsFor(spatial, cellDeg)) {
       if (!grid.has(k)) grid.set(k, new Set());
       grid.get(k).add(id);
     }
@@ -77,7 +77,7 @@ function createVolumeService(cellDeg = DEG_PER_CELL) {
   function remove(id) {
     const e = entities.get(id);
     if (!e) return;
-    for (const k of cellsFor(e.volume, cellDeg)) grid.get(k)?.delete(id);
+    for (const k of cellsFor(e.spatial, cellDeg)) grid.get(k)?.delete(id);
     entities.delete(id);
   }
 
@@ -99,7 +99,7 @@ function createVolumeService(cellDeg = DEG_PER_CELL) {
             seen.add(id);
             const e = entities.get(id);
             if (!e) continue;
-            const c = center(e.volume);
+            const c = center(e.spatial);
             if (c && distMeters(near, c) <= radius) results.push(e);
           }
         }
@@ -120,25 +120,22 @@ function createVolumeService(cellDeg = DEG_PER_CELL) {
   return { upsert, remove, query, get size() { return entities.size; } };
 }
 
-export const volumeHandler = {
-  id: 'bus.volume',
+export const spatialHandler = {
+  id: 'bus.spatial',
 
   resolve(event, bus) {
-    // lazy-init per bus instance
-    if (!bus.volume) {
-      bus.volume = createVolumeService();
-      // claim component and query namespaces
-      bus.resolve({ id: 'bus.volume-schema', schema: { volume: true, volume_query: true } });
+    if (event.registered) {
+      bus.install('spatial', createSpatialService());
+      bus.resolve({ schema: { spatial: true, spatial_query: true } });
+      return;
     }
 
-    // query: first handler to answer stops the chain
-    if (event.volume_query) {
-      return bus.volume.query(event.volume_query);
+    if (event.spatial_query) {
+      return bus.spatial.query(event.spatial_query);
     }
 
-    // index any entity with spatial data
-    if (event.id && event.volume && (event.volume.ll || event.volume.llextent)) {
-      bus.volume.upsert(event.id, event.volume);
+    if (event.id && event.spatial && (event.spatial.ll || event.spatial.llextent)) {
+      bus.spatial.upsert(event.id, event.spatial);
     }
   },
 };

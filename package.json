@@ -5,6 +5,7 @@
     "packages/bus",
     "packages/topo",
     "packages/utils",
-    "packages/volume"
+    "packages/spatial",
+    "packages/world"
   ]
 }

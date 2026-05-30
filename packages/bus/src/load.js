@@ -1,124 +1,35 @@
-// load — manifest loader for sim-core.
+// load — manifest loader for the orbital bus.
 //
-// The loader is a normal kernel resolver and responds to the event:
-//   { load: 'manifest', manifest: '<path>' }
+// Responds to: { load: 'manifest', manifest: '<absolute-or-relative-path>' }
 //
-// When the manifest is loaded, the loader installs sim.scenario, registers
-// agent resolvers, and emits a follow-up loaded event so newly registered
-// handlers can respond.
+// For each named export in the manifest:
+//   - entries with a resolve function (after inherits resolution) are registered as agents
+//   - all other entries are dispatched as bus events — component handlers process them
 
 import { pathToFileURL } from 'node:url';
-import { resolve as resolvePath, dirname, isAbsolute, join, relative } from 'node:path';
-import { statSync } from 'node:fs';
+import { resolve as resolvePath, dirname, isAbsolute, join } from 'node:path';
+import logger from '@orbital/utils';
 
-const RESERVED_EXPORTS = new Set(['meta']);
-
-export const manifestLoader = {
-  id: 'sim-core.manifest-loader',
-  resolve: async function (event, sim) {
-      if (event.load !== 'manifest' || event.loaded) return;
-      if (!event.manifest) {
-        console.error('[sim-core] load event missing manifest path', event);
-        return;
-      }
-
-      const abs = resolveManifestPath(event.manifest);
-      const { meta, registered, scenario } = await doLoadManifest(sim, abs);
-
-      await sim.resolve({
-        load: 'manifest',
-        manifest: abs,
-        meta,
-        count: registered.length,
-        assets: scenario.assets.size,
-        loaded: true,
-      });
-
-      return { meta, agents: registered, manifestPath: abs, scenario };
-  },
-};
-
-export async function loadManifest(sim, manifestPath) {
-  const result = await sim.resolve({ load: 'manifest', manifest: manifestPath });
-  return result;
+async function resolveInherits(entry, baseDir) {
+  if (!entry.inherits) return entry;
+  const spec = entry.inherits;
+  const importTarget = isImportSpecifier(spec)
+    ? spec
+    : pathToFileURL(resolvePath(baseDir, spec)).href;
+  let mod;
+  try {
+    mod = await import(importTarget);
+  } catch (err) {
+    logger.error(`[bus] failed to import '${spec}':`, err.message);
+    return null;
+  }
+  const template = mod.default ?? mod;
+  return { ...template, ...entry };
 }
 
-function resolveManifestPath(manifestPath) {
-  return isAbsolute(manifestPath) ? manifestPath : resolvePath(process.cwd(), manifestPath);
-}
-
-async function doLoadManifest(sim, abs) {
-  const url = pathToFileURL(abs).href;
-  const mod = await import(url);
-  const baseDir = dirname(abs);
-  const meta = mod.meta || {};
-
-  const entries = [];
-  for (const [name, value] of Object.entries(mod)) {
-    if (RESERVED_EXPORTS.has(name)) continue;
-    if (name === 'default') pushFlat(entries, value);
-    else pushFlat(entries, value, name);
-  }
-
-  const scenario = createScenario({ dir: baseDir, manifestPath: abs, meta });
-  sim.scenario = scenario;
-
-  const registered = [];
-  for (const entry of entries) {
-    if (!entry || typeof entry !== 'object') continue;
-    const kind = entry.kind || (entry.ref || typeof entry.resolve === 'function' ? 'agent' : null);
-    if (kind === 'asset') {
-      if (!entry.name) {
-        console.warn(`[sim-core] asset entry missing 'name'; skipping`, entry);
-        continue;
-      }
-      scenario.assets.set(entry.name, entry);
-      continue;
-    }
-    if (kind !== 'agent') continue;
-    const agent = await resolveAgent(entry, baseDir);
-    if (!agent) continue;
-    sim.register(agent);
-    registered.push(agent);
-  }
-
-  return { meta, registered, scenario };
-}
-
-function createScenario({ dir, manifestPath, meta }) {
-  const dataDir = join(dir, '.data');
-  const assets = new Map();
-
-  function assetPath(name) {
-    const a = assets.get(name);
-    if (!a) {
-      throw new Error(
-        `[sim-core] no asset named '${name}' declared in manifest ${relative(process.cwd(), manifestPath)}`
-      );
-    }
-    return join(dataDir, a.target || name);
-  }
-
-  function hasAsset(name) {
-    if (!assets.has(name)) return false;
-    try { statSync(assetPath(name)); return true; } catch { return false; }
-  }
-
-  function requireAsset(name) {
-    const p = assetPath(name);
-    try { statSync(p); return p; }
-    catch {
-      const rel = relative(process.cwd(), manifestPath);
-      const scenarioDir = relative(process.cwd(), dir);
-      throw new Error(
-        `[sim-core] missing asset '${name}' for ${rel}\n` +
-        `  expected at: ${p}\n` +
-        `  run: node scripts/fetch-data.mjs ${scenarioDir}`
-      );
-    }
-  }
-
-  return { dir, dataDir, manifestPath, meta, assets, assetPath, hasAsset, requireAsset };
+function isImportSpecifier(s) {
+  return /^(https?:|file:|node:|[a-z@][\w@\-./]*$)/i.test(s)
+    && !s.startsWith('./') && !s.startsWith('../') && !s.startsWith('/');
 }
 
 function pushFlat(out, value, defaultId) {
@@ -129,18 +40,55 @@ function pushFlat(out, value, defaultId) {
   out.push(value);
 }
 
-async function resolveAgent(entry, baseDir) {
-  if (!entry.ref) return entry;
-  const spec = entry.ref;
-  const importTarget = isImportSpecifier(spec)
-    ? spec
-    : pathToFileURL(resolvePath(baseDir, spec)).href;
-  const mod = await import(importTarget);
-  const template = mod.default ?? mod;
-  return { ...template, ...entry };
-}
+export const manifestLoader = {
+  id: 'bus.manifest-loader',
 
-function isImportSpecifier(s) {
-  return /^(https?:|file:|node:|[a-z@][\w@\-./]*$)/i.test(s)
-    && !s.startsWith('./') && !s.startsWith('../') && !s.startsWith('/');
-}
+  resolve: async function(event, bus) {
+
+    // @todo it is unclear why something needs both event.load AND a manifest
+    if (event.load !== 'manifest' || event.loaded) return;
+    if (!event.manifest) {
+      logger.error('[bus] load event missing manifest path');
+      return;
+    }
+
+    const abs = isAbsolute(event.manifest)
+      ? event.manifest
+      : resolvePath(process.cwd(), event.manifest);
+
+    const mod = await import(pathToFileURL(abs).href);
+    const baseDir = dirname(abs);
+
+    // @todo this line suggests a bus is handling only a single scenario at a time - a major design choice that requires thought
+    bus.scenario = { dir: baseDir, dataDir: join(baseDir, '.data'), manifestPath: abs };
+
+    // @todo i see that we're unrolling arrays here; it isn't absolutely critical to do that here - harmless however so we can leave it
+    // @todo i see that we clone the values and decorate them with their own name/id - may be better to mutate the source
+    const entries = [];
+    for (const [name, value] of Object.entries(mod)) {
+      if (name === 'default') pushFlat(entries, value);
+      else pushFlat(entries, value, name);
+    }
+
+    // here we are doing inherit - @todo we could cache those inherited base files once
+    // @todo i see we have a tendency to call bus.register directly; even though bus.resolve can do that
+    const registered = [];
+    for (const entry of entries) {
+      if (!entry || typeof entry !== 'object') continue;
+      const resolved = await resolveInherits(entry, baseDir);
+      if (!resolved) continue;
+
+      if (typeof resolved.resolve === 'function') {
+        bus.register(resolved);
+        registered.push(resolved);
+      } else {
+        await bus.resolve(resolved);
+      }
+    }
+
+    // @todo i see we call ourselves again with a more complete manifest ... hmmm. feels complicated.
+    // @todo think about the idea of how a scenario is collected as a group
+    await bus.resolve({ load: 'manifest', manifest: abs, count: registered.length, loaded: true });
+    return { agents: registered, manifestPath: abs };
+  },
+};

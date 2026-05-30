@@ -1,13 +1,13 @@
-// report — diagnostic agent. Prints a table of every cell + every field
-// after each tick. Drop from the manifest if you don't want the noise.
+// report — prints a table of every cell + every field after each tick.
+// Drop from the manifest if you don't want the output.
 
 export default {
   id: 'report',
   fields: ['elevation_m', 'tsi_w_m2'],
 
-  resolve(event, sim) {
+  resolve(event, bus) {
     if (!event.tick && !event.done) return;
-    const world = sim.world;
+    const world = bus.world;
     if (!world) return;
 
     const header = ['lat', 'lon', ...this.fields];

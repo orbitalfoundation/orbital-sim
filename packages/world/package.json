@@ -1,0 +1,8 @@
+{
+  "name": "@orbital/world",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "private": true,
+  "description": "Cell grid + field store for the orbital bus — installs bus.world on load"
+}

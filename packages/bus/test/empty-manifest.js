@@ -1,11 +1,6 @@
 // An intentionally boring manifest: declares one agent that just logs ticks.
 // Used by CLI smoke test.
 
-export const meta = {
-  name: 'empty-system',
-  description: 'Smallest possible manifest — one tick-logging agent.',
-};
-
 export const logger = {
   id: 'logger',
   resolve(event) {

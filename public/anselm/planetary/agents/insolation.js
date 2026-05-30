@@ -1,7 +1,7 @@
 // insolation — top-of-atmosphere shortwave irradiance per cell.
 //
-// Pure astronomical forcing. Writes `tsi_w_m2` to sim.world every tick (and
-// once at `load` so the initial state has values).
+// Pure astronomical forcing. Writes tsi_w_m2 to bus.world every tick (and
+// once at load so the initial state has values).
 //
 // Physics: Cooper 1969 declination, eccentricity correction, hour angle from
 // UTC + cell longitude. Not modelled: atmosphere, clouds, slope/aspect.
@@ -29,10 +29,9 @@ function hourAngleRad(date, lonDeg) {
 
 const baseAgent = {
   id: 'insolation',
-  label: 'Top-of-atmosphere shortwave irradiance',
 
-  resolve(event, sim) {
-    const world = sim.world;
+  resolve(event, bus) {
+    const world = bus.world;
     if (!world) return;
 
     if (event.tick) world.advance(event.dt);

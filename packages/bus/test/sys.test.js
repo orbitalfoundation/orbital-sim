@@ -22,10 +22,11 @@ test('resolver registered during resolve does not receive the current event', as
 
   sim.register(registrar);
   await sim.resolve({ load: true });
-  assert.deepEqual(received, []);
+  // child gets { registered: true } at registration time, not the load event that triggered it
+  assert.deepEqual(received, ['other']);
 
   await sim.resolve({ tick: true });
-  assert.deepEqual(received, ['tick']);
+  assert.deepEqual(received, ['other', 'tick']);
 });
 
 test('resolve ignores invalid non-object events', async (t) => {
@@ -35,17 +36,20 @@ test('resolve ignores invalid non-object events', async (t) => {
   await assert.doesNotReject(async () => sim.resolve('hello'));
 });
 
-test('remove event deletes a resolver', async (t) => {
+test('obliterate removes a resolver after it has seen the event', async () => {
   const sim = createBus();
+  let sawObliterate = false;
   const agent = {
     id: 'removable',
-    resolve() {
-      throw new Error('should not run');
+    resolve(event) {
+      if (event.registered) return;
+      if (event.obliterate) sawObliterate = true;
     },
   };
   sim.register(agent);
   assert.strictEqual(sim.has('removable'), true);
-  await sim.resolve({ resolve_remove: 'removable' });
+  await sim.resolve({ id: 'removable', obliterate: true });
+  assert.strictEqual(sawObliterate, true, 'handler saw the obliterate event before removal');
   assert.strictEqual(sim.has('removable'), false);
 });
 
@@ -66,8 +70,6 @@ test('manifest loader handles load event', async (t) => {
   const sim = createBus();
   const result = await sim.resolve({ load: 'manifest', manifest: './test/empty-manifest.js' });
 
-  assert.strictEqual(result?.meta?.name, 'empty-system');
   assert.strictEqual(result?.agents?.length, 1);
   assert.strictEqual(sim.has('logger'), true);
-  assert.strictEqual(sim.scenario.meta.name, 'empty-system');
 });
