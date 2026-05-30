@@ -1,0 +1,10 @@
+{
+  "name": "@orbital/topo",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "main": "src/topo.js",
+  "dependencies": {
+    "@orbital/utils": "file:../utils"
+  }
+}
