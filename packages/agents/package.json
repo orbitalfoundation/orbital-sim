@@ -1,0 +1,13 @@
+{
+  "name": "@orbital/agents",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Canonical orbital agents — spatial indexing, elevation, insolation, reporting",
+  "scripts": {
+    "test": "node --test test/agents.test.js"
+  },
+  "dependencies": {
+    "@orbital/utils": "*"
+  }
+}
