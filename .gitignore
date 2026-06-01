@@ -1,3 +1,6 @@
+.data
+public/.data
+simulate.world.old.reference
 node_modules
 todo.md
 old

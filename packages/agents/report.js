@@ -17,7 +17,7 @@ const reportAgent = {
     const cells = bus.insolation?.cells() ?? [];
     if (!cells.length) return;
 
-    const t = new Date(event.t * 1000).toISOString();
+    const t = event.t != null ? new Date(event.t * 1000).toISOString() : 'done';
     const header = ['lat', 'lon', ...this.fields];
     console.log(`\n[t=${t}]  tick ${event.tick ?? '-'}`);
     console.log(header.map(h => h.padStart(10)).join(''));

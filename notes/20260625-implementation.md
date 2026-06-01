@@ -1,4 +1,4 @@
-# 2026-06-25 notes
+# 20260625 notes on implementation approaches
 
 ## code that we need:
 
