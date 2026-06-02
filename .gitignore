@@ -1,5 +1,4 @@
 .data
-Wiki.svelte
 public/.data
 simulate.world.old.reference
 todo.md
@@ -16,5 +15,6 @@ public/*/*/.data/
 
 .DS_Store
 **/.DS_Store
+.claude/
 dist/
 website/server/*.pem
