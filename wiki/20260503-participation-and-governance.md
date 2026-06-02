@@ -6,6 +6,28 @@ The two communities — modelers and participatory governance practitioners — 
 
 ---
 
+## Why collective reasoning fails
+
+Before cataloguing the tools and traditions, it's worth being precise about what they're trying to fix. Democratic deliberation is not merely slow or politically contentious — it has structural failure modes that arise from information asymmetries, not just from bad faith or tribalism. Several recurring patterns:
+
+**1. Expert–lay asymmetry.** One party holds a model (the engineer's pipe-capacity spreadsheet, the seismic hazard map, the grid load forecast) and the other holds lived experience. The technical account is often correct but illegible to non-specialists; the experiential account is legible but partial. The failure here is translation, not disagreement. Stormwater, structural risk, grid load — most infrastructure decisions live in this gap.
+
+**2. Distributional engagement asymmetry.** Cost and benefit land on different people, and participation tracks cost. A bike lane removes twelve parking spots — those twelve people show up furious — to benefit three thousand cyclists who don't appear because each gains only a little. The process systematically overweights the concentrated loser not because the losers are wrong but because diffuse beneficiaries can't see or organize around their own stake. The *information* problem is that aggregate benefit is invisible to the individuals who compose it.
+
+**3. Temporal asymmetry.** Cost now, benefit deferred — or the reverse. Deferred maintenance, pension liabilities, wildfire fuel reduction, transit capital investment. Human cognition and political cycles both discount the future steeply, so the long-range term is structurally invisible at decision time. Counterfactuals (what didn't burn, what didn't fail) are almost impossible to argue from in a room. A model can at least make the future term visible and legible.
+
+**4. Absent-stakeholder problem.** In housing and zoning, the most affected party — the person who would live in the units if they were built — is not in the room, cannot vote, and has no formal channel. The same applies to future generations on climate and infrastructure, to future patients on health facility siting, to non-human species on land use decisions. The asymmetry here isn't hidden information; it's that a whole class of stakeholders may not yet exist or have no mechanism to express interest. A model can give absent and non-human stakeholders a computable voice by making their interests explicit rather than ignored.
+
+**5. Coupling asymmetry.** Citizens experience issues as separate single-topic problems: traffic is bad, rent is high, the school is overcrowded. These are often coupled outputs of one system — adding housing without transit loads roads; fixing roads without addressing zoning raises rents. No single stakeholder sees the links. Proposals that fix one silo silently load the others, and the connections only become apparent after implementation. Interactive scenario tools let participants trace consequences across the whole system before committing.
+
+**6. Strategic asymmetry.** Some stakeholders have direct incentive to misrepresent. A developer underestimates traffic impact; an opponent inflates it. Both are gaming a rhetorical process where numbers are assertions, not shared objects. A shared computational model doesn't prevent bias in the inputs, but it makes the model inspectable — opponents can challenge assumptions rather than trading competing assertions — and separates the structural question (what does this model predict?) from the values question (what should we do?).
+
+**7. Emotionally radioactive issues.** Some decisions are simply too charged to surface in public deliberation — conversations shut down before they start. Structured and sometimes anonymous engagement tools can make these issues discussable by lowering the social cost of honest expression. The goal is not to bypass emotion but to keep it from preventing the information from being heard at all.
+
+These are not problems that more voting solves. They are problems of information structure — who holds which piece of the picture, why the pieces don't add up in any single party's head, and why our rhetoric-based, majority-rule decision processes are systematically blind to whole classes of stakes. The traditions below are different attempts to address them.
+
+---
+
 ## The lineage
 
 ### Cybernetics and governance
