@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Orbital</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='7' fill='none' stroke='%230fd4bc' stroke-width='2'/><ellipse cx='16' cy='16' rx='14' ry='5' fill='none' stroke='%230fd4bc' stroke-width='1.5' opacity='.6'/></svg>" />
+</head>
+<body>
+  <div id="app"></div>
+  <!-- process.nextTick shim — must run before any module loads.
+       Web3Auth's EIP1193 provider uses readable-stream which calls process.nextTick
+       as a true global; vite-plugin-node-polyfills injects it as a module import
+       which lazy chunks don't inherit. -->
+  <script>
+    window.process = window.process || {};
+    if (!window.process.nextTick) {
+      window.process.nextTick = function nextTick(fn) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        setTimeout(function() { fn.apply(null, args); }, 0);
+      };
+    }
+  </script>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -113,3 +113,23 @@ Very interested in modeling these; I see a lot of speculation here. It also make
 
 - simulate this:
 - https://katu.com/news/local/people-for-the-elimination-of-animal-cruelty-exemption-controversial-petition-aims-criminalize-ban-hunting-fishing-pest-control-oregon
+
+- just a ton of articles on hormuz oil:
+    - https://x.com/Mark4XX/status/2060859047050399774
+    - https://x.com/shanaka86/status/2061254566843466226
+    - https://x.com/EdwardTWinz/status/2061126249389449260
+    - https://x.com/shanaka86/status/2033713550972358849 <- helium
+    - https://shanakaanslemperera.substack.com
+
+- https://www.theatlantic.com/magazine/2025/12/trump-climate-change-acceleration/684632/
+
+- https://news.agu.org/press-release/middle-east-north-africa-warming/ 
+- https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2024JD041625
+
+
+https://www.indiatoday.in/science/story/india-heatwave-deaths-study-extreme-heat-public-health-emergency-climate-change-2920200-2026-06-01
+
+this isn't so much as model as simply a dataset - it is kind of neat
+i wonder if it makes sense to have stuff like this?
+New eDNA initiative aims to make freshwater quality monitoring more accessible by combining traditional macro-invertebrate surveys with cutting-edge eDNA sequencing to build a future Taxonomic Independent Community Index (TICI) in Denmark
+https://x.com/evohologen/status/2061387420554113297

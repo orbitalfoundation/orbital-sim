@@ -1,9 +1,21 @@
 {
   "private": true,
   "type": "module",
+  "scripts": {
+    "start": "node --env-file=website/server/.env website/server/index.js",
+    "dev": "concurrently -n server,client -c cyan,magenta \"node --env-file=website/server/.env --watch website/server/index.js\" \"cd website/client && npm run dev\"",
+    "dev:server": "node --env-file=website/server/.env --watch website/server/index.js",
+    "build": "cd website/client && npm run build",
+    "build:watch": "cd website/client && npm run dev"
+  },
   "workspaces": [
     "packages/bus",
     "packages/utils",
-    "packages/agents"
-  ]
+    "packages/agents",
+    "packages/server",
+    "website/server"
+  ],
+  "devDependencies": {
+    "concurrently": "^10.0.1"
+  }
 }

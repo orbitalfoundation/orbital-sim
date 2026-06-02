@@ -1,9 +1,11 @@
 .data
+Wiki.svelte
 public/.data
 simulate.world.old.reference
-node_modules
 todo.md
 old
+can 
+node_modules
 raw_ingestion_data
 node_packages
 .env
@@ -14,3 +16,5 @@ public/*/*/.data/
 
 .DS_Store
 **/.DS_Store
+dist/
+website/server/*.pem
