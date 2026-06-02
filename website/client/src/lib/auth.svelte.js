@@ -1,11 +1,10 @@
-// Auth — Web3Auth no-modal integration.
+// Auth — Web3Auth no-modal v9 integration.
 // Requires VITE_WEB3AUTH_CLIENT_ID in website/client/.env
 // Sessions are token-based (Authorization: Bearer <token>), no cookies.
 //
-// Uses redirect mode (uiConfig.uxMode = 'redirect') because Google's OAuth page sets
-// Cross-Origin-Opener-Policy: same-origin, which nulls window.opener in the popup and
-// prevents Web3Auth's postMessage callback from reaching our page. Redirect mode avoids
-// the popup entirely: the whole page navigates to Google and back.
+// Uses redirect mode because Google's OAuth page sets Cross-Origin-Opener-Policy: same-origin,
+// which nulls window.opener in the popup and prevents the postMessage callback from working.
+// Redirect mode avoids the popup: the whole page navigates to the OAuth provider and back.
 
 const CLIENT_ID = import.meta.env.VITE_WEB3AUTH_CLIENT_ID ?? '';
 
@@ -13,20 +12,31 @@ let _web3auth = null;
 
 async function getWeb3Auth() {
   if (_web3auth) return _web3auth;
-  const [{ Web3AuthNoModal }, { CHAIN_NAMESPACES }] = await Promise.all([
+  const [{ Web3AuthNoModal }, { CHAIN_NAMESPACES }, { AuthAdapter }, { CommonPrivateKeyProvider }] = await Promise.all([
     import('@web3auth/no-modal'),
     import('@web3auth/base'),
+    import('@web3auth/auth-adapter'),
+    import('@web3auth/base-provider'),
   ]);
+  const chainConfig = {
+    chainNamespace: CHAIN_NAMESPACES.OTHER,
+    chainId: '0x0',
+    rpcTarget: 'http://localhost',  // unused — OTHER namespace makes no RPC calls
+  };
+  // v9: privateKeyProvider must be passed so no-modal can call setKeyExportFlag on it
+  // when project config returns key_export_enabled. CommonPrivateKeyProvider skips
+  // EIP-1559 probing and other chain calls — safe for auth-only (no wallet) use.
+  const privateKeyProvider = new CommonPrivateKeyProvider({ config: { chainConfig } });
   _web3auth = new Web3AuthNoModal({
     clientId: CLIENT_ID,
     web3AuthNetwork: 'sapphire_mainnet',
-    // OTHER skips EIP1193 Ethereum provider setup (setupWeb3/readable-stream).
-    chainConfig: { chainNamespace: CHAIN_NAMESPACES.OTHER },
-    // redirect mode: no popup, full-page navigation to OAuth provider and back.
-    // Passed via uiConfig because no-modal v10 reads uiConfig.uxMode into connectorSettings.
-    uiConfig: { uxMode: 'redirect' },
+    privateKeyProvider,
   });
-  // init() processes any pending OAuth redirect result stored in localStorage.
+  // v9: social login requires an explicitly configured AuthAdapter.
+  _web3auth.configureAdapter(new AuthAdapter({
+    adapterSettings: { uxMode: 'redirect' },
+  }));
+  // init() on the redirect-return page automatically processes the stored OAuth result.
   await _web3auth.init();
   return _web3auth;
 }
@@ -72,19 +82,13 @@ class Auth {
     this.loading = true;
     try {
       const w3a = await getWeb3Auth();
-      // Wait until the auth connector is ready to accept a new connection.
-      for (let i = 0; i < 50; i++) {
-        const s = w3a.getConnector?.('auth')?.status;
-        if (s === 'ready' || s === 'connected') break;
-        await new Promise(r => setTimeout(r, 100));
-      }
-      if (w3a.getConnector?.('auth')?.status === 'connected') await w3a.logout();
+      // If already connected from a previous session, log out first.
+      if (w3a.connected) await w3a.logout();
       // sessionStorage survives same-tab OAuth redirects (cleared only when tab closes).
-      // This flag lets checkRedirect know the return leg of the redirect is ours.
       sessionStorage.setItem('orbital_oauth_pending', '1');
       // In redirect mode connectTo navigates the page away — nothing after it runs.
-      await w3a.connectTo('auth', { authConnection: provider });
-      // Only reached if the connector fell back to popup mode:
+      await w3a.connectTo('auth', { loginProvider: provider });
+      // Only reached if the adapter fell back to popup mode:
       sessionStorage.removeItem('orbital_oauth_pending');
       await this._finishLogin(w3a);
     } catch (err) {
@@ -102,19 +106,18 @@ class Auth {
     this.loading = true;
     try {
       const w3a = await getWeb3Auth();
-      // init() above processes the redirect result; wait until the connector reaches 'connected'.
-      // v10: this transition can lag behind init() resolving, so poll up to 10s.
-      for (let i = 0; i < 100; i++) {
-        const s = w3a.getConnector?.('auth')?.status;
-        if (s === 'connected') break;
+      // v9: init() above automatically processes the OAuth redirect result.
+      // After init() resolves, w3a.connected should be true if the redirect succeeded.
+      // Brief poll in case the status update lags behind init() resolving.
+      for (let i = 0; i < 50; i++) {
+        if (w3a.connected) break;
         await new Promise(r => setTimeout(r, 100));
       }
-      const authStatus = w3a.getConnector?.('auth')?.status;
       sessionStorage.removeItem('orbital_oauth_pending');
-      if (authStatus === 'connected') {
+      if (w3a.connected) {
         await this._finishLogin(w3a);
       } else {
-        console.warn('[auth] redirect: connector did not connect, status:', authStatus);
+        console.warn('[auth] redirect: not connected after init, status:', w3a.status);
       }
     } catch (err) {
       sessionStorage.removeItem('orbital_oauth_pending');
@@ -127,7 +130,7 @@ class Auth {
     try {
       await fetch('/api/auth/session', { method: 'DELETE', headers: this.headers });
       const w3a = await getWeb3Auth().catch(() => null);
-      if (w3a?.getConnector?.('auth')?.status === 'connected') await w3a.logout();
+      if (w3a?.connected) await w3a.logout();
     } catch { /* best effort */ }
     this.user  = null;
     this.token = null;
