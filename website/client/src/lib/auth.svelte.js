@@ -70,6 +70,7 @@ class Auth {
     const { token } = await res.json();
     this.token = token;
     this.user  = { name: info.name, email: info.email, profileImage: info.profileImage };
+    console.log('[auth] signed in:', info.name, info.email);
     sessionStorage.setItem('orbital_token', token);
     sessionStorage.setItem('orbital_user',  JSON.stringify(this.user));
   }

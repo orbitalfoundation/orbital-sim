@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MENA Warming — Orbital</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: ui-monospace, monospace;
+    font-size: 14px;
+    background: light-dark(#f5f5f0, #0d0d12);
+    color: light-dark(#1a1a2e, #c8c8d8);
+    padding: 3rem 2rem;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  nav { margin-bottom: 2rem; color: light-dark(#555, #888); }
+  nav a { color: inherit; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  h1 { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+  .byline { color: light-dark(#666, #888); margin-bottom: 2rem; }
+  section { margin-bottom: 2rem; }
+  h2 { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+       color: light-dark(#888, #666); margin-bottom: 0.75rem; }
+  .status-row { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1rem; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #444; flex-shrink: 0; }
+  .dot.running { background: #4a9; animation: pulse 1.4s ease-in-out infinite; }
+  .dot.error   { background: #c44; }
+  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.4 } }
+  #status { color: light-dark(#666, #888); }
+  #log {
+    background: light-dark(#eee, #0a0a10);
+    border: 1px solid light-dark(#ddd, #1e1e28);
+    padding: 1rem;
+    height: 200px;
+    overflow-y: auto;
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+  #log .entry { color: light-dark(#555, #999); }
+  #log .entry span { color: light-dark(#1a1a2e, #c8c8d8); }
+  button {
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 0.4rem 1rem;
+    background: light-dark(#1a1a2e, #c8c8d8);
+    color: light-dark(#f5f5f0, #0d0d12);
+    border: none;
+    cursor: pointer;
+  }
+  button:hover { opacity: 0.8; }
+  button:disabled { opacity: 0.4; cursor: default; }
+  .cite { font-size: 0.82rem; color: light-dark(#888, #666); }
+  .cite a { color: inherit; }
+</style>
+</head>
+<body>
+
+<nav><a href="/">orbital</a> / <a href="/anselm/">anselm</a> / africa_middle_east_warming_2049</nav>
+
+<h1>Middle East &amp; North Africa — Accelerated Warming</h1>
+<p class="byline">Stub scenario · insolation baseline only · energy balance model pending</p>
+
+<section>
+  <h2>Simulation</h2>
+  <div class="status-row">
+    <div class="dot" id="dot"></div>
+    <span id="status">Stopped.</span>
+    <button id="btn" onclick="toggle()">Start</button>
+  </div>
+  <div id="log"><div class="entry">— waiting —</div></div>
+</section>
+
+<section>
+  <h2>Reference</h2>
+  <p class="cite">
+    Malik et al. (2024). Accelerated Historical and Future Warming in the Middle East and North Africa.
+    <em>Journal of Geophysical Research: Atmospheres.</em>
+    <a href="https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2024JD041625" target="_blank">doi:10.1029/2024JD041625</a>
+  </p>
+</section>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/orbital-client.js"></script>
+<script>
+  const dot    = document.getElementById('dot');
+  const status = document.getElementById('status');
+  const log    = document.getElementById('log');
+  const btn    = document.getElementById('btn');
+
+  let session = null;
+
+  function appendLog(text) {
+    const d = document.createElement('div');
+    d.className = 'entry';
+    d.innerHTML = text;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+    if (log.children.length === 1 && log.children[0].textContent === '— waiting —') log.children[0].remove();
+  }
+
+  async function toggle() {
+    if (session) {
+      await session.stop();
+      session = null;
+      dot.className = 'dot';
+      status.textContent = 'Stopped.';
+      btn.textContent = 'Start';
+      return;
+    }
+
+    btn.disabled = true;
+    status.textContent = 'Starting…';
+    try {
+      session = await OrbitalClient.start(
+        'public/orbital/planetary/manifest.js',
+        { hz: 2, dt: 21600 }
+      );
+      dot.className = 'dot running';
+      status.textContent = 'Running.';
+      btn.textContent = 'Stop';
+      btn.disabled = false;
+
+      session.on('tick', ({ tick, t }) => {
+        const ts = new Date(t * 1000).toISOString().replace('T', ' ').slice(0, 19);
+        appendLog(`tick <span>${tick}</span> &nbsp; t = <span>${ts}</span>`);
+      });
+
+      session.on('stopped', () => {
+        dot.className = 'dot';
+        status.textContent = 'Stopped by server.';
+        btn.textContent = 'Start';
+        session = null;
+      });
+
+    } catch (err) {
+      dot.className = 'dot error';
+      status.textContent = `Error: ${err.message}`;
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
