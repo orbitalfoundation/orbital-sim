@@ -67,15 +67,31 @@ The contemporary **futures literacy** movement — championed through UNESCO —
 
 **[Decidim](https://decidim.org)** — open-source participatory democracy platform; used by cities (Barcelona, Helsinki, NYC) for participatory budgeting, planning, and policy co-design. Built on the premise that digital civic infrastructure should be publicly owned.
 
-**[Pol.is](https://pol.is)** — real-time opinion mapping; surfaces areas of consensus and division across large groups without the dynamics of social media debate. Used in Taiwan's vTaiwan civic consultation process and by the Audrey Tang-era digital ministry.
+**[Pol.is](https://pol.is)** / **[CompDemocracy](https://compdemocracy.org/polis/)** — opinion mapping via a "wiki-survey": participants submit short statements; others vote agree, disagree, or pass. The vote matrix is then reduced with SVD/PCA and clustered to reveal opinion groups — not a taxonomy the designer imposed, but a geometry that emerges from actual votes. The key output is not a poll result but a *map*: a 2D projection where people who voted similarly cluster together, and where each statement's position indicates whether it unifies or divides groups. The system can surface consensus statements — things agreed on across otherwise opposing groups — that standard Q&A or polling would never find.
+
+The design is notable for what it omits: no threaded replies, no engagement metrics, no upvotes. This is not a failure of craft — it is a structural choice. Reply threading and engagement metrics reward conflict and virality; removing them changes what behavior gets amplified. A provocative statement gets no more attention than a careful one; you cannot dominate a Pol.is conversation by posting frequently, because all statements are semi-randomly distributed to voters. The surface is almost invisible — no social signals, no sense of who else is engaged, no performance layer. That plainness is correct design for what it is doing: not performing social interaction but aggregating epistemics across a large group without letting the group's social dynamics corrupt the signal.
+
+The platform has wide enough deployment to be surprising given its minimal surface. Used in Taiwan's vTaiwan process (Uber regulation, 2015), by the Audrey Tang-era digital ministry, and more broadly in civic consultation, community listening, and research on opinion topology.
 
 **[vTaiwan](https://vtaiwan.tw)** — Taiwan's online-to-offline deliberative process for tech policy. The most-cited working example of large-scale digital civic participation producing actionable policy outcomes.
-
-**[Polis](https://compdemocracy.org/polis/)** — related to Pol.is; the research/nonprofit side of the same technology.
 
 **[Loomio](https://www.loomio.com)** — cooperative decision-making software; used by worker cooperatives, community organizations, and local governments for structured asynchronous deliberation.
 
 **[Citizens' Assemblies](https://www.knoca.eu)** — the institutional form that has gained most traction in recent years: randomly selected citizens deliberating intensively on a defined question (climate, abortion, electoral reform) and producing recommendations. Ireland's experience (marriage equality, abortion) is the benchmark. The [KNOCA network](https://www.knoca.eu) (Knowledge Network on Climate Assemblies) specifically tracks climate applications.
+
+### Computational democracy
+
+The tools above represent a broader family sometimes called **computational democracy** — approaches that use mathematical or algorithmic structure to address the specific failure modes of standard deliberative and voting processes. The framing is distinct from e-democracy (digitizing existing processes) because the *mechanism* is different, not just the delivery channel. Each tool is essentially a structural response to a named dysfunction.
+
+**[Quadratic voting (QV)](https://www.radicalxchange.org/concepts/quadratic-voting/)** — the cost of casting n votes on a single issue is n², paid from a fixed budget of "voice credits." A voter who cares intensely can accumulate votes, but at increasing cost. This redistributes influence toward breadth of preference rather than intensity alone — preventing the single-issue minority from systematically dominating those who care moderately about many things. Proposed by Glen Weyl and Eric Posner (*Radical Markets*, 2018); piloted in the Colorado state legislature and in Gitcoin public-goods funding rounds.
+
+**[Liquid democracy](https://en.wikipedia.org/wiki/Liquid_democracy)** — voters can vote directly or delegate their vote to someone they trust, who can in turn redelegate. The result is a weighted directed graph of trust rather than a flat one-person-one-vote structure. The motivation: direct democracy requires everyone to be informed about everything; representative democracy fixes expertise at the cost of granularity; liquid democracy allows fine-grained delegation by topic. Experiments in Democracy.earth, Gitcoin, and various pirate parties in Europe.
+
+**[Conviction voting](https://medium.com/giveth/conviction-voting-a-novel-continuous-decision-making-alternative-to-governance-aa746cfea747)** — votes accumulate over time; the longer you maintain a position, the more weight it carries. Rewards sustained belief over reactive rushes; prevents last-minute vote surges that capture funding or governance decisions. Deployed in Commons Stack and 1Hive DAO governance.
+
+**[Futarchy](http://mason.gmu.edu/~rhanson/futarchy.html)** — Robin Hanson's proposal: "vote on values, bet on beliefs." Policy is decided by prediction markets rather than majority vote. Voters define goals; markets aggregate distributed knowledge about which policy best achieves them. The proposal's intellectual clarity — it sharply separates the values question (what do we want?) from the epistemic question (what will happen if we do X?) — is not matched yet by deployment at scale, but it foreshadows the direction that coupling simulation models to governance processes would point.
+
+These mechanisms address different failure modes. Quadratic voting fixes intensity asymmetry. Liquid democracy fixes the expertise gap without surrendering granularity. Conviction voting fixes temporal manipulation. Pol.is fixes the dominance dynamics of threaded discourse. None is universal; each is a structural argument about which failure mode matters most in a given context.
 
 ### Futures and foresight practice
 
