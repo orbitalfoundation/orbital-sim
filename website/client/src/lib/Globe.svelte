@@ -89,7 +89,7 @@
       depthWrite: false,
       blending: THREE.AdditiveBlending,
     })
-    const atmo = new THREE.Mesh(new THREE.SphereGeometry(1.12, 64, 64), atmoMat)
+    const atmo = new THREE.Mesh(new THREE.SphereGeometry(1.02, 64, 64), atmoMat)
     tiltGroup.add(atmo)
 
     // Dot markers: half-size spheres, different colours, semi-transparent.
