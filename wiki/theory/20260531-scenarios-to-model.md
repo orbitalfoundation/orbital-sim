@@ -43,7 +43,7 @@ The practical implication: simple scenarios can use analytic insolation, DEM-der
 
 *Stakeholders: cities, planners, citizens, developers, neighborhood groups.*
 
-This is the scale where the participation asymmetries are sharpest and the audience is most immediate. Detailed bioregional modeling at this scale is in some ways harder than macroeconomic simulation — the spatial resolution requirements are higher and the data more fragmented — but the audience is local and motivated.
+This is the scale where the participation asymmetries are sharpest and the audience is most immediate. Detailed bioregional modeling at this scale is in some ways harder than macroeconomic simulation — the spatial resolution requirements are higher and the data more fragmented — but the audience is local and smaller - although highly motivated.
 
 ### Land use
 - **New suburb approval** — infrastructure cost per unit, VMT increase, fiscal ROI to city over 20 years, habitat conversion. Demonstrates the full-cycle cost that subdivision approval meetings rarely quantify.

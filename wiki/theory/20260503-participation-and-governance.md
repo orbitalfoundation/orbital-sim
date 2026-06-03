@@ -101,6 +101,10 @@ The **MRV approach** is significant because it attempts to bridge the gap betwee
 
 **[Global Forest Watch](https://www.globalforestwatch.org)** — near-real-time forest cover monitoring from satellite data; used by governments, NGOs, and communities to track and respond to deforestation. A working example of earth observation data made accessible to non-specialists for governance purposes.
 
+**[Pachama](https://pachama.com)** — satellite and AI-based verification platform for forest carbon projects; focuses on MRV (measurement, reporting, verification) of carbon stored and sequestered in forests. A working implementation of the measurement layer that regenerative finance requires.
+
+**[EarthShot LandOS](https://landos.earthshot.eco)** — terrain and land management platform for ecological land stewardship at scale; tools for land trusts, conservation buyers, and restoration practitioners to understand and act on their land.
+
 **[SkyTruth](https://skytruth.org)** — environmental monitoring via satellite; focuses on oil spills, mining, and fishing; Global Fishing Watch emerged from SkyTruth research.
 
 **[iNaturalist](https://www.inaturalist.org)** — citizen science biodiversity observation platform; ~200M observations; the largest participatory ecological dataset in existence.
@@ -124,6 +128,8 @@ The **MRV approach** is significant because it attempts to bridge the gap betwee
 **Reinventing Organizations** — Frederic Laloux (2014). Teal organizations and self-management; influential in the regenerative/cooperative space even if it avoids the word "cybernetics."
 
 **Governing the Commons** — Elinor Ostrom (1990). The Nobel-winning empirical demolition of the tragedy of the commons; her design principles for self-governing resource systems are the empirical foundation for much regenerative governance work.
+
+**"Feelings are Facts"** — [Meredith Whittaker](https://www.linkedin.com/in/meredith-whittaker-760a40252/) ([talk, 2023](https://www.youtube.com/watch?v=bK4OU52RK_I)). Not a book but a talk worth naming: Whittaker, Signal president and AI governance researcher, argues that the experience of a technical system is not separable from its design — that affect, social power, and lived use are not noise layered on top of function but are partly constitutive of what the system *is*. Relevant here because most simulation and civic-tech work treats the human experience layer as UI polish when it is actually a political and epistemological question.
 
 ---
 

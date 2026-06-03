@@ -158,6 +158,8 @@ The hardest part of any model in this domain is data, not the engine. The key so
 
 **Doughnut Economics** — Kate Raworth (2017). The planetary-boundaries / social-foundation framing that has become the policy lingua franca for this kind of work.
 
+**A General Theory of Simulation** — Benjamin Bratton (Antikythera, ongoing). A philosophical account of simulation as a general condition, not a technical tool — asking what it means for models to precede and shape what they model. [Project site](https://theoryofsim.antikythera.org/). Harder to read than anything else on this list but raises questions the engineering literature ignores.
+
 **Antifragile** — Nassim Taleb (2012). Not simulation per se, but the clearest articulation of why fragility and nonlinearity matter in complex systems.
 
 **The Collapse of Complex Societies** — Joseph Tainter (1988). Historical analysis of why complexity has a cost and how it leads to collapse. Essential context for anyone modeling civilizational dynamics.
