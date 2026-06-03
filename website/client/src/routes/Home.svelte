@@ -57,15 +57,15 @@
   </div>
 
   <!-- Featured scenarios -->
-  <section class="bg-[var(--bg)]/70 backdrop-blur-sm">
+  <section>
     <h2 class="mono text-xs tracking-[0.15em] text-[var(--muted)] uppercase mb-4 px-4">
       Recent scenarios
     </h2>
-    <div class="flex flex-col">
+    <div class="flex flex-col gap-2">
       {#each featured as s}
         <button
           onclick={() => router.navigate(s.path)}
-          class="group bg-transparent hover:bg-[var(--surface)]/60 text-left px-4 py-4 transition-colors w-full"
+          class="group bg-[var(--bg)]/50 hover:bg-[var(--surface)]/60 text-left px-4 py-4 transition-colors w-full"
         >
           <div class="flex items-baseline gap-3 mb-1">
             <span class="font-medium text-[var(--text)] group-hover:text-[var(--accent)] transition-colors">
