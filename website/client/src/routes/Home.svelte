@@ -57,11 +57,11 @@
   </div>
 
   <!-- Featured scenarios -->
-  <section>
-    <h2 class="mono text-xs tracking-[0.15em] text-[var(--muted)] uppercase mb-4">
+  <section class="bg-[var(--bg)]/70 backdrop-blur-sm">
+    <h2 class="mono text-xs tracking-[0.15em] text-[var(--muted)] uppercase mb-4 px-4">
       Recent scenarios
     </h2>
-    <div class="flex flex-col divide-y divide-[var(--border)]">
+    <div class="flex flex-col">
       {#each featured as s}
         <button
           onclick={() => router.navigate(s.path)}
@@ -76,7 +76,7 @@
           <p class="text-sm text-[var(--muted)] leading-relaxed">{s.desc}</p>
           <div class="flex gap-2 mt-2">
             {#each s.tags as tag}
-              <span class="mono text-[10px] tracking-wide text-[var(--muted)] border border-[var(--border)] px-2 py-0.5">
+              <span class="mono text-[10px] tracking-wide text-[var(--muted)] bg-[var(--surface)] px-2 py-0.5">
                 {tag}
               </span>
             {/each}
