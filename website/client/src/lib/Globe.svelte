@@ -21,8 +21,8 @@
     ['Dubai',        25.2,   55.3 ],
   ]
 
-  // Cycle through these for the dot markers
-  const DOT_COLORS = [0xff6b35, 0x4fc3f7, 0x81c784, 0xffca28]
+  // Shades of blue for dot markers
+  const DOT_COLORS = [0xadd8ff, 0x60aee8, 0x2e7fbf, 0x89c4f4]
 
   function latLonToXYZ(lat, lon, r = 1) {
     const phi   = (90 - lat) * (Math.PI / 180)
@@ -79,6 +79,19 @@
     globe.rotation.y = -Math.PI / 2   // start with Europe/Africa facing forward
     tiltGroup.add(globe)
 
+    // Atmosphere rim — slightly larger sphere rendered from the inside.
+    // BackSide + AdditiveBlending creates a blue glow around the limb.
+    const atmoMat = new THREE.MeshBasicMaterial({
+      color: 0x2266cc,
+      side: THREE.BackSide,
+      transparent: true,
+      opacity: 0.18,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    })
+    const atmo = new THREE.Mesh(new THREE.SphereGeometry(1.12, 64, 64), atmoMat)
+    tiltGroup.add(atmo)
+
     // Dot markers: half-size spheres, different colours, semi-transparent.
     // Children of globe so they rotate with it.
     // r=1.025 keeps them clear of the surface without hitting the CSS clip.
@@ -115,6 +128,7 @@
       cancelAnimationFrame(raf)
       ro.disconnect()
       dotMats.forEach(m => m.dispose())
+      atmoMat.dispose()
       renderer.domElement.remove()
       renderer.dispose()
     }
