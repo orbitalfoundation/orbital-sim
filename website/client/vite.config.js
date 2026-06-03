@@ -44,6 +44,7 @@ export default defineConfig({
     // Proxy API and socket calls to the Fastify server during dev
     proxy: {
       '/api':       'http://localhost:3000',
+      '/assets':    'http://localhost:3000',
       '/socket.io': { target: 'http://localhost:3000', ws: true },
     },
   },

@@ -21,6 +21,7 @@
     "@web3auth/base": "^9.7.0",
     "@web3auth/no-modal": "^9.7.0",
     "buffer": "^6.0.3",
+    "three": "^0.184.0",
     "viem": "^2.52.0",
     "vite-plugin-node-polyfills": "^0.28.0"
   }
