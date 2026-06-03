@@ -28,7 +28,9 @@
   ];
 </script>
 
-<!-- Half-globe: 3D rotating Earth, circular crop, right-half clipped off screen -->
+<!-- Half-globe: 3D rotating Earth, circular crop, right-half clipped off screen.
+     To revert to static image: replace <Globe /> with:
+     <img src="/assets/world.jpg" alt="" class="w-full h-full object-cover" draggable="false" /> -->
 <div aria-hidden="true" class="fixed -z-10 right-0 top-1/2 -translate-y-1/2 translate-x-1/2
      w-[min(80vw,80vh)] aspect-square rounded-full overflow-hidden pointer-events-none
      opacity-[0.38] select-none">

@@ -51,36 +51,33 @@
     const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100)
     camera.position.z = 2.4
 
-    // Lighting: soft ambient + directional from upper-left to suggest a sun
-    scene.add(new THREE.AmbientLight(0xffffff, 0.45))
-    const sun = new THREE.DirectionalLight(0xffffff, 1.1)
-    sun.position.set(-3, 2, 4)
-    scene.add(sun)
-
-    // Globe sphere — starts showing the Atlantic / Europe-Africa face
+    // Globe sphere — MeshBasicMaterial shows texture at full brightness,
+    // matching the original static image. No lighting setup needed.
     const tex = new THREE.TextureLoader().load('/assets/earth.jpg')
+    tex.colorSpace = THREE.SRGBColorSpace
     const globe = new THREE.Mesh(
       new THREE.SphereGeometry(1, 64, 64),
-      new THREE.MeshStandardMaterial({ map: tex, roughness: 0.8, metalness: 0 })
+      new THREE.MeshBasicMaterial({ map: tex })
     )
     globe.rotation.x =  0.28           // slight northward tilt toward viewer
     globe.rotation.y = -Math.PI / 2    // start with Europe/Africa facing front
     scene.add(globe)
 
-    // City dot markers — children of globe so they rotate with it
-    const dotGeo = new THREE.SphereGeometry(0.013, 8, 8)
+    // City dot markers — children of globe so they rotate with it.
+    // MeshBasicMaterial keeps them bright regardless of scene lighting.
+    const dotGeo = new THREE.SphereGeometry(0.03, 10, 10)
     const dotMat = new THREE.MeshBasicMaterial({ color: 0xff5533 })
     for (const [, lat, lon] of CITIES) {
       const dot = new THREE.Mesh(dotGeo, dotMat)
-      dot.position.copy(latLonToXYZ(lat, lon, 1.016))
+      dot.position.copy(latLonToXYZ(lat, lon, 1.04))
       globe.add(dot)
     }
 
-    // Slow eastward rotation
+    // Very slow eastward rotation (~6 min per revolution at 60 fps)
     let raf
     const tick = () => {
       raf = requestAnimationFrame(tick)
-      globe.rotation.y += 0.0015
+      globe.rotation.y += 0.0003
       renderer.render(scene, camera)
     }
     tick()
