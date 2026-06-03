@@ -1,7 +1,7 @@
 <script>
   import * as THREE from 'three'
 
-  // Placeholder city markers — replace with real scenario locations later
+  // Placeholder city markers — swap for real scenario { lat, lon } later
   const CITIES = [
     ['London',       51.5,   -0.1 ],
     ['New York',     40.7,  -74.0 ],
@@ -21,8 +21,9 @@
     ['Dubai',        25.2,   55.3 ],
   ]
 
-  // Equirectangular lat/lon → Three.js sphere XYZ
-  // Matches the UV mapping of THREE.SphereGeometry's default orientation
+  // Cycle through these for the dot markers
+  const DOT_COLORS = [0xff6b35, 0x4fc3f7, 0x81c784, 0xffca28]
+
   function latLonToXYZ(lat, lon, r = 1) {
     const phi   = (90 - lat) * (Math.PI / 180)
     const theta = (lon + 180) * (Math.PI / 180)
@@ -48,32 +49,52 @@
     container.appendChild(renderer.domElement)
 
     const scene  = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100)
-    camera.position.z = 2.4
 
-    // Globe sphere — MeshBasicMaterial shows texture at full brightness,
-    // matching the original static image. No lighting setup needed.
+    // Pull camera back so the sphere is ~75% of the frame — leaves visible space
+    // between sphere edge and CSS circular clip, which breaks the flat-disk illusion.
+    // Slight upward offset gives a natural "looking down a little" angle.
+    const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100)
+    camera.position.set(0, 0.3, 3.2)
+    camera.lookAt(0, 0, 0)
+
+    // Subtle lighting — strong ambient so the dark side isn't black,
+    // soft directional from upper-left to give a legible shading gradient.
+    scene.add(new THREE.AmbientLight(0xffffff, 0.65))
+    const sun = new THREE.DirectionalLight(0xffffff, 0.65)
+    sun.position.set(-3, 2, 4)
+    scene.add(sun)
+
+    // Tilt group: tilts the rotation axis 23.4° (Earth's axial tilt).
+    // The child globe then spins around its own (tilted) Y-axis.
+    const tiltGroup = new THREE.Group()
+    tiltGroup.rotation.z = 23.4 * (Math.PI / 180)
+    scene.add(tiltGroup)
+
+    // Globe — MeshPhongMaterial gives a shading gradient without full PBR cost
     const tex = new THREE.TextureLoader().load('/assets/earth.jpg')
     tex.colorSpace = THREE.SRGBColorSpace
     const globe = new THREE.Mesh(
       new THREE.SphereGeometry(1, 64, 64),
-      new THREE.MeshBasicMaterial({ map: tex })
+      new THREE.MeshPhongMaterial({ map: tex, shininess: 6 })
     )
-    globe.rotation.x =  0.28           // slight northward tilt toward viewer
-    globe.rotation.y = -Math.PI / 2    // start with Europe/Africa facing front
-    scene.add(globe)
+    globe.rotation.y = -Math.PI / 2   // start with Europe/Africa facing forward
+    tiltGroup.add(globe)
 
-    // City dot markers — children of globe so they rotate with it.
-    // MeshBasicMaterial keeps them bright regardless of scene lighting.
-    const dotGeo = new THREE.SphereGeometry(0.03, 10, 10)
-    const dotMat = new THREE.MeshBasicMaterial({ color: 0xff5533 })
-    for (const [, lat, lon] of CITIES) {
-      const dot = new THREE.Mesh(dotGeo, dotMat)
-      dot.position.copy(latLonToXYZ(lat, lon, 1.04))
+    // Dot markers: half-size spheres, different colours, semi-transparent.
+    // Children of globe so they rotate with it.
+    // r=1.025 keeps them clear of the surface without hitting the CSS clip.
+    const dotGeo  = new THREE.SphereGeometry(0.015, 10, 10)
+    const dotMats = DOT_COLORS.map(c =>
+      new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.72 })
+    )
+    for (let i = 0; i < CITIES.length; i++) {
+      const [, lat, lon] = CITIES[i]
+      const dot = new THREE.Mesh(dotGeo, dotMats[i % dotMats.length])
+      dot.position.copy(latLonToXYZ(lat, lon, 1.025))
       globe.add(dot)
     }
 
-    // Very slow eastward rotation (~6 min per revolution at 60 fps)
+    // ~6 min per revolution at 60 fps
     let raf
     const tick = () => {
       raf = requestAnimationFrame(tick)
@@ -82,7 +103,6 @@
     }
     tick()
 
-    // Responsive resize
     const ro = new ResizeObserver(() => {
       const w2 = container.clientWidth
       const h2 = container.clientHeight
@@ -95,6 +115,7 @@
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
+      dotMats.forEach(m => m.dispose())
       renderer.domElement.remove()
       renderer.dispose()
     }
