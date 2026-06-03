@@ -57,11 +57,11 @@
     camera.position.set(0, 0.3, 3.2)
     camera.lookAt(0, 0, 0)
 
-    // Subtle lighting — strong ambient so the dark side isn't black,
-    // soft directional from upper-left to give a legible shading gradient.
-    scene.add(new THREE.AmbientLight(0xffffff, 0.65))
-    const sun = new THREE.DirectionalLight(0xffffff, 0.65)
-    sun.position.set(-3, 2, 4)
+    // Low ambient so the shadow side is dark; directional from the upper-left
+    // and slightly in front — terminator falls across the visible hemisphere.
+    scene.add(new THREE.AmbientLight(0xffffff, 0.12))
+    const sun = new THREE.DirectionalLight(0xffffff, 1.8)
+    sun.position.set(-5, 2, 2)
     scene.add(sun)
 
     // Tilt group: tilts the rotation axis 23.4° (Earth's axial tilt).
@@ -70,12 +70,11 @@
     tiltGroup.rotation.z = 23.4 * (Math.PI / 180)
     scene.add(tiltGroup)
 
-    // Globe — MeshPhongMaterial gives a shading gradient without full PBR cost
     const tex = new THREE.TextureLoader().load('/assets/earth.jpg')
     tex.colorSpace = THREE.SRGBColorSpace
     const globe = new THREE.Mesh(
       new THREE.SphereGeometry(1, 64, 64),
-      new THREE.MeshPhongMaterial({ map: tex, shininess: 6 })
+      new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9, metalness: 0 })
     )
     globe.rotation.y = -Math.PI / 2   // start with Europe/Africa facing forward
     tiltGroup.add(globe)
@@ -90,7 +89,7 @@
     for (let i = 0; i < CITIES.length; i++) {
       const [, lat, lon] = CITIES[i]
       const dot = new THREE.Mesh(dotGeo, dotMats[i % dotMats.length])
-      dot.position.copy(latLonToXYZ(lat, lon, 1.025))
+      dot.position.copy(latLonToXYZ(lat, lon, 1.01))
       globe.add(dot)
     }
 
