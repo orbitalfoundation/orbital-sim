@@ -11,6 +11,10 @@ IMAGE_NAME="orbital-sim"
 CONTAINER_NAME="orbital-sim"
 DEPLOY_LOCK="/tmp/orbital-sim-deploy.lock"
 
+# Data directory — lives outside the repo so it survives git operations and
+# container rebuilds. Populated once via scripts/sync-data.sh.
+DATA_DIR="$(dirname "$REPO_DIR")/orbital-sim-data"
+
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 cd "$REPO_DIR" || exit 1
 
@@ -48,11 +52,13 @@ echo "[$(date)] Building Docker image..."
 docker build -t "$IMAGE_NAME" . > /tmp/orbital-sim-build.log 2>&1
 
 echo "[$(date)] Restarting container..."
+mkdir -p "$DATA_DIR"
 docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
 docker run -d \
   --name "$CONTAINER_NAME" \
   --restart unless-stopped \
   -p 8000:3000 \
+  -v "$DATA_DIR:/app/public/.data" \
   "$IMAGE_NAME" \
   node website/server/index.js
 
