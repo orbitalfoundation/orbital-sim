@@ -65,6 +65,61 @@ Access the app at `https://orbital.local:3000`.
 | `website/server/.env` | `TLS_KEY` | Path to mkcert `-key.pem` key file |
 | `website/server/.env` | `PORT` | Server port (default: 3000) |
 
+## Scenario data
+
+Simulation scenarios require large geographic datasets that are too big for git
+and are not included in the repository. They live in `public/.data/` (gitignored).
+
+### What's needed
+
+| File / directory | Size | Used by |
+|---|---|---|
+| `public/.data/elevation/global_5arcmin.i16` | 18 MB | All current scenarios — land/sea mask and elevation at 5 arc-minute resolution |
+| `public/.data/gebco_2026/` | 7 GB | High-resolution scenarios only (15 arc-second GeoTIFF tiles) — not required for IPCC |
+
+### Populating locally
+
+If assets are declared in a manifest's `fetch` block, download them:
+
+```sh
+node scripts/fetch-data.mjs          # fetch all declared assets
+node scripts/fetch-data.mjs --list   # show what would be fetched without downloading
+node scripts/fetch-data.mjs --verify # checksum existing files
+```
+
+If you already have the data elsewhere, you can copy it directly into `public/.data/`.
+
+### Pushing data to the remote server
+
+The production container mounts `~/orbital-sim-data` as a bind mount at
+`/app/public/.data`. Data is not baked into the Docker image — it must be
+synced separately.
+
+Run this **from your local machine** (not on the server):
+
+```sh
+bash scripts/sync-data.sh                        # push to default server (party-whiskey.exe.xyz)
+bash scripts/sync-data.sh user@other-host        # push to a different server
+bash scripts/sync-data.sh user@host /custom/dir  # custom remote data path
+```
+
+rsync is incremental — only changed files transfer after the first run.
+The first sync of the full dataset (including the 7 GB tile set if present)
+can take 1–2 hours. The 18 MB raster alone syncs in seconds.
+
+No container restart is needed after a sync — the bind mount is live.
+
+### Verifying data on the server
+
+The deploy script reports the data directory size at the end of each build:
+
+```
+[...] Data directory: /home/exedev/orbital-sim-data (4.2G)
+```
+
+A warning instead of a size means the directory is empty or missing — run
+`sync-data.sh` from your local machine to fix it.
+
 ## Public asset paths
 
 | Path prefix | Served from | Notes |
