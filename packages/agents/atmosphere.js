@@ -105,8 +105,12 @@ const atmosphereAgent = {
 
   resolve(event, bus) {
     if (event.registered) {
-      // Spin up silently from 1850 to t0
+      // Seed bus.time so event.t yields the correct year regardless of how the
+      // bus was started (CLI --t0 flag or web startSim with no tStart).
       const startYear = this.t0 ?? 2024;
+      bus.time = new Date(`${startYear}-01-01T00:00:00Z`).getTime() / 1000;
+
+      // Spin up silently from 1850 to t0
       let deltaT = 0;
       const dtSec = 365.25 * 86400; // 1-year steps
       for (let y = 1850; y < startYear; y++) {

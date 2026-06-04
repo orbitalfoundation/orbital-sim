@@ -191,4 +191,5 @@ io.on('connection', socket => {
 });
 
 simEvents.on('tick',    ({ id, ...data }) => io.to(id).emit('tick',    data));
+simEvents.on('frame',   ({ id, ...data }) => io.to(id).emit('frame',   data));
 simEvents.on('stopped', ({ id })          => io.to(id).emit('stopped', {}));

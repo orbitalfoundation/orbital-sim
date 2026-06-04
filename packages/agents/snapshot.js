@@ -1,24 +1,25 @@
-// snapshot — renders the temperature anomaly field to a PNG at the end of a run.
+// snapshot — renders the temperature anomaly field to a PNG on each interval tick.
 //
 // Produces an equirectangular (plate carrée) world map at 1440×720 (0.25°/pixel).
 // Color scale: ivory (0°C) → yellow → orange → deep red (6°C+).
 // Ocean pixels are darkened and blue-shifted relative to land so continents are
 // immediately legible without a separate coastline dataset.
 //
+// After rendering, emits { frame: { year, tick, buf } } into the bus so the
+// server tap can stream the PNG buffer to connected clients via socket.
+//
 // Configuration (override in manifest):
-//   outputDir  — directory to write PNGs (created if absent)
-//   prefix     — filename prefix (default 'temperature')
+//   outputDir  — if set, also writes PNG files to this directory (useful for CLI)
+//   prefix     — filename prefix when writing to disk (default 'temperature')
 //   width      — output width in pixels (default 1440)
 //   height     — output height in pixels (default 720)
-//   interval   — write a frame every N ticks as well as at done (0 = final only)
+//   interval   — emit a frame every N ticks as well as at done (0 = final only)
 
-import { createWriteStream, mkdirSync } from 'node:fs';
+import { writeFile, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 
 // ---------- colour scale ----------
-// Stops: [anomaly_°C, [r, g, b]]
-// Range 0–6°C; clamped outside.
 const STOPS = [
   [0,   [255, 252, 220]],  // ivory
   [0.5, [255, 235, 150]],  // pale yellow
@@ -42,7 +43,6 @@ function anomalyRGB(dT) {
   return STOPS[STOPS.length - 1][1];
 }
 
-// Ocean: darken and blue-shift the anomaly colour so land/sea are distinct.
 const OCEAN_BLEND = 0.55;
 const OCEAN_TINT  = [10, 35, 80];
 
@@ -57,7 +57,7 @@ function pixelRGB(dT, isLand) {
 }
 
 // ---------- render ----------
-function render(bus, W, H) {
+function renderToBuffer(bus, W, H) {
   const png = new PNG({ width: W, height: H });
   for (let yi = 0; yi < H; yi++) {
     const lat = 90 - (yi + 0.5) * (180 / H);
@@ -65,8 +65,7 @@ function render(bus, W, H) {
       const lon    = (xi + 0.5) * (360 / W) - 180;
       const dT     = bus.atmosphere?.temperature_anomaly(lon, lat) ?? 0;
       const elev   = bus.elevation?.sample(lon, lat) ?? -1;
-      const isLand = elev >= 0;
-      const [r, g, b] = pixelRGB(dT, isLand);
+      const [r, g, b] = pixelRGB(dT, elev >= 0);
       const idx = (yi * W + xi) * 4;
       png.data[idx]     = r;
       png.data[idx + 1] = g;
@@ -74,53 +73,55 @@ function render(bus, W, H) {
       png.data[idx + 3] = 255;
     }
   }
-  return png;
-}
-
-async function writePNG(png, path) {
-  await new Promise((resolve, reject) => {
-    const stream = createWriteStream(path);
-    png.pack().pipe(stream);
-    stream.on('finish', resolve);
-    stream.on('error', reject);
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    png.pack()
+      .on('data', d => chunks.push(d))
+      .on('end', () => resolve(Buffer.concat(chunks)))
+      .on('error', reject);
   });
 }
 
 // ---------- agent ----------
 const snapshotAgent = {
   id: 'snapshot',
-  outputDir: 'output',
-  prefix: 'temperature',
-  width: 1440,
-  height: 720,
-  interval: 0,  // 0 = final frame only
+  outputDir: null,   // null = stream only; set to a path to also write files (CLI)
+  prefix:    'temperature',
+  width:     1440,
+  height:    720,
+  interval:  0,      // 0 = final frame only
 
   async resolve(event, bus) {
+    if (event.frame) return;  // don't react to our own emitted frames
     if (!event.tick && !event.done) return;
 
-    const shouldWrite =
+    const shouldEmit =
       event.done ||
       (this.interval > 0 && event.tick % this.interval === 0);
+    if (!shouldEmit) return;
 
-    if (!shouldWrite) return;
+    const year = bus.atmosphere?.year() ?? null;
+    const buf  = await renderToBuffer(bus, this.width, this.height);
 
-    const year  = bus.atmosphere?.year() ?? 'unknown';
-    const scenario = bus.atmosphere
-      ? (bus.atmosphere._scenario ?? '')
-      : '';
+    // Emit frame into the bus — server tap picks this up and streams to socket.
+    bus.resolve({ frame: { year, tick: event.tick ?? null, buf } })
+      .catch(e => console.error('[snapshot] frame emit error:', e));
 
-    mkdirSync(this.outputDir, { recursive: true });
-
-    const label = event.done && !event.tick ? `${year}_final` : String(year);
-    const file  = join(this.outputDir, `${this.prefix}_${label}.png`);
-
-    const png = render(bus, this.width, this.height);
-    await writePNG(png, file);
-    console.log(`[snapshot] wrote ${file}  (${this.width}×${this.height})`);
+    // If outputDir is set (e.g. CLI mode), also write to disk.
+    if (this.outputDir) {
+      mkdirSync(this.outputDir, { recursive: true });
+      const label = event.done && !event.tick ? `${year}_final` : String(year);
+      const file  = join(this.outputDir, `${this.prefix}_${label}.png`);
+      writeFile(file, buf, err => {
+        if (err) console.error('[snapshot] write error:', err.message);
+        else console.log(`[snapshot] wrote ${file}  (${this.width}×${this.height})`);
+      });
+    } else {
+      console.log(`[snapshot] frame year=${year} tick=${event.tick ?? 'done'}  (${this.width}×${this.height})`);
+    }
   },
 };
 
-// Runs after atmosphere so the anomaly field is current for the tick.
 snapshotAgent.resolve.after = 'atmosphere';
 
 export default snapshotAgent;

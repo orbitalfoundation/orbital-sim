@@ -1,5 +1,6 @@
-// sims — bus instance lifecycle, ported from packages/server.
-// Thin bridge: creates bus instances, emits tick events, no domain knowledge.
+// sims — bus instance lifecycle.
+// Thin bridge: creates bus instances, taps observable state after each tick,
+// streams frame buffers. No domain knowledge — just wiring.
 
 import { createBus } from '@orbital/bus';
 import { EventEmitter } from 'node:events';
@@ -13,9 +14,29 @@ export async function startSim(manifestPath, { hz = 1, dt = 3600 } = {}) {
 
   bus.register({
     id: 'server.tap',
-    resolve(event) {
-      if (!event.tick) return;
-      simEvents.emit('tick', { id, tick: event.tick, t: event.t, dt: event.dt });
+    resolve(event, bus) {
+      // Forward tick with whatever observable state agents have installed.
+      if (event.tick) {
+        simEvents.emit('tick', {
+          id,
+          tick:   event.tick,
+          t:      event.t,
+          dt:     event.dt,
+          year:   bus.atmosphere?.year?.()          ?? null,
+          co2:    bus.atmosphere?.co2_ppm?.()        ?? null,
+          deltaT: bus.atmosphere?.global_delta_t?.() ?? null,
+        });
+      }
+
+      // Forward rendered frame buffers to the socket layer.
+      if (event.frame) {
+        simEvents.emit('frame', {
+          id,
+          year: event.frame.year,
+          tick: event.frame.tick,
+          buf:  event.frame.buf,
+        });
+      }
     },
   });
 
