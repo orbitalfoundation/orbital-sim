@@ -6,7 +6,9 @@
     "dev": "concurrently -n server,client -c cyan,magenta \"node --env-file=website/server/.env --watch website/server/index.js\" \"cd website/client && npm run dev\"",
     "dev:server": "node --env-file=website/server/.env --watch website/server/index.js",
     "build": "cd website/client && npm run build",
-    "build:watch": "cd website/client && npm run dev"
+    "build:watch": "cd website/client && npm run dev",
+    "docker:build": "docker build -t orbital-sim .",
+    "docker:run": "docker run --rm -p 3000:3000 orbital-sim"
   },
   "workspaces": [
     "packages/bus",
