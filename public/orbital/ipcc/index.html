@@ -273,9 +273,10 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-const MANIFEST = 'public/orbital/ipcc/manifest.js';
-const HZ       = 4;     // ticks per second — 76 years in ~19 s
-const DT       = 31536000; // seconds per year
+const MANIFEST   = 'public/orbital/ipcc/manifest.js';
+const HZ         = 4;          // ticks per second — 76 years in ~19 s
+const DT         = 31536000;   // seconds per year
+const MAX_TICKS  = 76;         // 2024–2099; sim auto-stops at the end
 
 const map        = document.getElementById('map');
 const placeholder= document.getElementById('placeholder');
@@ -322,7 +323,7 @@ async function startRun() {
     res = await fetch('/api/sim', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ manifest: MANIFEST, hz: HZ, dt: DT }),
+      body:    JSON.stringify({ manifest: MANIFEST, hz: HZ, dt: DT, maxTicks: MAX_TICKS }),
     });
   } catch (err) {
     status('Error: ' + err.message);

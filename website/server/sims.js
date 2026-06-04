@@ -8,15 +8,17 @@ import { EventEmitter } from 'node:events';
 export const simEvents = new EventEmitter();
 const sims = new Map();
 
-export async function startSim(manifestPath, { hz = 1, dt = 3600 } = {}) {
+export async function startSim(manifestPath, { hz = 1, dt = 3600, maxTicks = null } = {}) {
   const id = crypto.randomUUID();
   const bus = createBus();
+
+  let tickCount = 0;
 
   bus.register({
     id: 'server.tap',
     resolve(event, bus) {
-      // Forward tick with whatever observable state agents have installed.
       if (event.tick) {
+        tickCount++;
         simEvents.emit('tick', {
           id,
           tick:   event.tick,
@@ -26,9 +28,12 @@ export async function startSim(manifestPath, { hz = 1, dt = 3600 } = {}) {
           co2:    bus.atmosphere?.co2_ppm?.()        ?? null,
           deltaT: bus.atmosphere?.global_delta_t?.() ?? null,
         });
+        // Auto-stop after maxTicks — deferred so the current tick completes first.
+        if (maxTicks && tickCount >= maxTicks) {
+          setImmediate(() => stopSim(id));
+        }
       }
 
-      // Forward rendered frame buffers to the socket layer.
       if (event.frame) {
         simEvents.emit('frame', {
           id,

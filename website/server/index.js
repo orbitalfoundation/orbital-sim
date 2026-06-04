@@ -98,10 +98,10 @@ fastify.post('/api/areas/:name/:project', async (req, reply) => {
 // --- API: sims ---
 
 fastify.post('/api/sim', async (req, reply) => {
-  const { manifest, hz, dt } = req.body ?? {};
+  const { manifest, hz, dt, maxTicks } = req.body ?? {};
   if (!manifest) return reply.code(400).send({ error: 'manifest required' });
   try {
-    const sim = await startSim(manifest, { hz, dt });
+    const sim = await startSim(manifest, { hz, dt, maxTicks: maxTicks ?? null });
     return { id: sim.id };
   } catch (err) {
     fastify.log.error(err);
@@ -185,11 +185,54 @@ fastify.get('/*', async (req, reply) => {
 await fastify.listen({ port: PORT, host: '0.0.0.0' });
 
 const io = new IO(fastify.server, { cors: { origin: '*' } });
+
+// Idle timeout: stop a sim after IDLE_MS with no socket subscribers.
+// Prevents sims from running forever when a user navigates away.
+const IDLE_MS    = 5 * 60 * 1000; // 5 minutes
+const idleTimers = new Map();      // simId → timer handle
+
+function clearIdleTimer(simId) {
+  const t = idleTimers.get(simId);
+  if (t) { clearTimeout(t); idleTimers.delete(simId); }
+}
+
+function scheduleIdleStop(simId) {
+  if (idleTimers.has(simId)) return;
+  if (!getSim(simId)) return;
+  const t = setTimeout(() => {
+    idleTimers.delete(simId);
+    if (stopSim(simId)) fastify.log.info(`[sim] ${simId} stopped after idle timeout`);
+  }, IDLE_MS);
+  idleTimers.set(simId, t);
+}
+
 io.on('connection', socket => {
-  socket.on('subscribe',   id => socket.join(id));
-  socket.on('unsubscribe', id => socket.leave(id));
+  // Track which sim rooms this socket joined so we can check them on disconnect.
+  const joined = new Set();
+
+  socket.on('subscribe', id => {
+    socket.join(id);
+    joined.add(id);
+    clearIdleTimer(id); // client is back — cancel any pending stop
+  });
+
+  socket.on('unsubscribe', id => {
+    socket.leave(id);
+    joined.delete(id);
+    if ((io.sockets.adapter.rooms.get(id)?.size ?? 0) === 0) scheduleIdleStop(id);
+  });
+
+  socket.on('disconnect', () => {
+    // socket.io has already removed the socket from rooms by this point.
+    for (const id of joined) {
+      if ((io.sockets.adapter.rooms.get(id)?.size ?? 0) === 0) scheduleIdleStop(id);
+    }
+  });
 });
 
 simEvents.on('tick',    ({ id, ...data }) => io.to(id).emit('tick',    data));
 simEvents.on('frame',   ({ id, ...data }) => io.to(id).emit('frame',   data));
-simEvents.on('stopped', ({ id })          => io.to(id).emit('stopped', {}));
+simEvents.on('stopped', ({ id })          => {
+  clearIdleTimer(id);      // sim ended — no need to wait for the timer
+  io.to(id).emit('stopped', {});
+});
