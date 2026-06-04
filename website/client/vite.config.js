@@ -44,9 +44,13 @@ export default defineConfig({
     // Proxy API and socket calls to the Fastify server during dev.
     // secure: false because the local TLS cert is self-signed (mkcert).
     proxy: {
-      '/api':       { target: 'https://localhost:3000', secure: false },
-      '/assets':    { target: 'https://localhost:3000', secure: false },
-      '/socket.io': { target: 'https://localhost:3000', secure: false, ws: true },
+      '/api':        { target: 'https://localhost:3000', secure: false },
+      '/assets':     { target: 'https://localhost:3000', secure: false },
+      '/socket.io':  { target: 'https://localhost:3000', secure: false, ws: true },
+      // Proxy area/project paths so static scenario pages (index.html) are
+      // reachable through the Vite dev server as well as directly on port 3000.
+      '/orbital':    { target: 'https://localhost:3000', secure: false },
+      '/anselm':     { target: 'https://localhost:3000', secure: false },
     },
   },
 });
