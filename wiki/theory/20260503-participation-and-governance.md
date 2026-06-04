@@ -38,6 +38,8 @@ These are not problems that more voting solves. They are problems of information
 
 The most radical application was **Project Cybersyn** (1971–73) in Allende's Chile — Beer's attempt to build a real-time cybernetic nervous system for a national economy. Factory production data flowed to a central operations room; economic deviations triggered alerts; workers could flag problems upward. It was destroyed in the 1973 coup but remains the most serious real-world attempt to apply cybernetic principles to democratic governance. Eden Medina's book *Cybernetic Revolutionaries* (2011) is the definitive account.
 
+A contemporary popular essay such as [The Santiago Boys on cybernetics](https://www.the-santiago-boys.com/) is a useful modern reference for the cultural and historical resonance of these ideas.
+
 **Gregory Bateson** worked the ecological and anthropological angle — how organisms, ecosystems, and cultures maintain coherence through information and pattern. His *Steps to an Ecology of Mind* (1972) remains influential in systems thinking and regenerative design circles.
 
 ### Anticipatory democracy
@@ -134,6 +136,10 @@ The **MRV approach** is significant because it attempts to bridge the gap betwee
 **The Brain of the Firm** — Stafford Beer (1972). The original VSM; dense but foundational for anyone interested in viable systems and organizational cybernetics.
 
 **Steps to an Ecology of Mind** — Gregory Bateson (1972). Information, pattern, and feedback in living systems; the philosophical substrate of much systems ecology.
+
+**The Origin and Nature of Life on Earth** — a broad treatment of emergence, the biosphere, and the planetary processes that make life possible; useful background for connecting ecological complexity to governance and collective futures.
+
+**Scale** — Geoffrey West (2017). A complexity science account of universal scaling laws across organisms, cities, economies, and companies; useful for thinking through how network geometry and efficiency shapes growth, innovation, and sustainability in human systems.
 
 **Future Shock** — Alvin Toffler (1970). Dated in specifics but the framing of anticipatory capacity as a democratic necessity holds up.
 

@@ -85,7 +85,7 @@
       color: 0x2266cc,
       side: THREE.BackSide,
       transparent: true,
-      opacity: 0.18,
+      opacity: 0.28,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
     })

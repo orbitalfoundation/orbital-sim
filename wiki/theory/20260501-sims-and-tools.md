@@ -30,11 +30,33 @@ The **[Club of Rome](https://www.clubofrome.org)** — founded 1968 as a gatheri
 
 **Earth system models (ESMs)** are the full climate simulations run by NOAA, ECMWF, and similar institutions. High resolution, physically grounded, computationally expensive, and primarily concerned with physical variables rather than human dynamics.
 
+## Emerging world models
+
+Emerging world models occupy a different part of the AI-simulation landscape. In deep learning, a world model is an internal representation of an environment that lets an agent predict future states and evaluate actions without directly testing them in the real world. As of mid-2026, most world-model research is concentrated on near-field physical systems — tables, fluids, robotics, and controlled interactive environments — but there is a growing case for extending the idea to larger socio-environmental domains.
+
+The field is often described by two taxonomies:
+
+- Functional:
+  - **Renderers** emphasize perceptual fidelity. They generate realistic images or video, but they may not maintain coherent 3D geometry or robust physical causality.
+  - **Simulators** emphasize structural and physical accuracy. They aim for consistent geometry, Newtonian dynamics, and cause-and-effect behavior useful in robotics, digital twins, and physical AI.
+  - **Planners** use the internal simulation to evaluate sequences of actions and optimize toward a goal, closing the perception-action loop.
+
+- Architectural:
+  - **Latent dynamics models** compress the world into a latent state and predict how that state evolves over time. This approach traces back to the Ha and Schmidhuber world-model work and underpins models such as Dreamer and RSSM.
+  - **Joint embedding predictive architectures (JEPA)** learn to predict representations of future states rather than pixels, reducing compute cost and focusing on semantic structure.
+  - **Generative interactive environments** train on large video or simulated datasets to create controllable, playable worlds.
+
+In the current discourse, the contrast is often drawn between data-driven renderers (examples include video-focused systems such as Sora or Genie) and more physically grounded simulators (examples include research systems such as Marble or Cosmos). The planners layer is still nascent, but it is the part of the stack most directly relevant to decision support and policy exploration.
+
+For socio-environmental modeling, the future potential of world models is less about photorealistic imagery and more about internalizing coupled physical, ecological, and social dynamics in a way that supports counterfactual reasoning. Researchers such as Fei-Fei Li are pointing toward a world-model trajectory that moves beyond pixel generation to spatial and physical understanding, which is the sort of capability needed for larger-scale environmental and policy applications. On the data side, platforms such as Google Earth Engine provide one of the most important planetary-scale data infrastructures for environmental sensing and analysis.
+
+A number of larger-scale digital-twin and planetary-data efforts are already trying to assemble the pieces for this class of system: Microsoft Planetary Computer and Azure Open Data, NASA’s digital twins and Earth systems modeling programs, the World Economic Forum / DNV “Global Digital Twin” ambition, ESA/Copernicus climate and remote sensing infrastructure, and industry stacks from Siemens, Dassault, and GE. High-profile philanthropy has also backed the idea that a shared planetary data/model infrastructure can support climate and infrastructure decision making.
+
+That potential is still largely speculative today, but the need is clear: larger-scale world models would bring the strengths of AI-driven prediction and planning to the same classes of complex systems that traditional system dynamics, ABM, IAMs, and ESMs already study.
+
 ---
 
 ## Tools
-
-### System dynamics
 - **[Vensim](https://vensim.com)** (Ventana Systems) — the industry standard; used in climate modeling, pandemic response, resource management. The World3 model runs in Vensim.
 - **[Stella Architect](https://www.iseesystems.com/store/products/stella-architect.aspx)** (isee systems) — more accessible; widely used in education and policy work.
 - **[PySD](https://pysd.readthedocs.io)** — runs Vensim and Stella models in Python; brings SD into the scientific-Python ecosystem.
@@ -108,11 +130,17 @@ The hardest part of any model in this domain is data, not the engine. The key so
 
 **[CASA — Centre for Advanced Spatial Analysis, UCL](https://www.ucl.ac.uk/bartlett/casa)** — Mike Batty's group, the lineage for urban digital twins and geo-coupled simulation. Relevant when geography and spatial interaction matter.
 
+**[Google Earth Engine](https://earthengine.google.com)** — planetary-scale remote sensing and environmental data processing platform. Its global imagery, derived datasets, and analysis APIs are a major infrastructure layer for planetary digital twins.
+
+**NVIDIA Omniverse / World 2** — NVIDIA's growing digital-twin and physical-AI stack for integrating heterogeneous sensor, simulation, and physics data into shared virtual environments. It exemplifies the corporate push toward real-time, multi-domain digital twins of complex systems.
+
 **[SESYNC — National Socio-Environmental Synthesis Center](https://www.sesync.org)** (University of Maryland) — dedicated to synthesis research at the interface of human and ecological systems.
 
 **[CoMSES / OpenABM](https://www.comses.net)** — the open research community for computational and agent-based modeling. Peer-reviewed, DOI-assigned model repository. The highest-yield place to find existing models and practitioners.
 
 **[IPCC](https://www.ipcc.ch)** — the Intergovernmental Panel on Climate Change; the main institutional consumer of IAMs and ESMs; its reports define the scenario vocabulary (SSP, RCP) that most climate-adjacent modeling uses.
+
+**[simulate.world](https://simulate.world/about)** — a planetary modeling thesis developed by the author of this note, with a public talk available at https://www.youtube.com/watch?v=ibgt7Mbw2tE. It represents a practical exploration of planet-scale system modeling and public-facing simulation argument.
 
 ---
 

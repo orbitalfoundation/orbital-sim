@@ -1,14 +1,15 @@
-# Orbital Simulation Service
+# Orbital Web Service for Modeling
 
-Last Rev: 20260601
+Web facing interface for Orbital agent based modeling/simulations service.
 
-An agent based simulation scaffold for modeling multi-domain scenarios.
+Features:
 
-Core layout:
-
-/packages ... core agent scaffolding; pub/sub with late binding agents
-/public   ... multiplayer shared space; participants can define agents
-/website  ... a helpful web scaffolding for convenient interaction
+	- backed by orbital agent based models foundation
+	- real geographical data
+	- users sign in using socials and or web3 auth; giving them control over data
+	- users can spin up digital twins of local, bioregional or world issues
+	- playtest and share with others (jupyter notebooks style)
+	- mix and match tools, data, agents with other users
 
 ## Running
 
