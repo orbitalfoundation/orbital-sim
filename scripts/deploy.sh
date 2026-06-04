@@ -6,12 +6,13 @@
 
 set -e
 
-REPO_DIR="${1:-.}"
+REPO_DIR="${1:-/home/exedev/terrasim}"
 IMAGE_NAME="orbital-sim"
 CONTAINER_NAME="orbital-sim"
 DEPLOY_LOCK="/tmp/orbital-sim-deploy.lock"
 
-cd "$REPO_DIR"
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+cd "$REPO_DIR" || exit 1
 
 # Prevent concurrent deployments
 if [ -f "$DEPLOY_LOCK" ]; then
