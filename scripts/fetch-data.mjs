@@ -165,7 +165,20 @@ async function processManifest(manifestPath, opts, stats) {
     const sizeStr = have ? `  [${fmtBytes(await fileSize(resolve(ROOT, r.path)))}]` : '  [MISSING]';
     console.log(`    ${`${r._entity}.${r._component}`.padEnd(28)} local path: ${r.path}${sizeStr}`);
     if (!have) {
-      console.log(`      → not auto-fetchable; run: bash scripts/sync-data.sh`);
+      // Give specific guidance for the GEBCO raster — the most common missing file.
+      const isGebcoRaster = r.path?.includes('elevation') && r.path?.endsWith('.i16');
+      const isGebcoTiles  = r.path?.includes('gebco');
+      if (isGebcoRaster) {
+        console.log(`      → generated from GEBCO tiles; to create it:`);
+        console.log(`        1. download tiles from https://www.gebco.net/data-products/gridded-bathymetry-data`);
+        console.log(`           place .tif files in public/.data/gebco_2026/`);
+        console.log(`        2. node scripts/gebco-downsample.mjs`);
+        console.log(`        then: bash scripts/sync-data.sh  (to push to remote)`);
+      } else if (isGebcoTiles) {
+        console.log(`      → download from https://www.gebco.net/data-products/gridded-bathymetry-data`);
+      } else {
+        console.log(`      → not auto-fetchable; run: bash scripts/sync-data.sh`);
+      }
       stats.localMissing++;
     }
   }

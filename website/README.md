@@ -75,19 +75,51 @@ and are not included in the repository. They live in `public/.data/` (gitignored
 | File / directory | Size | Used by |
 |---|---|---|
 | `public/.data/elevation/global_5arcmin.i16` | 18 MB | All current scenarios — land/sea mask and elevation at 5 arc-minute resolution |
-| `public/.data/gebco_2026/` | 7 GB | High-resolution scenarios only (15 arc-second GeoTIFF tiles) — not required for IPCC |
+| `public/.data/gebco_2026/` | 7 GB | High-resolution scenarios only (15 arc-second GeoTIFF tiles, source for the above) |
 
-### Populating locally
+### Where the 18 MB raster comes from
 
-If assets are declared in a manifest's `fetch` block, download them:
+The file `global_5arcmin.i16` is not a raw download — it is generated from the
+full-resolution GEBCO 2026 tiles by averaging 20×20 pixel blocks (15 arc-sec →
+5 arc-min). The pipeline is:
+
+**Step 1 — download the GEBCO 2026 tiles** (7 GB total, 8 tiles covering 90°×90° quadrants each).
+
+Direct download links are available at:
+https://www.gebco.net/data-products/gridded-bathymetry-data
+
+Download the GeoTIFF sub-ice topography tiles and place them in
+`public/.data/gebco_2026/`. The filenames follow the pattern
+`gebco_2026_n{N}_s{S}_w{W}_e{E}_geotiff.tif`.
+
+**Step 2 — run the downsampler:**
+
+```sh
+node scripts/gebco-downsample.mjs
+# reads:  public/.data/gebco_2026/*.tif
+# writes: public/.data/elevation/global_5arcmin.i16  (~18 MB, ~30 s)
+```
+
+The output is a raw little-endian Int16 array, 4320×2160, north-up
+equirectangular, elevation in metres. This is what all current scenarios use.
+The full 7 GB tile set is only needed if you want full 15 arc-second resolution
+(future high-precision scenarios) — it is not required for IPCC or the current
+insolation baseline.
+
+### Populating locally (other assets)
+
+For assets declared in a manifest with a `url` and `sha256`, the fetch script
+handles them automatically:
 
 ```sh
 node scripts/fetch-data.mjs          # fetch all declared assets
-node scripts/fetch-data.mjs --list   # show what would be fetched without downloading
-node scripts/fetch-data.mjs --verify # checksum existing files
+node scripts/fetch-data.mjs --list   # inventory without downloading
+node scripts/fetch-data.mjs --verify # checksum existing files against manifests
 ```
 
-If you already have the data elsewhere, you can copy it directly into `public/.data/`.
+The GEBCO raster is a local-path-only reference (no `url` in the manifest) so
+this script will flag it as present or missing but cannot download it — follow
+the two-step process above instead.
 
 ### Pushing data to the remote server
 
