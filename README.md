@@ -19,3 +19,14 @@ See [website/README.md](website/README.md) for full setup including local HTTPS 
 npm run build
 npm run start
 ```
+
+## Scenario data
+
+Scenarios require geographic datasets not included in the repository (gitignored, too large).
+
+```sh
+node scripts/fetch-data.mjs   # download declared assets locally
+bash scripts/sync-data.sh     # push local data to the remote server
+```
+
+See [website/README.md § Scenario data](website/README.md) for details.
