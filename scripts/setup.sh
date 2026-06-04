@@ -57,16 +57,9 @@ chmod +x "$DEPLOY_SCRIPT"
 if crontab -l 2>/dev/null | grep -qF "$DEPLOY_SCRIPT"; then
   green "  [ok] cron job already installed"
 else
-  yellow "  [..] installing cron job..."
-  # Append to existing crontab (preserves any other entries)
-  if ( crontab -l 2>/dev/null; echo "$CRON_LINE" ) | crontab - 2>/dev/null; then
-    green "  [ok] cron job installed"
-    echo "       $CRON_LINE"
-  else
-    yellow "  [!!] cron install failed (macOS sandbox? run on the Linux server)"
-    yellow "       Add manually: crontab -e"
-    yellow "       Line: $CRON_LINE"
-  fi
+  yellow "  [!!] cron job not found — add it on the deployment server:"
+  yellow "       crontab -e"
+  yellow "       $CRON_LINE"
 fi
 
 # --- Done ---
