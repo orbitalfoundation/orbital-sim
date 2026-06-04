@@ -1,20 +1,26 @@
-.data
-public/.data
-simulate.world.old.reference
-todo.md
-old
-can 
+# typical nodejs ignores
 node_modules
-raw_ingestion_data
 node_packages
 .env
-runs
-
-# fetched scenario assets — populated by scripts/fetch-data.mjs
-public/*/*/.data/
-
 .DS_Store
 **/.DS_Store
-.claude/
 dist/
+**/dist
+.vscode
+.idea
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+runs
+
+# TLS certs — injected via env vars or secrets at runtime, not baked in
 website/server/*.pem
+
+# this data is too heavy to put into git - see scripts/fetch-data.mjs
+public/*/*/.data/
+.data
+public/.data
+
+# lets not share this - mostly local claude config
+.claude/

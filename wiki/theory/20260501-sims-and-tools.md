@@ -30,6 +30,25 @@ The **[Club of Rome](https://www.clubofrome.org)** — founded 1968 as a gatheri
 
 **Earth system models (ESMs)** are the full climate simulations run by NOAA, ECMWF, and similar institutions. High resolution, physically grounded, computationally expensive, and primarily concerned with physical variables rather than human dynamics.
 
+- https://www.youtube.com/watch?v=3rZPRfPq9Ho&t=16s primer on GCMs
+- https://en.wikipedia.org/wiki/General_circulation_model
+- https://www.youtube.com/watch?v=ZouTDk9icbA&t=14s ( gcms tutorial )
+- https://www.energy.gov/science/doe-explainsearth-system-and-climate-models nice image
+- https://www.gfdl.noaa.gov/climate-modeling/ (tutorial on gcms)
+- https://claude.ai/share/8f96e715-29b3-4322-a9ba-7c1468b91326
+
+More details: Earth System Models (ESMs) and General Circulation Models (GCMs) are complex computer models used to simulate, understand, and predict the Earth's climate and atmospheric behavior. While the terms are often used interchangeably, they represent different levels of complexity.
+
+General Circulation Model (GCM): Also known as a Global Climate Model, a GCM is a 3-dimensional mathematical representation of the Earth's physical climate system. It focuses primarily on the fundamental laws of physics and fluid dynamics to simulate the movement of energy, heat, moisture, and momentum across the atmosphere and oceans.
+
+Earth System Model (ESM): An ESM is the most advanced tier of climate modeling. It takes the foundational physics of a GCM and adds active biogeochemical cycles, simulating how carbon sinks (like forests and phytoplankton) and chemical processes interact with the physical climate.
+
+In practice discretization is used: The Earth is divided into a 3D grid of boxes, often spanning tens of kilometers horizontally and layered vertically into the atmosphere and ocean.
+
+Solving the Math: At every grid point, typically powerful supercomputers solve the complex primitive equations of geophysical fluid dynamics. These are based on the Navier-Stokes equations and laws of thermodynamics to calculate variables like wind velocity, pressure, temperature, and humidity.
+
+Parameterization: Processes that are too small or complex to resolve directly at the grid-box scale (like cloud formation, turbulence, or individual thunderstorms) are approximated using mathematical parameterizations.
+
 ## Emerging world models
 
 Emerging world models occupy a different part of the AI-simulation landscape. In deep learning, a world model is an internal representation of an environment that lets an agent predict future states and evaluate actions without directly testing them in the real world. As of mid-2026, most world-model research is concentrated on near-field physical systems — tables, fluids, robotics, and controlled interactive environments — but there is a growing case for extending the idea to larger socio-environmental domains.
