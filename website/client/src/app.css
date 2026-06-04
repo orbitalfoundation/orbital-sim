@@ -15,7 +15,7 @@
   --border:  light-dark(#e0e0ea, #1e1e30);
   --accent:  light-dark(#0aaa96, #0fd4bc);
   --text:    light-dark(#0f0f1c, #dcdce8);
-  --muted:   light-dark(#8080a0, #5a5a7a);
+  --muted:   light-dark(#8080a0, #9090b0);
 }
 
 *, *::before, *::after { box-sizing: border-box; }

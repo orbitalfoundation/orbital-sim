@@ -41,11 +41,12 @@ export default defineConfig({
     },
   },
   server: {
-    // Proxy API and socket calls to the Fastify server during dev
+    // Proxy API and socket calls to the Fastify server during dev.
+    // secure: false because the local TLS cert is self-signed (mkcert).
     proxy: {
-      '/api':       'http://localhost:3000',
-      '/assets':    'http://localhost:3000',
-      '/socket.io': { target: 'http://localhost:3000', ws: true },
+      '/api':       { target: 'https://localhost:3000', secure: false },
+      '/assets':    { target: 'https://localhost:3000', secure: false },
+      '/socket.io': { target: 'https://localhost:3000', secure: false, ws: true },
     },
   },
 });

@@ -4,30 +4,45 @@
 
   let { name } = $props();
 
-  let projects = $state([]);
-  let loading  = $state(true);
-  let error    = $state(null);
+  let items   = $state([]);
+  let loading = $state(true);
+  let error   = $state(null);
 
   $effect(() => {
     loading = true;
     error   = null;
     fetch(`/api/areas/${name}`)
       .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-      .then(d => { projects = d.projects ?? []; loading = false; })
+      .then(d => { items = d.items ?? []; loading = false; })
       .catch(e => { error = String(e); loading = false; });
   });
 
   const isOwner = $derived(auth.loggedIn && auth.area === name.toLowerCase());
 
   async function createProject() {
-    const slug = prompt('Project name (letters, numbers, hyphens):')?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    const slug = prompt('Project slug (letters, numbers, hyphens):')?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
     if (!slug) return;
+    const type  = prompt('Type (scenario / agent / collection / post / other):', 'other')?.trim() || 'other';
+    const title = prompt('Title:', slug)?.trim() || slug;
     const res = await fetch(`/api/areas/${name}/${slug}`, {
       method: 'POST',
       headers: { ...auth.headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, title }),
     });
-    if (res.ok) { projects = [...projects, { name: slug, hasIndex: false }]; }
-    else alert(await res.text());
+    if (res.ok) {
+      const item = await res.json();
+      items = [...items, { slug: item.slug, type: item.type, title: item.title, author: item.author, tags: [] }];
+    } else {
+      alert(await res.text());
+    }
+  }
+
+  function typeLabel(type) {
+    return type === 'scenario'   ? 'scenario'
+         : type === 'agent'      ? 'agent'
+         : type === 'collection' ? 'collection'
+         : type === 'post'       ? 'post'
+         : null;
   }
 </script>
 
@@ -47,21 +62,38 @@
   {:else if error}
     <p class="text-red-400 mono text-sm">{error}</p>
 
-  {:else if projects.length === 0}
-    <p class="text-[var(--muted)] text-sm">No projects yet.</p>
+  {:else if items.length === 0}
+    <p class="text-[var(--muted)] text-sm">Nothing listed in info.json yet.</p>
 
   {:else}
-    <div class="flex flex-col gap-px bg-[var(--border)]">
-      {#each projects as p}
+    <div class="flex flex-col gap-2">
+      {#each items as item}
         <button
-          onclick={() => router.navigate(`/${name}/${p.name}`)}
-          class="group bg-[var(--bg)] hover:bg-[var(--surface)] text-left px-4 py-3 transition-colors w-full"
+          onclick={() => router.navigate(`/${name}/${item.slug}`)}
+          class="group bg-[var(--bg)]/50 hover:bg-[var(--surface)]/60 text-left px-4 py-4 transition-colors w-full"
         >
-          <span class="mono text-sm text-[var(--text)] group-hover:text-[var(--accent)] transition-colors">
-            {p.name}/
-          </span>
-          {#if p.hasIndex}
-            <span class="ml-2 mono text-[10px] text-[var(--muted)] border border-[var(--border)] px-1.5 py-0.5">page</span>
+          <div class="flex items-baseline gap-3 mb-1 flex-wrap">
+            <span class="mono text-sm text-[var(--text)] group-hover:text-[var(--accent)] transition-colors">
+              {item.title ?? item.slug}
+            </span>
+            {#if typeLabel(item.type)}
+              <span class="mono text-[10px] text-[var(--muted)] border border-[var(--border)] px-1.5 py-0.5">
+                {typeLabel(item.type)}
+              </span>
+            {/if}
+          </div>
+          {#if item.description}
+            <p class="text-sm text-[var(--muted)] leading-relaxed">{item.description}</p>
+          {/if}
+          {#if item.tags?.length || item.location?.label}
+            <div class="flex gap-2 mt-2 flex-wrap">
+              {#each (item.tags ?? []) as tag}
+                <span class="mono text-[10px] tracking-wide text-[var(--muted)] bg-[var(--surface)] px-2 py-0.5">{tag}</span>
+              {/each}
+              {#if item.location?.label}
+                <span class="mono text-[10px] text-[var(--muted)] opacity-60">{item.location.label}</span>
+              {/if}
+            </div>
           {/if}
         </button>
       {/each}

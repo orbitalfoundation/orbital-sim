@@ -1,0 +1,50 @@
+{
+  "title": "Anselm",
+  "description": "Scenarios and experiments",
+  "items": [
+    {
+      "slug": "tenerife-futures",
+      "type": "scenario",
+      "title": "Tenerife Futures",
+      "description": "Scenario sketches for land use, water, and tourism on a volcanic Atlantic island.",
+      "author": "anselm",
+      "tags": ["speculative", "urban"],
+      "location": { "lat": 28.29, "lon": -16.63, "label": "Tenerife, Canary Islands" },
+      "updated": "2026-05-20"
+    },
+    {
+      "slug": "africa_middle_east_warming_2049",
+      "type": "scenario",
+      "title": "MENA Warming — 2049",
+      "description": "Accelerated surface temperature rise in the Middle East and North Africa. Desert regions warm at Arctic rates because no soil moisture buffers the CO₂ forcing.",
+      "author": "anselm",
+      "tags": ["climate", "energy balance"],
+      "location": { "lat": 26.0, "lon": 37.0, "label": "Middle East & North Africa" },
+      "updated": "2026-04-10"
+    },
+    {
+      "slug": "tuvalu",
+      "type": "scenario",
+      "title": "Tuvalu Baseline",
+      "description": "Freshwater lens, coral reef, fishery, and population dynamics on a low-lying island under sustained sea-level pressure.",
+      "author": "anselm",
+      "tags": ["ecosystem", "sea level"],
+      "location": { "lat": -8.52, "lon": 179.2, "label": "Tuvalu, Pacific Ocean" },
+      "updated": "2026-03-01"
+    },
+    {
+      "slug": "agents",
+      "type": "collection",
+      "title": "Agent Library",
+      "description": "Reusable agent definitions for ecological and climate simulations.",
+      "author": "anselm"
+    },
+    {
+      "slug": "microeconomy",
+      "type": "collection",
+      "title": "Microeconomy",
+      "description": "Market and trade simulation experiments.",
+      "author": "anselm"
+    }
+  ]
+}

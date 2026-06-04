@@ -55,12 +55,20 @@ fastify.get('/orbital-client.js', async (req, reply) => {
   return reply.code(404).send();
 });
 
+// --- API: home feed ---
+
+fastify.get('/api/home', async (req, reply) => {
+  const feed = await areas.homeFeed();
+  if (!feed) return reply.code(404).send({ error: 'no home feed' });
+  return feed;
+});
+
 // --- API: areas ---
 
 fastify.get('/api/areas/:name', async (req, reply) => {
-  const projects = await areas.listArea(req.params.name);
-  if (!projects) return reply.code(404).send({ error: 'area not found' });
-  return { projects };
+  const items = await areas.listArea(req.params.name);
+  if (!items) return reply.code(404).send({ error: 'area not found' });
+  return { items };
 });
 
 fastify.get('/api/areas/:name/:project', async (req, reply) => {
@@ -77,9 +85,11 @@ fastify.post('/api/areas/:name/:project', async (req, reply) => {
   const ownerArea = session.email?.split('@')[0]?.toLowerCase();
   if (ownerArea !== req.params.name.toLowerCase())
     return reply.code(403).send({ error: 'forbidden' });
+  const ownerSlug = ownerArea; // slug == email prefix == area name
   try {
-    await areas.createProject(req.params.name, req.params.project);
-    return { ok: true };
+    const meta = { author: ownerSlug, ...(req.body ?? {}) };
+    await areas.createProject(req.params.name, req.params.project, meta);
+    return { ok: true, slug: req.params.project, author: ownerSlug, type: meta.type ?? 'other', title: meta.title ?? req.params.project };
   } catch (err) {
     return reply.code(409).send({ error: err.message });
   }

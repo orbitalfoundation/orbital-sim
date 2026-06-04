@@ -1,0 +1,19 @@
+{
+  "type": "feed",
+  "title": "Orbital",
+  "description": "Recent activity",
+  "feed": [
+    {
+      "ref": "/anselm/tenerife-futures",
+      "date": "2026-05-20"
+    },
+    {
+      "ref": "/anselm/africa_middle_east_warming_2049",
+      "date": "2026-04-10"
+    },
+    {
+      "ref": "/anselm/tuvalu",
+      "date": "2026-03-01"
+    }
+  ]
+}
