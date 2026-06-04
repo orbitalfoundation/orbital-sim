@@ -48,11 +48,56 @@ function parseTileExtent(filename) {
   return { north: +m[1], south: +m[2], west: +m[3], east: +m[4] };
 }
 
+// Module-level caches — keyed by absolute path.
+// Storing Promises rather than values means concurrent loads of the same
+// resource await the same Promise rather than each triggering a file read.
+// The underlying Int16Array and tile objects are read-only after initial load
+// and safe to share across many bus instances.
+const rasterCache  = new Map(); // abs path → Promise<{data,width,height}>
+const tileSetCache = new Map(); // abs dir  → Promise<tile[]>
+
+async function loadRasterCached(abs, width, height) {
+  if (!rasterCache.has(abs)) {
+    rasterCache.set(abs, (async () => {
+      const buf    = await readFile(abs);
+      const pixels = buf.length / 2;
+      const w = width  || Math.round(Math.sqrt(pixels * 2));
+      const h = height || Math.round(pixels / w);
+      logger.info(`elevation: loaded ${w}×${h} raster from ${abs}`);
+      return { data: new Int16Array(buf.buffer, buf.byteOffset, pixels), width: w, height: h };
+    })().catch(err => { rasterCache.delete(abs); throw err; }));
+  }
+  return rasterCache.get(abs);
+}
+
+async function loadTileSetCached(abs) {
+  if (!tileSetCache.has(abs)) {
+    tileSetCache.set(abs, (async () => {
+      let entries;
+      try { entries = await readdir(abs); }
+      catch (err) {
+        logger.warn(`elevation: cannot read tile dir ${abs}: ${err.message}`);
+        return [];
+      }
+      const found = [];
+      for (const name of entries) {
+        if (!name.endsWith('.tif') && !name.endsWith('.tiff')) continue;
+        const extent = parseTileExtent(name);
+        if (!extent) continue;
+        found.push({ extent, path: join(abs, name), data: null, loading: false });
+      }
+      if (!found.length) logger.warn(`elevation: no GeoTIFF tiles found in ${abs}`);
+      else logger.info(`elevation: registered ${found.length} tile(s) from ${abs}`);
+      return found;
+    })().catch(err => { tileSetCache.delete(abs); throw err; }));
+  }
+  return tileSetCache.get(abs);
+}
+
 function createElevationService() {
-  // Single flat raster (load by path/target)
+  // These closure variables point into the module-level shared cache entries.
   let raster = null;
-  // Tile set loaded from a directory: array of { extent, data: Int16Array | null, loading: bool, path }
-  let tiles = null;
+  let tiles  = null;
 
   function sampleRaster(lon, lat) {
     const { data, width, height } = raster;
@@ -112,41 +157,19 @@ function createElevationService() {
     tile.loading = false;
   }
 
-  async function loadTilesDir(dir) {
-    const abs = isAbsolute(dir) ? dir : resolvePath(process.cwd(), dir);
-    let entries;
-    try {
-      entries = await readdir(abs);
-    } catch (err) {
-      logger.warn(`elevation: cannot read tile dir ${abs}: ${err.message}`);
+  async function load({ target, path: p, url, tiles: tilesDir, width, height }) {
+    if (tilesDir) {
+      const abs = isAbsolute(tilesDir) ? tilesDir : resolvePath(process.cwd(), tilesDir);
+      tiles = await loadTileSetCached(abs);
+      // Eagerly load any tiles not yet loaded by a previous bus instance.
+      await Promise.all(tiles.map(t => (!t.data && !t.loading && !t.unavailable) ? loadTile(t) : null));
       return;
     }
-    const found = [];
-    for (const name of entries) {
-      if (!name.endsWith('.tif') && !name.endsWith('.tiff')) continue;
-      const extent = parseTileExtent(name);
-      if (!extent) continue;
-      found.push({ extent, path: join(abs, name), data: null, loading: false });
-    }
-    if (!found.length) { logger.warn(`elevation: no GeoTIFF tiles found in ${abs}`); return; }
-    tiles = found;
-    logger.info(`elevation: registered ${tiles.length} tile(s) from ${abs}`);
-    // Eagerly load all available tiles (each ~930 MB — RAM must allow)
-    await Promise.all(tiles.map(loadTile));
-  }
-
-  async function load({ target, path: p, url, tiles: tilesDir, width, height }) {
-    if (tilesDir) return loadTilesDir(tilesDir);
     const src = p || target || url;
     if (!src) return;
     const abs = isAbsolute(src) ? src : resolvePath(process.cwd(), src);
     try {
-      const buf = await readFile(abs);
-      const pixels = buf.length / 2;
-      const w = width  || Math.round(Math.sqrt(pixels * 2));
-      const h = height || Math.round(pixels / w);
-      raster = { data: new Int16Array(buf.buffer, buf.byteOffset, pixels), width: w, height: h };
-      logger.info(`elevation: loaded ${w}×${h} raster from ${abs}`);
+      raster = await loadRasterCached(abs, width, height);
     } catch (err) {
       logger.warn(`elevation: cannot load ${src}: ${err.message}`);
     }
