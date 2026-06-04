@@ -1,0 +1,17 @@
+{
+  "type": "collection",
+  "title": "Orbital",
+  "description": "Reference scenarios and shared simulation resources.",
+  "author": "orbital",
+  "items": [
+    {
+      "slug": "ipcc",
+      "type": "scenario",
+      "title": "IPCC AR6 — Global Warming Scenarios",
+      "description": "Energy balance model driven by AR6 SSP CO₂ trajectories. Geographic temperature anomaly under four emissions pathways, 2024–2100.",
+      "author": "orbital",
+      "tags": ["climate", "ipcc", "ar6", "global"],
+      "updated": "2026-06-04"
+    }
+  ]
+}

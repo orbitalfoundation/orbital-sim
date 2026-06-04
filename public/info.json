@@ -4,6 +4,10 @@
   "description": "Recent activity",
   "feed": [
     {
+      "ref": "/orbital/ipcc",
+      "date": "2026-06-04"
+    },
+    {
       "ref": "/anselm/tenerife-futures",
       "date": "2026-05-20"
     },
