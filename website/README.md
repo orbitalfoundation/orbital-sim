@@ -83,14 +83,16 @@ The file `global_5arcmin.i16` is not a raw download — it is generated from the
 full-resolution GEBCO 2026 tiles by averaging 20×20 pixel blocks (15 arc-sec →
 5 arc-min). The pipeline is:
 
-**Step 1 — download the GEBCO 2026 tiles** (7 GB total, 8 tiles covering 90°×90° quadrants each).
+**Step 1 — download and extract the GEBCO 2026 tiles** (~3 GB zip, expands to ~7 GB):
 
-Direct download links are available at:
-https://www.gebco.net/data-products/gridded-bathymetry-data
+```sh
+bash scripts/fetch-gebco.sh
+# downloads zip from CEDA/BODC, extracts 8 tiles to public/.data/gebco_2026/
+```
 
-Download the GeoTIFF sub-ice topography tiles and place them in
-`public/.data/gebco_2026/`. The filenames follow the pattern
-`gebco_2026_n{N}_s{S}_w{W}_e{E}_geotiff.tif`.
+Or manually: download the zip directly from
+`https://dap.ceda.ac.uk/bodc/gebco/global/gebco_2026/ice_surface_elevation/geotiff/gebco_2026_geotiff.zip?download=1`
+and unzip the `.tif` files into `public/.data/gebco_2026/`.
 
 **Step 2 — run the downsampler:**
 
