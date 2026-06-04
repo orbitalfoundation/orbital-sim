@@ -6,7 +6,7 @@
 
 set -e
 
-REPO_DIR="${1:-/home/exedev/terrasim}"
+REPO_DIR="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 IMAGE_NAME="orbital-sim"
 CONTAINER_NAME="orbital-sim"
 DEPLOY_LOCK="/tmp/orbital-sim-deploy.lock"
@@ -33,7 +33,7 @@ REMOTE_COMMIT=$(git rev-parse origin/main 2>/dev/null || echo "$CURRENT_COMMIT")
 if [ -f "$LAST_COMMIT_FILE" ]; then
   LAST_COMMIT=$(cat "$LAST_COMMIT_FILE")
 else
-  LAST_COMMIT="$CURRENT_COMMIT"
+  LAST_COMMIT="none"
 fi
 
 if [ "$REMOTE_COMMIT" = "$LAST_COMMIT" ]; then
