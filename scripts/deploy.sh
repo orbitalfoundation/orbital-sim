@@ -64,3 +64,12 @@ docker run -d \
 
 echo "[$(date)] Deploy complete. Current commit: $REMOTE_COMMIT"
 echo "$REMOTE_COMMIT" > "$LAST_COMMIT_FILE"
+
+# Report data directory status so it's obvious if a sync is needed.
+if [ -d "$DATA_DIR" ] && [ -n "$(ls -A "$DATA_DIR" 2>/dev/null)" ]; then
+  DATA_SIZE=$(du -sh "$DATA_DIR" 2>/dev/null | cut -f1)
+  echo "[$(date)] Data directory: $DATA_DIR ($DATA_SIZE)"
+else
+  echo "[$(date)] WARNING: data directory is empty or missing: $DATA_DIR"
+  echo "[$(date)]          Run from your local machine: bash scripts/sync-data.sh"
+fi
