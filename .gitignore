@@ -22,5 +22,8 @@ public/*/*/.data/
 .data
 public/.data
 
+# simulation output — runtime artifacts, regenerate with node packages/bus/run.js
+**/output/
+
 # lets not share this - mostly local claude config
 .claude/

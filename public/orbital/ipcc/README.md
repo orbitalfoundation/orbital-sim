@@ -22,7 +22,7 @@ The scenarios in this model are the **SSPs — Shared Socioeconomic Pathways**. 
 
 - **SSP3-7.0** — high emissions with fragmentation. Regional rivalries, slow energy transition. CO₂ reaches ~867 ppm. Forcing ≈ 7 W/m².
 
-- **SSP5-8.5** — very high, fossil-fuel-intensive development. CO₂ exceeds 1100 ppm by 2100. The upper bound scenario; often treated as a stress test. Forcing ≈ 8.5 W/m².
+- **SSP5-8.5** — very high, fossil-fuel-intensive development. CO₂ exceeds 1100 ppm by 2100. The upper bound scenario; often treated as a stress test. Forcing ≈ 8.5 W/m². (This scenario has been recently criticized and to some degree discounted).
 
 A critical point: the SSPs are not predictions. They are conditional scenarios — what happens *if* the world follows a given emissions trajectory. The question is not which one will happen but which one choices determine. Presenting them as a menu rather than a single forecast is itself a participatory gesture: these are branches on a decision tree, not items in a forecast.
 
