@@ -4,15 +4,15 @@
 # After this, run gebco-downsample.mjs to generate the 18 MB working raster.
 #
 # Full pipeline:
-#   bash scripts/fetch-gebco.sh             # ~3 GB download, extracts to public/.data/gebco_2026/
+#   bash scripts/fetch-gebco.sh             # ~3 GB download, extracts to public/.data/elevation/global_15arcsec.i16/
 #   node scripts/gebco-downsample.mjs       # generates public/.data/elevation/global_5arcmin.i16 (~30 s)
 #   bash scripts/sync-data.sh               # push to remote server (if deploying)
 
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DEST_DIR="$REPO_DIR/public/.data/gebco_2026"
-ZIP_FILE="$REPO_DIR/public/.data/gebco_2026_geotiff.zip"
+DEST_DIR="$REPO_DIR/public/.data/elevation/global_15arcsec.i16"
+ZIP_FILE="$REPO_DIR/public/.data/elevation/global_15arcsec.i16_geotiff.zip"
 GEBCO_URL="https://dap.ceda.ac.uk/bodc/gebco/global/gebco_2026/ice_surface_elevation/geotiff/gebco_2026_geotiff.zip?download=1"
 
 echo "GEBCO 2026 — ice surface elevation GeoTIFF"

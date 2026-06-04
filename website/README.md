@@ -75,7 +75,7 @@ and are not included in the repository. They live in `public/.data/` (gitignored
 | File / directory | Size | Used by |
 |---|---|---|
 | `public/.data/elevation/global_5arcmin.i16` | 18 MB | All current scenarios — land/sea mask and elevation at 5 arc-minute resolution |
-| `public/.data/gebco_2026/` | 7 GB | High-resolution scenarios only (15 arc-second GeoTIFF tiles, source for the above) |
+| `public/.data/elevation/global_15arcsec.i16/` | 7 GB | GeoTIFF tiles at full 15 arc-second resolution — source material for the downsampler, and available for future high-precision scenarios |
 
 ### Where the 18 MB raster comes from
 
@@ -87,18 +87,18 @@ full-resolution GEBCO 2026 tiles by averaging 20×20 pixel blocks (15 arc-sec �
 
 ```sh
 bash scripts/fetch-gebco.sh
-# downloads zip from CEDA/BODC, extracts 8 tiles to public/.data/gebco_2026/
+# downloads zip from CEDA/BODC, extracts 8 tiles to public/.data/elevation/global_15arcsec.i16/
 ```
 
 Or manually: download the zip directly from
 `https://dap.ceda.ac.uk/bodc/gebco/global/gebco_2026/ice_surface_elevation/geotiff/gebco_2026_geotiff.zip?download=1`
-and unzip the `.tif` files into `public/.data/gebco_2026/`.
+and unzip the `.tif` files into `public/.data/elevation/global_15arcsec.i16/`.
 
 **Step 2 — run the downsampler:**
 
 ```sh
 node scripts/gebco-downsample.mjs
-# reads:  public/.data/gebco_2026/*.tif
+# reads:  public/.data/elevation/global_15arcsec.i16/*.tif
 # writes: public/.data/elevation/global_5arcmin.i16  (~18 MB, ~30 s)
 ```
 

@@ -12,22 +12,21 @@
 //   node scripts/gebco-downsample.mjs [tile-dir] [output-path]
 //
 // Defaults:
-//   tile-dir:    public/.data/gebco_2026/
+//   tile-dir:    public/.data/elevation/global_15arcsec.i16/
 //   output-path: public/.data/elevation/global_5arcmin.i16
 
 import { readFile, writeFile, readdir, mkdir } from 'node:fs/promises';
-import { resolve, isAbsolute, dirname, join } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
 
-const tileDir  = resolve(root, process.argv[2] ?? 'public/.data/gebco_2026/');
+const tileDir  = resolve(root, process.argv[2] ?? 'public/.data/elevation/global_15arcsec.i16/');
 const outPath  = resolve(root, process.argv[3] ?? 'public/.data/elevation/global_5arcmin.i16');
 
 // Source: 15 arc-second tiles, 21600×21600 per 90° quadrant
 const SRC_PX_PER_DEG = 240;   // 3600 / 15 = 240 pixels per degree
-const SRC_TILE_PX    = 21600; // pixels per tile side
 
 // Target: 5 arc-minute global grid
 const DST_PX_PER_DEG = 12;    // 60 / 5 = 12 pixels per degree
