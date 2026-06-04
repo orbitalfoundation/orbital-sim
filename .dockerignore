@@ -1,15 +1,33 @@
+# Dependencies — reinstalled inside the image by npm ci
 node_modules
 **/node_modules
+
+# Build output — rebuilt inside the image
 dist
 **/dist
+
+# Large data files — fetched at runtime, not baked into the image
 public/.data
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-.DS_Store
+public/*/*/.data/
+.data
+
+# Dev tooling and local config — not needed in production
 .git
 .gitignore
 .vscode
 .idea
+.claude
+notes
+
+# TLS certs — injected via env vars or secrets at runtime, not baked in
+website/server/*.pem
+
+# Logs and ephemeral state
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 runs
+
+# macOS noise
+.DS_Store
