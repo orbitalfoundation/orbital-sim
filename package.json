@@ -14,7 +14,6 @@
     "packages/bus",
     "packages/utils",
     "packages/agents",
-    "packages/server",
     "website/server"
   ],
   "devDependencies": {

@@ -8,6 +8,7 @@
     "test": "node --test test/agents.test.js"
   },
   "dependencies": {
-    "@orbital/utils": "*"
+    "@orbital/utils": "*",
+    "pngjs": "^7"
   }
 }

@@ -1,0 +1,8 @@
+{
+  "type": "scenario",
+  "title": "IPCC AR6 — Global Warming Scenarios",
+  "description": "Energy balance model driven by AR6 SSP CO₂ trajectories. Shows geographic temperature anomaly from pre-industrial baseline under four emissions pathways (SSP1-2.6 through SSP5-8.5), 2024–2100.",
+  "author": "orbital",
+  "tags": ["climate", "ipcc", "ar6", "temperature", "global"],
+  "updated": "2026-06-04"
+}
