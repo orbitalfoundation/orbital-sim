@@ -54,13 +54,8 @@ fi
 
 chmod +x "$DEPLOY_SCRIPT"
 
-if crontab -l 2>/dev/null | grep -qF "$DEPLOY_SCRIPT"; then
-  green "  [ok] cron job already installed"
-else
-  yellow "  [!!] cron job not found — add it on the deployment server:"
-  yellow "       crontab -e"
-  yellow "       $CRON_LINE"
-fi
+yellow "  [..] ensure this cron entry exists on the deployment server:"
+echo  "       $CRON_LINE"
 
 # --- Done ---
 
