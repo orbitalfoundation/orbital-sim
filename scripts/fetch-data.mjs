@@ -179,6 +179,8 @@ async function processManifest(manifestPath, opts, stats) {
         console.log(`      → not auto-fetchable; run: bash scripts/sync-data.sh`);
       }
       stats.localMissing++;
+    } else {
+      stats.localPresent++;
     }
   }
 
@@ -287,7 +289,7 @@ use scripts/sync-data.sh to push them from your local machine.
 
   const mode = args.verify ? 'verify' : args.list ? 'list' : 'fetch';
   const stats = { total: 0, fetched: 0, skipped: 0, verified: 0,
-                  missing: 0, mismatched: 0, failed: 0, localMissing: 0 };
+                  missing: 0, mismatched: 0, failed: 0, localPresent: 0, localMissing: 0 };
 
   let manifests = [];
   if (args.targets.length === 0) {
@@ -315,9 +317,12 @@ use scripts/sync-data.sh to push them from your local machine.
   // Summary
   console.log('');
   if (mode === 'fetch') {
-    console.log(`done.  ${stats.fetched} fetched  ${stats.skipped} already present  ${stats.failed} failed`);
+    const localStr = (stats.localPresent + stats.localMissing) > 0
+      ? `  |  local-path: ${stats.localPresent} present  ${stats.localMissing} missing`
+      : '';
+    console.log(`done.  ${stats.fetched} fetched  ${stats.skipped} already present  ${stats.failed} failed${localStr}`);
     if (stats.localMissing > 0) {
-      console.log(`       ${stats.localMissing} local-path asset(s) missing — run: bash scripts/sync-data.sh`);
+      console.log(`       run: bash scripts/sync-data.sh  (or see website/README.md § Scenario data)`);
     }
   } else if (mode === 'verify') {
     console.log(`done.  ${stats.verified} ok  ${stats.mismatched} mismatched  ${stats.missing} missing`);
