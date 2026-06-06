@@ -1,0 +1,117 @@
+{
+  "_notes": "Major fertilizer production facilities in and dependent on the Persian Gulf. The cascade: LNG shortage → ammonia plants shut → urea/ammonium nitrate production falls → global fertilizer price spike → farmers reduce application → crop yields fall.",
+
+  "gulf_producers": [
+    {
+      "id": "qafco",
+      "name": "Qatar Fertiliser Company (QAFCO)",
+      "country": "Qatar",
+      "lat": 25.89, "lon": 51.55,
+      "facility": "Ras Laffan Industrial City",
+      "operator": "QatarEnergy (75%) / Yara International (25%)",
+      "products": ["urea", "ammonia"],
+      "urea_capacity_mtpa": 5.6,
+      "ammonia_capacity_mtpa": 3.2,
+      "feedstock": "natural_gas",
+      "must_transit_hormuz": true,
+      "status_2026": "offline",
+      "notes": "World's largest single urea production complex. Offline due to Ras Laffan disruption. Yara is one of world's largest fertilizer companies — this is a critical input to their global supply chain."
+    },
+    {
+      "id": "sabic_jubail",
+      "name": "SABIC Jubail Complex",
+      "country": "Saudi Arabia",
+      "lat": 27.0, "lon": 49.7,
+      "operator": "SABIC (Saudi Aramco 70%)",
+      "products": ["ammonia", "urea", "methanol", "ethylene"],
+      "ammonia_capacity_mtpa": 2.8,
+      "urea_capacity_mtpa": 2.0,
+      "methanol_capacity_mtpa": 1.5,
+      "feedstock": "natural_gas",
+      "must_transit_hormuz": true,
+      "status_2026": "reduced",
+      "notes": "Jubail Industrial City is Saudi Arabia's main petrochemical hub. Products must still transit Hormuz for export despite being on Gulf coast."
+    },
+    {
+      "id": "fertiglobe_ruwais",
+      "name": "Fertiglobe / OCI Ruwais",
+      "country": "UAE",
+      "lat": 24.05, "lon": 52.66,
+      "operator": "Fertiglobe (OCI 58% / ADNOC 42%)",
+      "products": ["ammonia", "urea"],
+      "ammonia_capacity_mtpa": 1.1,
+      "urea_capacity_mtpa": 1.5,
+      "feedstock": "natural_gas",
+      "must_transit_hormuz": false,
+      "bypass_available": true,
+      "notes": "Located at Ruwais on UAE coast. Can use Fujairah routing. Fertiglobe is a key global ammonia/urea exporter — one of the few Gulf producers with partial bypass."
+    },
+    {
+      "id": "oman_india_fertiliser",
+      "name": "Oman India Fertiliser Company (OMIFCO)",
+      "country": "Oman",
+      "lat": 22.5, "lon": 59.5,
+      "operator": "OMIFCO (IFFCO / KRIBHCO India / OmanOil)",
+      "products": ["ammonia", "urea"],
+      "ammonia_capacity_mtpa": 1.65,
+      "urea_capacity_mtpa": 2.52,
+      "feedstock": "natural_gas",
+      "must_transit_hormuz": false,
+      "notes": "Oman is outside the strait. Direct Indian ownership means product primarily goes to India. One of the few major Gulf fertilizer producers unaffected by Hormuz closure."
+    }
+  ],
+
+  "dependent_consumers": [
+    {
+      "id": "india_fertilizer_sector",
+      "name": "India Fertilizer Industry",
+      "country": "India",
+      "lat": 22.0, "lon": 78.0,
+      "gulf_gas_dependency": 0.45,
+      "notes": "India is world's second-largest urea consumer. Heavily dependent on Gulf natural gas imports for domestic ammonia production. Facilities using imported gas face shutdown when LNG price exceeds economics."
+    },
+    {
+      "id": "bangladesh_fertilizer",
+      "name": "Bangladesh Fertilizer Industry",
+      "country": "Bangladesh",
+      "lat": 23.7, "lon": 90.4,
+      "gulf_urea_dependency": 0.55,
+      "notes": "Over 50% of fertilizer from Gulf. Severe vulnerability — Bangladesh agricultural productivity at risk with sustained closure."
+    },
+    {
+      "id": "pakistan_fertilizer",
+      "name": "Pakistan Fertilizer Industry",
+      "country": "Pakistan",
+      "lat": 30.4, "lon": 69.3,
+      "gulf_urea_dependency": 0.50,
+      "notes": "~50% of fertilizer imports from Gulf. Pakistan already food-stressed — fertilizer shortage creates compounded risk."
+    },
+    {
+      "id": "mosaic_company",
+      "name": "The Mosaic Company (US/Brazil)",
+      "country": "United States",
+      "lat": 27.9, "lon": -82.7,
+      "notes": "World's largest phosphate producer. Relies on Gulf sulfur for sulfuric acid production used in phosphate fertilizer. Gulf sulfur supply disruption forces production cuts in US and Brazil."
+    }
+  ],
+
+  "commodity_cascade": {
+    "description": "The fertilizer cascade that emerges from LNG/natural gas disruption",
+    "steps": [
+      "LNG supply disrupted → LNG/gas price spike",
+      "Gas price > economic threshold → ammonia synthesis plants shut down (Haber-Bosch process requires ~800-900°C with natural gas as both feedstock and fuel)",
+      "Ammonia shortage → urea and ammonium nitrate production falls (urea = CO2 + 2NH3)",
+      "Sulfur shortage (Gulf = 50% of seaborne sulfur) → sulfuric acid shortage → phosphate fertilizer production falls (Americas, North Africa affected)",
+      "Urea + phosphate price spike → farmers in price-sensitive markets reduce application rates",
+      "Reduced application (FAO elasticity ~0.3-0.6) → crop yield decline 4-8% for each 30% reduction in application",
+      "Yield decline + reduced food trade flows → food price spike → food insecurity"
+    ],
+    "timing": {
+      "gas_to_plant_shutdown": "days_to_weeks",
+      "plant_shutdown_to_market_price": "weeks",
+      "price_to_farmer_decision": "weeks_to_months (seasonal — spring planting window most critical)",
+      "farmer_decision_to_yield_impact": "months (harvest timing)",
+      "yield_impact_to_food_price": "months"
+    }
+  }
+}

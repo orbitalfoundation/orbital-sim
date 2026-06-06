@@ -1,0 +1,8 @@
+{
+  "type": "scenario",
+  "title": "Strait of Hormuz — Supply Chain Cascade",
+  "description": "Agent-based model of commodity flow disruption through the Strait of Hormuz and its second-order impacts: energy prices, fertilizer shortages, crop yields, food insecurity, and helium supply destruction.",
+  "author": "orbital",
+  "tags": ["hormuz", "supply-chain", "food-security", "energy", "geopolitics"],
+  "updated": "2026-06-05"
+}

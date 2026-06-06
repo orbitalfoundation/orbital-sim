@@ -5,6 +5,15 @@
   "author": "orbital",
   "items": [
     {
+      "slug": "hormuz",
+      "type": "scenario",
+      "title": "Strait of Hormuz — Supply Chain Cascade",
+      "description": "Agent-based commodity flow model. Set blockade intensity and watch energy prices, fertilizer shortages, crop yields, and food insecurity cascade naturally from the system structure.",
+      "author": "orbital",
+      "tags": ["hormuz", "supply-chain", "food-security", "energy"],
+      "updated": "2026-06-05"
+    },
+    {
       "slug": "ipcc",
       "type": "scenario",
       "title": "IPCC AR6 — Global Warming Scenarios",

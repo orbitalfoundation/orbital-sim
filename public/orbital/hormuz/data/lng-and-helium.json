@@ -1,0 +1,138 @@
+{
+  "_notes": "LNG terminals and helium production facilities in the Gulf. All Qatar LNG and associated helium must transit Hormuz — there is no bypass.",
+
+  "lng_terminals": [
+    {
+      "id": "ras_laffan",
+      "name": "Ras Laffan LNG Complex",
+      "country": "Qatar",
+      "lat": 25.89, "lon": 51.55,
+      "operator": "QatarEnergy",
+      "capacity_mmtpa": 77,
+      "must_transit_hormuz": true,
+      "status_2026": "partially_damaged",
+      "damage_notes": "Iranian missile strike March 2026 damaged infrastructure. QatarEnergy CEO stated 17% capacity reduction for up to 5 years.",
+      "effective_capacity_mmtpa": 64,
+      "helium_coproduction": true,
+      "helium_fraction_of_global": 0.32,
+      "notes": "World's largest LNG export complex. Feeds Qatar's entire LNG trade plus ~32% of global helium supply as byproduct of natural gas processing."
+    },
+    {
+      "id": "das_island",
+      "name": "Das Island LNG (ADGAS)",
+      "country": "UAE",
+      "lat": 25.13, "lon": 52.87,
+      "operator": "ADGAS (ADNOC / TotalEnergies / Mitsui / BP)",
+      "capacity_mmtpa": 5.8,
+      "must_transit_hormuz": false,
+      "notes": "UAE LNG. Can use Fujairah pipeline bypass for condensate; LNG tankers still technically need Hormuz but UAE is on Gulf of Oman side approach."
+    },
+    {
+      "id": "oman_lng",
+      "name": "Oman LNG (Qalhat / Sur)",
+      "country": "Oman",
+      "lat": 22.5, "lon": 59.5,
+      "operator": "OmanLNG (Government of Oman / Shell / TotalEnergies)",
+      "capacity_mmtpa": 10.4,
+      "must_transit_hormuz": false,
+      "notes": "Oman is outside the Persian Gulf — on the Gulf of Oman coast. Oman LNG does NOT require Hormuz transit. Critical alternative supplier."
+    }
+  ],
+
+  "helium_sources": [
+    {
+      "id": "qatar_ras_laffan_he",
+      "name": "Qatar / Ras Laffan Helium Plants",
+      "country": "Qatar",
+      "lat": 25.89, "lon": 51.55,
+      "global_share": 0.32,
+      "annual_production_mmcm": 36,
+      "operator": "QatarEnergy / Air Products / Linde",
+      "must_transit_hormuz": true,
+      "status_2026": "offline",
+      "notes": "Helium extracted as byproduct of LNG processing. Goes offline when LNG production stops. Single largest source — 32% of global supply cut when Ras Laffan impacted."
+    },
+    {
+      "id": "us_federal_helium_reserve",
+      "name": "US Federal Helium Reserve (Cliffside, Texas)",
+      "country": "United States",
+      "lat": 35.2, "lon": -102.1,
+      "global_share": 0.38,
+      "annual_production_mmcm": 43,
+      "operator": "BLM / US DOI (privatised 2024)",
+      "must_transit_hormuz": false,
+      "notes": "Largest single helium reserve in world. Located in Hugoton gas field, Texas/Kansas/Oklahoma. US is global swing producer but has limited surge capacity. Reserve is depleting — fields in decline."
+    },
+    {
+      "id": "algeria_skikda",
+      "name": "Algeria Helium (Skikda / Arzew)",
+      "country": "Algeria",
+      "lat": 36.9, "lon": 6.9,
+      "global_share": 0.08,
+      "annual_production_mmcm": 9,
+      "operator": "Sonatrach / Air Liquide",
+      "must_transit_hormuz": false
+    },
+    {
+      "id": "russia_amur",
+      "name": "Russia (Amur / Siberia)",
+      "country": "Russia",
+      "lat": 50.8, "lon": 128.3,
+      "global_share": 0.12,
+      "annual_production_mmcm": 14,
+      "operator": "Gazprom",
+      "must_transit_hormuz": false,
+      "notes": "Sanctioned since 2022; effectively unavailable to Western markets. Amur Gas Processing Plant came online 2021."
+    },
+    {
+      "id": "australia_darwin",
+      "name": "Australia (Darwin LNG / emerging)",
+      "country": "Australia",
+      "lat": -12.4, "lon": 130.9,
+      "global_share": 0.03,
+      "annual_production_mmcm": 3,
+      "must_transit_hormuz": false,
+      "notes": "Emerging producer. Insufficient to replace Qatar volumes."
+    }
+  ],
+
+  "helium_mechanics": {
+    "boiloff_days": 45,
+    "description": "Helium evaporates from ISO containers even when sealed. Once stranded at a port, containers empty in approximately 35-48 days. Supply destruction is permanent — helium returns to atmosphere at concentrations too diffuse to recapture economically.",
+    "container_value_usd": 1000000,
+    "key_consumers": [
+      {
+        "sector": "semiconductor_manufacturing",
+        "global_share": 0.26,
+        "critical_users": ["TSMC", "Samsung Electronics", "SK Hynix", "Intel", "Micron"],
+        "notes": "Wafer cooling in lithography; leak detection in sub-5nm fabs. Lines stop, not slow, when helium runs out."
+      },
+      {
+        "sector": "mri_scanners",
+        "global_share": 0.21,
+        "notes": "Superconducting magnet cooling to near absolute zero. No substitute gas. Hospitals ration scans during shortages."
+      },
+      {
+        "sector": "aerospace",
+        "global_share": 0.12,
+        "critical_users": ["NASA", "SpaceX", "ULA", "Ariane"],
+        "notes": "Rocket fuel system purging, tank pressurization, leak testing. Cannot substitute."
+      },
+      {
+        "sector": "fiber_optics",
+        "global_share": 0.10,
+        "notes": "Inert atmosphere for fiber drawing. Affects global telecommunications infrastructure manufacturing."
+      },
+      {
+        "sector": "research_quantum",
+        "global_share": 0.08,
+        "notes": "Cryogenic cooling for quantum computing research; particle physics experiments."
+      }
+    ],
+    "south_korea_dependency": {
+      "qatar_fraction": 0.65,
+      "affected_companies": ["Samsung Electronics", "SK Hynix", "LG Electronics"],
+      "notes": "South Korea sources ~65% of industrial helium from Qatar. Samsung and SK Hynix are the world's two largest memory chip manufacturers."
+    }
+  }
+}

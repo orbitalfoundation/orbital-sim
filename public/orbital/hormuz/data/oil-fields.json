@@ -1,0 +1,185 @@
+{
+  "_notes": "Major Gulf oil and gas fields. production_mbpd is pre-crisis capacity. must_transit_hormuz = true if the field has no pipeline bypass. Coordinates are approximate field centroids.",
+  "fields": [
+    {
+      "id": "ghawar",
+      "name": "Ghawar",
+      "country": "Saudi Arabia",
+      "lat": 25.1, "lon": 49.4,
+      "type": "oil",
+      "production_mbpd": 3.8,
+      "operator": "Saudi Aramco",
+      "must_transit_hormuz": false,
+      "bypass_route": "pipeline_petroline",
+      "notes": "World's largest conventional oil field. Production has declined from peak ~5 Mbpd. Primary exit via Abqaiq processing → Ras Tanura or East-West Pipeline."
+    },
+    {
+      "id": "khurais",
+      "name": "Khurais",
+      "country": "Saudi Arabia",
+      "lat": 24.2, "lon": 48.1,
+      "type": "oil",
+      "production_mbpd": 1.2,
+      "operator": "Saudi Aramco",
+      "must_transit_hormuz": false,
+      "bypass_route": "pipeline_petroline"
+    },
+    {
+      "id": "shaybah",
+      "name": "Shaybah",
+      "country": "Saudi Arabia",
+      "lat": 22.5, "lon": 54.4,
+      "type": "oil",
+      "production_mbpd": 1.0,
+      "operator": "Saudi Aramco",
+      "must_transit_hormuz": false,
+      "bypass_route": "pipeline_petroline"
+    },
+    {
+      "id": "safaniya",
+      "name": "Safaniya",
+      "country": "Saudi Arabia",
+      "lat": 28.0, "lon": 48.8,
+      "type": "oil",
+      "production_mbpd": 1.2,
+      "operator": "Saudi Aramco",
+      "must_transit_hormuz": false,
+      "bypass_route": "pipeline_petroline",
+      "notes": "World's largest offshore oil field."
+    },
+    {
+      "id": "ras_tanura_terminal",
+      "name": "Ras Tanura Export Terminal",
+      "country": "Saudi Arabia",
+      "lat": 26.64, "lon": 50.17,
+      "type": "terminal",
+      "export_capacity_mbpd": 6.0,
+      "operator": "Saudi Aramco",
+      "must_transit_hormuz": true,
+      "notes": "World's largest crude oil export terminal. Marine terminal on Persian Gulf coast — ALL exports from here go through Hormuz. Key chokepoint for Saudi exports even with Petroline available."
+    },
+    {
+      "id": "burgan",
+      "name": "Burgan",
+      "country": "Kuwait",
+      "lat": 29.0, "lon": 47.9,
+      "type": "oil",
+      "production_mbpd": 1.8,
+      "operator": "Kuwait Oil Company",
+      "must_transit_hormuz": true,
+      "notes": "World's second-largest oil field. Kuwait has no pipeline bypass — all exports must transit Hormuz. Kuwait CEO cited 3-4 month recovery timeline post-blockade."
+    },
+    {
+      "id": "rumaila",
+      "name": "Rumaila",
+      "country": "Iraq",
+      "lat": 30.5, "lon": 47.4,
+      "type": "oil",
+      "production_mbpd": 1.5,
+      "operator": "Basra Oil Company / BP",
+      "must_transit_hormuz": true,
+      "notes": "World's third-largest oil field. Basra crude primarily exported via offshore Basra Oil Terminal (KAAOT/ABOT). No practical bypass — Iraq-Turkey pipeline only handles Kirkuk."
+    },
+    {
+      "id": "west_qurna_1",
+      "name": "West Qurna-1",
+      "country": "Iraq",
+      "lat": 30.8, "lon": 47.5,
+      "type": "oil",
+      "production_mbpd": 0.5,
+      "operator": "ExxonMobil / PetroChina",
+      "must_transit_hormuz": true
+    },
+    {
+      "id": "west_qurna_2",
+      "name": "West Qurna-2",
+      "country": "Iraq",
+      "lat": 30.6, "lon": 47.5,
+      "type": "oil",
+      "production_mbpd": 0.4,
+      "operator": "Lukoil",
+      "must_transit_hormuz": true
+    },
+    {
+      "id": "kirkuk",
+      "name": "Kirkuk",
+      "country": "Iraq",
+      "lat": 35.5, "lon": 44.4,
+      "type": "oil",
+      "production_mbpd": 0.35,
+      "operator": "North Oil Company",
+      "must_transit_hormuz": false,
+      "bypass_route": "pipeline_iraq_turkey",
+      "notes": "Only major Iraqi field with Hormuz bypass via Kirkuk-Ceyhan pipeline to Turkey. Often disrupted."
+    },
+    {
+      "id": "upper_zakum",
+      "name": "Upper Zakum",
+      "country": "UAE",
+      "lat": 24.4, "lon": 52.8,
+      "type": "oil",
+      "production_mbpd": 0.75,
+      "operator": "ADNOC / ExxonMobil / JODCO",
+      "must_transit_hormuz": false,
+      "bypass_route": "pipeline_fujairah",
+      "notes": "Offshore UAE field. Abu Dhabi crude can use ADCOP pipeline to Fujairah to bypass Hormuz."
+    },
+    {
+      "id": "murban",
+      "name": "Murban / Bu Hasa",
+      "country": "UAE",
+      "lat": 23.5, "lon": 52.9,
+      "type": "oil",
+      "production_mbpd": 1.4,
+      "operator": "ADNOC",
+      "must_transit_hormuz": false,
+      "bypass_route": "pipeline_fujairah",
+      "notes": "UAE's primary onshore field complex. ADNOC flagship production."
+    },
+    {
+      "id": "north_field",
+      "name": "North Field (Qatar) / South Pars (Iran)",
+      "country": "Qatar",
+      "lat": 25.5, "lon": 51.4,
+      "type": "gas",
+      "production_mcm_per_day": 650,
+      "lng_equivalent_mmtpa": 77,
+      "operator": "QatarEnergy",
+      "must_transit_hormuz": true,
+      "notes": "World's largest single natural gas field (shared structure with Iran's South Pars). ALL Qatar LNG must transit Hormuz — there is no bypass. Ras Laffan LNG complex processes this gas. 17% LNG export capacity degraded for up to 5 years per QatarEnergy CEO after Ras Laffan damage."
+    },
+    {
+      "id": "south_pars",
+      "name": "South Pars",
+      "country": "Iran",
+      "lat": 27.5, "lon": 52.5,
+      "type": "gas",
+      "production_mcm_per_day": 400,
+      "operator": "NIOC / Petropars",
+      "must_transit_hormuz": true,
+      "notes": "Iran's portion of the North Field / South Pars structure. Iran is also the power enforcing the blockade — paradoxically Iran also exports via this strait."
+    },
+    {
+      "id": "ahvaz",
+      "name": "Ahvaz-Aghajari complex",
+      "country": "Iran",
+      "lat": 31.3, "lon": 49.2,
+      "type": "oil",
+      "production_mbpd": 0.9,
+      "operator": "NIOC",
+      "must_transit_hormuz": true,
+      "notes": "Iran's largest oil field complex. Iran's primary export terminal is Kharg Island."
+    },
+    {
+      "id": "kharg_island",
+      "name": "Kharg Island Export Terminal",
+      "country": "Iran",
+      "lat": 29.3, "lon": 50.3,
+      "type": "terminal",
+      "export_capacity_mbpd": 4.5,
+      "operator": "NIOC",
+      "must_transit_hormuz": true,
+      "notes": "Iran's main crude oil export terminal. Handles ~90% of Iran's oil exports."
+    }
+  ]
+}

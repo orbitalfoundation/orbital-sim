@@ -1,0 +1,81 @@
+{
+  "_notes": "Commodity routes through and around the Persian Gulf. blockade_sensitivity = how much Hormuz closure affects this route (1.0 = fully blocked, 0 = unaffected). capacity_mbpd is pre-crisis baseline.",
+  "routes": [
+    {
+      "id": "hormuz",
+      "name": "Strait of Hormuz",
+      "type": "sea_strait",
+      "waypoints": [[56.45, 26.35], [57.0, 25.8]],
+      "commodities": ["crude_oil", "lng", "condensate", "lpg", "urea", "ammonia", "sulfur", "methanol", "helium"],
+      "capacity_mbpd": 17.0,
+      "capacity_lng_mmtpa": 77,
+      "blockade_sensitivity": 1.0,
+      "transit_time_days": 0.5,
+      "pre_crisis_tankers_per_day": 150,
+      "notes": "21-mile-wide strait; only maritime exit from Persian Gulf. Pre-crisis: ~17 Mbpd oil, ~25% of global LNG."
+    },
+    {
+      "id": "suez_canal",
+      "name": "Suez Canal",
+      "type": "sea_canal",
+      "waypoints": [[32.55, 30.6], [32.55, 29.9]],
+      "commodities": ["crude_oil", "refined_products", "lng", "general_cargo"],
+      "capacity_mbpd": 5.5,
+      "blockade_sensitivity": 0.0,
+      "transit_time_penalty_days": 7,
+      "notes": "Alternative for oil from Gulf to Europe via Red Sea. Does not help Asia-bound Gulf cargo. Had own disruption risk from Houthi attacks 2024-25."
+    },
+    {
+      "id": "cape_of_good_hope",
+      "name": "Cape of Good Hope",
+      "type": "sea_route",
+      "waypoints": [[18.4, -34.3]],
+      "commodities": ["crude_oil", "lng", "refined_products", "general_cargo"],
+      "capacity_mbpd": 99,
+      "blockade_sensitivity": 0.0,
+      "transit_time_penalty_days": 18,
+      "cost_premium_per_barrel": 4.5,
+      "notes": "Full bypass for Gulf oil. No capacity limit but adds 14-21 days and ~$3-5/barrel. Used extensively during 2024 Red Sea disruption."
+    },
+    {
+      "id": "pipeline_petroline",
+      "name": "East-West Pipeline (Petroline)",
+      "type": "pipeline",
+      "waypoints": [[49.7, 25.9], [38.0, 24.1]],
+      "origin": "Abqaiq, Saudi Arabia",
+      "destination": "Yanbu, Saudi Arabia (Red Sea)",
+      "commodities": ["crude_oil"],
+      "capacity_mbpd": 2.0,
+      "available_capacity_mbpd": 1.2,
+      "blockade_sensitivity": 0.0,
+      "operators": ["Saudi Aramco"],
+      "notes": "Only Saudi crude. Destination Yanbu then Suez or direct shipping. Was underutilized pre-crisis; now critical bypass. Total capacity 2 Mbpd but ~1.2 Mbpd available beyond current use."
+    },
+    {
+      "id": "pipeline_fujairah",
+      "name": "Abu Dhabi-Fujairah Pipeline (ADCOP)",
+      "type": "pipeline",
+      "waypoints": [[54.5, 24.5], [56.3, 25.1]],
+      "origin": "Habshan, Abu Dhabi",
+      "destination": "Fujairah (Gulf of Oman coast)",
+      "commodities": ["crude_oil"],
+      "capacity_mbpd": 1.5,
+      "blockade_sensitivity": 0.0,
+      "operators": ["ADNOC"],
+      "notes": "UAE crude only. Fujairah is outside the strait. Operational and most strategically significant bypass built specifically for this contingency."
+    },
+    {
+      "id": "pipeline_iraq_turkey",
+      "name": "Kirkuk-Ceyhan Pipeline (Iraq-Turkey)",
+      "type": "pipeline",
+      "waypoints": [[44.4, 35.5], [36.2, 36.6]],
+      "origin": "Kirkuk, Iraq",
+      "destination": "Ceyhan, Turkey (Mediterranean)",
+      "commodities": ["crude_oil"],
+      "capacity_mbpd": 0.35,
+      "blockade_sensitivity": 0.0,
+      "operators": ["SOMO (Iraq)", "Botas (Turkey)"],
+      "notes": "Only Kirkuk crude. Often damaged; intermittently operational even pre-crisis. Currently partially operational at ~0.2 Mbpd."
+    }
+  ]
+}

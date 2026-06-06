@@ -1,0 +1,119 @@
+{
+  "_notes": "Major refineries that process Gulf crude. Organized by region. gulf_crude_fraction = fraction of crude input from Gulf states. All figures are approximate pre-crisis baselines.",
+
+  "refineries": [
+    {
+      "id": "jamnagar",
+      "name": "Jamnagar Refinery Complex (Reliance)",
+      "country": "India",
+      "lat": 22.3, "lon": 69.9,
+      "capacity_mbpd": 1.24,
+      "operator": "Reliance Industries",
+      "gulf_crude_fraction": 0.65,
+      "notes": "World's largest single refinery complex. Two refineries totalling 1.24 Mbpd. Processes substantial Gulf crude (Saudi, Iraqi, UAE). Also a major exporter of refined products."
+    },
+    {
+      "id": "ulsan_sk_energy",
+      "name": "Ulsan Refinery (SK Energy)",
+      "country": "South Korea",
+      "lat": 35.5, "lon": 129.4,
+      "capacity_mbpd": 0.84,
+      "operator": "SK Energy",
+      "gulf_crude_fraction": 0.72
+    },
+    {
+      "id": "yeosu_gs_caltex",
+      "name": "Yeosu Refinery (GS Caltex)",
+      "country": "South Korea",
+      "lat": 34.7, "lon": 127.7,
+      "capacity_mbpd": 0.79,
+      "operator": "GS Caltex (GS Holdings / Chevron)",
+      "gulf_crude_fraction": 0.70
+    },
+    {
+      "id": "onsan_s_oil",
+      "name": "Onsan Refinery (S-Oil)",
+      "country": "South Korea",
+      "lat": 35.4, "lon": 129.3,
+      "capacity_mbpd": 0.67,
+      "operator": "S-Oil (Saudi Aramco 63.4%)",
+      "gulf_crude_fraction": 0.90,
+      "notes": "Saudi Aramco is majority owner — this refinery processes almost exclusively Saudi crude."
+    },
+    {
+      "id": "zhoushan_zpc",
+      "name": "Zhoushan / Zhejiang Petrochemical",
+      "country": "China",
+      "lat": 29.9, "lon": 121.8,
+      "capacity_mbpd": 0.8,
+      "operator": "Rongsheng / Zhejiang Petrochemical",
+      "gulf_crude_fraction": 0.45
+    },
+    {
+      "id": "tianjin_sinopec",
+      "name": "Tianjin Petrochemical (Sinopec)",
+      "country": "China",
+      "lat": 39.0, "lon": 117.6,
+      "capacity_mbpd": 0.4,
+      "operator": "Sinopec",
+      "gulf_crude_fraction": 0.40
+    },
+    {
+      "id": "jurong_singapore",
+      "name": "Jurong Island Refinery Complex",
+      "country": "Singapore",
+      "lat": 1.3, "lon": 103.7,
+      "capacity_mbpd": 0.59,
+      "operator": "ExxonMobil / Shell / Chevron (multiple)",
+      "gulf_crude_fraction": 0.55,
+      "notes": "Singapore is Asia's primary petroleum trading and refining hub. Multiple refineries on Jurong Island."
+    },
+    {
+      "id": "negishi_jx",
+      "name": "Negishi Refinery (ENEOS/JX Nippon)",
+      "country": "Japan",
+      "lat": 35.4, "lon": 139.7,
+      "capacity_mbpd": 0.27,
+      "operator": "ENEOS Holdings",
+      "gulf_crude_fraction": 0.85
+    },
+    {
+      "id": "chiba_idemitsu",
+      "name": "Chiba Refinery (Idemitsu)",
+      "country": "Japan",
+      "lat": 35.6, "lon": 140.1,
+      "capacity_mbpd": 0.22,
+      "operator": "Idemitsu Kosan",
+      "gulf_crude_fraction": 0.80
+    },
+    {
+      "id": "rotterdam_shell",
+      "name": "Rotterdam Pernis Refinery (Shell)",
+      "country": "Netherlands",
+      "lat": 51.88, "lon": 4.36,
+      "capacity_mbpd": 0.44,
+      "operator": "Shell",
+      "gulf_crude_fraction": 0.20,
+      "notes": "Europe's largest refinery. More diverse crude sourcing than Asian refineries — North Sea, West Africa, Americas reduce Gulf dependency."
+    },
+    {
+      "id": "rotterdam_gunvor",
+      "name": "Rotterdam Refinery (Gunvor/formerly BP)",
+      "country": "Netherlands",
+      "lat": 51.9, "lon": 4.2,
+      "capacity_mbpd": 0.39,
+      "operator": "Gunvor",
+      "gulf_crude_fraction": 0.15
+    },
+    {
+      "id": "milazzo_eni",
+      "name": "Milazzo Refinery (ENI)",
+      "country": "Italy",
+      "lat": 38.2, "lon": 15.2,
+      "capacity_mbpd": 0.20,
+      "operator": "ENI / Kuwait Petroleum (50/50)",
+      "gulf_crude_fraction": 0.50,
+      "notes": "Co-owned by Kuwait Petroleum International. Processes Kuwaiti crude."
+    }
+  ]
+}
