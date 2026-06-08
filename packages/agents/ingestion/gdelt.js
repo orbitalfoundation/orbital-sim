@@ -29,7 +29,7 @@ import unzipper            from 'unzipper';
 import { getDb }           from '../lib/db.js';
 
 // GDELT 2.0 endpoints
-const GDELT_LASTUPDATE = 'https://data.gdelt.org/gdeltv2/lastupdate.txt';
+const GDELT_LASTUPDATE = 'http://data.gdeltproject.org/gdeltv2/lastupdate.txt';
 
 // Gulf country codes (FIPS 10-4 standard used by GDELT)
 const GULF_FIPS = new Set(['IR','IZ','SA','KU','BA','QA','AE','MU','YE','SY']);
@@ -199,9 +199,10 @@ async function sync(db) {
   if (_syncing) return;
   _syncing = true;
   try {
+    console.log(`[gdelt] checking ${GDELT_LASTUPDATE}`);
     const zipUrl  = await getLatestFileUrl();
     const ts      = zipUrl.match(/(\d{14})/)?.[1] ?? 'unknown';
-    console.log(`[gdelt] fetching ${ts} update…`);
+    console.log(`[gdelt] fetching update ${ts} from ${zipUrl}`);
 
     const inserted = await insertEvents(db, streamGulfConflicts(zipUrl));
     pruneOldEvents(db);

@@ -18,7 +18,9 @@ const worldManifest = join(repoRoot, 'public/orbital/world/manifest.js');
 // ---------- world bus (singleton, server lifetime) ----------
 
 export const worldBus = createBus({ description: 'world bus — infrastructure agents' });
+console.log('[worldBus] starting — loading', worldManifest);
 await worldBus.resolve({ load: worldManifest });
+console.log('[worldBus] ready —', worldBus.list().map(a => a.id).join(', '));
 
 // ---------- per-session sim buses ----------
 
