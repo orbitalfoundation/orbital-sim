@@ -203,7 +203,7 @@ function latlonToXYZ(lat, lon, r = 1.015) {
 let eventMesh = null;
 
 function renderEvents(events) {
-  if (eventMesh) { scene.remove(eventMesh); eventMesh.geometry.dispose(); }
+  if (eventMesh) { globe.remove(eventMesh); eventMesh.geometry.dispose(); }
   if (!events.length) { eventMesh = null; return; }
 
   const positions = [], colors = [], sizes = [];
@@ -258,7 +258,7 @@ function renderEvents(events) {
   });
 
   eventMesh = new THREE.Points(geo, mat);
-  scene.add(eventMesh);
+  globe.add(eventMesh);
 
   document.getElementById('stat-count').textContent    = events.length;
   document.getElementById('stat-material').textContent = `${nMaterial} material conflict`;
