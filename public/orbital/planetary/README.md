@@ -1,5 +1,7 @@
 # orbital/planetary
 
+@todo June 7 2026 - this is still a work in progress, we ended up focusing on ../IPCC first and will circle back to this.
+
 Abiotic baseline agents — solar forcing, elevation, surface fields — that
 other simulations build on top of. Each agent is a field-style process: one
 object that reads and writes named fields over a grid of `bus.world` cells.
