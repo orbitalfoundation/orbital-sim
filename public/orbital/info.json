@@ -14,6 +14,15 @@
       "updated": "2026-06-05"
     },
     {
+      "slug": "world-events",
+      "type": "scenario",
+      "title": "World Events",
+      "description": "Interactive globe showing georeferenced conflict events from GDELT, UCDP, and ACLED. Time slider steps through days.",
+      "author": "orbital",
+      "tags": ["conflict", "gdelt", "ucdp", "real-time", "globe"],
+      "updated": "2026-06-07"
+    },
+    {
       "slug": "ipcc",
       "type": "scenario",
       "title": "IPCC AR6 — Global Warming Scenarios",

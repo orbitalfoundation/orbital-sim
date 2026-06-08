@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>World Events — Orbital</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #07070e; --surface: #0f0f1c; --border: #1e1e30;
+    --accent: #0fd4bc; --text: #dcdce8; --muted: #9090b0;
+    --mono: ui-monospace, monospace; --sans: ui-sans-serif, system-ui, sans-serif;
+  }
+  html, body { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; overflow: hidden; }
+  #canvas { position: fixed; inset: 0; }
+
+  /* ---- overlays ---- */
+  .overlay { position: fixed; z-index: 10; }
+
+  #header {
+    top: 0; left: 0; right: 0;
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 20px;
+    background: linear-gradient(to bottom, rgba(7,7,14,.9) 0%, transparent 100%);
+  }
+  .wordmark { font-family: var(--mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
+  .title { font-size: 13px; color: var(--text); opacity: .7; }
+  .controls { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  select {
+    font-family: var(--mono); font-size: 11px; background: var(--surface);
+    color: var(--text); border: 1px solid var(--border); padding: 4px 8px; cursor: pointer;
+  }
+
+  #stats {
+    top: 56px; left: 20px;
+    font-family: var(--mono); font-size: 11px; color: var(--muted); line-height: 1.8;
+  }
+  #stats .big { font-size: 22px; color: var(--accent); font-family: var(--mono); }
+
+  #legend {
+    top: 56px; right: 20px;
+    font-family: var(--mono); font-size: 10px; color: var(--muted); line-height: 2;
+  }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+
+  #timeline {
+    bottom: 0; left: 0; right: 0;
+    padding: 16px 24px 20px;
+    background: linear-gradient(to top, rgba(7,7,14,.95) 0%, transparent 100%);
+  }
+  #date-label { font-family: var(--mono); font-size: 13px; color: var(--accent); margin-bottom: 8px; }
+  .slider-row { display: flex; align-items: center; gap: 12px; }
+  #slider { flex: 1; accent-color: var(--accent); height: 4px; }
+  #play-btn {
+    font-family: var(--mono); font-size: 11px; border: 1px solid var(--accent);
+    color: var(--accent); background: transparent; padding: 5px 14px; cursor: pointer;
+    transition: background .15s, color .15s; white-space: nowrap;
+  }
+  #play-btn:hover { background: var(--accent); color: var(--bg); }
+  #source-info { margin-top: 6px; font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+  #loading {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; font-family: var(--mono); font-size: 12px; color: var(--muted); z-index: 100;
+  }
+  #loading.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div id="header" class="overlay">
+  <a href="/" class="wordmark">Orbital</a>
+  <span class="title">World Events</span>
+  <div class="controls">
+    <select id="source-select">
+      <option value="gdelt">GDELT (real-time)</option>
+      <option value="ucdp">UCDP (historical)</option>
+      <option value="acled">ACLED (curated)</option>
+    </select>
+  </div>
+</div>
+
+<div id="stats" class="overlay">
+  <div class="big" id="stat-count">—</div>
+  <div>events on this date</div>
+  <div id="stat-material" style="margin-top:6px">— material conflict</div>
+  <div id="stat-verbal">— verbal conflict</div>
+</div>
+
+<div id="legend" class="overlay">
+  <div><span class="dot" style="background:#ef4444"></span>Material conflict</div>
+  <div><span class="dot" style="background:#f59e0b"></span>Verbal conflict</div>
+  <div style="margin-top:6px;font-size:9px;opacity:.6">Dot size ∝ mentions / fatalities</div>
+</div>
+
+<div id="timeline" class="overlay">
+  <div id="date-label">Loading…</div>
+  <div class="slider-row">
+    <input type="range" id="slider" min="0" max="0" value="0">
+    <button id="play-btn">Play ▶</button>
+  </div>
+  <div id="source-info"></div>
+</div>
+
+<div id="loading">
+  <div style="font-size:13px;color:var(--text)">World Events</div>
+  <div>Loading globe…</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three":          "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+    "three/addons/":  "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE            from 'three';
+import { OrbitControls }     from 'three/addons/controls/OrbitControls.js';
+
+// ---- renderer ----
+const canvas   = document.getElementById('canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(devicePixelRatio);
+
+const scene  = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
+camera.position.set(0, 0, 2.8);
+
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping  = true;
+controls.dampingFactor  = 0.08;
+controls.minDistance    = 1.2;
+controls.maxDistance    = 8;
+controls.enablePan      = false; // panning doesn't make sense on a globe
+
+// ---- lights ----
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.0);
+sun.position.set(5, 3, 5);
+scene.add(sun);
+
+// ---- earth ----
+const earthGeo = new THREE.SphereGeometry(1, 64, 64);
+const earthTex = new THREE.TextureLoader().load('/assets/earth.jpg');
+const earthMat = new THREE.MeshPhongMaterial({ map: earthTex, specular: 0x111122, shininess: 8 });
+const earth    = new THREE.Mesh(earthGeo, earthMat);
+scene.add(earth);
+
+// ---- atmosphere glow ----
+const atmGeo = new THREE.SphereGeometry(1.015, 32, 32);
+const atmMat = new THREE.MeshPhongMaterial({
+  color: 0x3399ff, transparent: true, opacity: 0.08, side: THREE.FrontSide, depthWrite: false,
+});
+scene.add(new THREE.Mesh(atmGeo, atmMat));
+
+// ---- stars ----
+{
+  const starGeo = new THREE.BufferGeometry();
+  const pos     = new Float32Array(3000);
+  for (let i = 0; i < 3000; i += 3) {
+    const phi   = Math.acos(2 * Math.random() - 1);
+    const theta = 2 * Math.PI * Math.random();
+    const r     = 50 + Math.random() * 50;
+    pos[i]   = r * Math.sin(phi) * Math.cos(theta);
+    pos[i+1] = r * Math.cos(phi);
+    pos[i+2] = r * Math.sin(phi) * Math.sin(theta);
+  }
+  starGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 })));
+}
+
+// ---- resize ----
+function onResize() {
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+}
+onResize();
+window.addEventListener('resize', onResize);
+
+// ---- lat/lon to XYZ ----
+function latlonToXYZ(lat, lon, r = 1.015) {
+  const phi   = (90 - lat)  * Math.PI / 180;
+  const theta = (lon + 180) * Math.PI / 180;
+  return new THREE.Vector3(
+    -r * Math.sin(phi) * Math.cos(theta),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta),
+  );
+}
+
+// ---- event points ----
+let eventMesh = null;
+
+function renderEvents(events) {
+  if (eventMesh) { scene.remove(eventMesh); eventMesh.geometry.dispose(); }
+  if (!events.length) { eventMesh = null; return; }
+
+  const positions = [], colors = [], sizes = [];
+  let nMaterial = 0, nVerbal = 0;
+
+  for (const e of events) {
+    const lat = e.latitude ?? e.ActionGeo_Lat;
+    const lon = e.longitude ?? e.ActionGeo_Long;
+    if (!lat || !lon) continue;
+
+    const pos   = latlonToXYZ(lat, lon);
+    positions.push(pos.x, pos.y, pos.z);
+
+    // Colour by conflict type
+    const quad = e.quad_class ?? e.QuadClass ?? (e.type_of_violence ? 4 : 3);
+    const material = quad === 4;
+    if (material) nMaterial++; else nVerbal++;
+    const col = material ? new THREE.Color(0xef4444) : new THREE.Color(0xf59e0b);
+    colors.push(col.r, col.g, col.b);
+
+    // Size by severity signal
+    const mentions = e.num_mentions ?? e.deaths_best ?? e.fatalities ?? 1;
+    sizes.push(Math.min(0.035, Math.max(0.006, Math.sqrt(mentions + 1) * 0.004)));
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('color',    new THREE.Float32BufferAttribute(colors,    3));
+  geo.setAttribute('size',     new THREE.Float32BufferAttribute(sizes,     1));
+
+  // Custom shader so each point can have its own size
+  const mat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false,
+    vertexShader: `
+      attribute float size;
+      attribute vec3 color;
+      varying vec3 vColor;
+      void main() {
+        vColor = color;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        gl_PointSize = size * (600.0 / -mv.z);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      varying vec3 vColor;
+      void main() {
+        float d = length(gl_PointCoord - vec2(0.5));
+        if (d > 0.5) discard;
+        float alpha = 1.0 - smoothstep(0.3, 0.5, d);
+        gl_FragColor = vec4(vColor, alpha * 0.85);
+      }`,
+    vertexColors: true,
+  });
+
+  eventMesh = new THREE.Points(geo, mat);
+  scene.add(eventMesh);
+
+  document.getElementById('stat-count').textContent    = events.length;
+  document.getElementById('stat-material').textContent = `${nMaterial} material conflict`;
+  document.getElementById('stat-verbal').textContent   = `${nVerbal} verbal conflict`;
+}
+
+// ---- city dots ----
+async function loadCities() {
+  try {
+    const res = await fetch('/api/cities?min_pop=500000');
+    if (!res.ok) return;
+    const { cities } = await res.json();
+    const pos = [], col = [];
+    const c = new THREE.Color(0x0fd4bc);
+    for (const city of cities) {
+      const p = latlonToXYZ(city.latitude, city.longitude, 1.012);
+      pos.push(p.x, p.y, p.z);
+      col.push(c.r, c.g, c.b);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setAttribute('color',    new THREE.Float32BufferAttribute(col, 3));
+    const mat = new THREE.PointsMaterial({ size: 0.004, vertexColors: true });
+    scene.add(new THREE.Points(geo, mat));
+  } catch {}
+}
+loadCities();
+
+// ---- date slider ----
+const slider      = document.getElementById('slider');
+const dateLabel   = document.getElementById('date-label');
+const playBtn     = document.getElementById('play-btn');
+const sourceInfo  = document.getElementById('source-info');
+const sourceSelect = document.getElementById('source-select');
+
+let dates    = [];
+let current  = 0;
+let playing  = false;
+let playTimer= null;
+
+async function loadDates(source) {
+  const res = await fetch(`/api/events/dates?source=${source}`);
+  if (!res.ok) return;
+  dates = (await res.json()).dates ?? [];
+  slider.max   = Math.max(0, dates.length - 1);
+  slider.value = slider.max;
+  current      = dates.length - 1;
+  updateDate();
+  document.getElementById('loading').classList.add('hidden');
+}
+
+async function updateDate() {
+  if (!dates.length) { dateLabel.textContent = 'No data — run a GDELT or UCDP agent first'; return; }
+  const date = dates[current];
+  dateLabel.textContent = date;
+  const source = sourceSelect.value;
+  try {
+    const res = await fetch(`/api/events?source=${source}&date=${date}`);
+    if (res.ok) renderEvents((await res.json()).events ?? []);
+  } catch {}
+}
+
+slider.addEventListener('input', () => {
+  current = Number(slider.value);
+  updateDate();
+});
+
+playBtn.addEventListener('click', () => {
+  playing = !playing;
+  playBtn.textContent = playing ? 'Pause ⏸' : 'Play ▶';
+  if (playing) {
+    playTimer = setInterval(() => {
+      current = (current + 1) % dates.length;
+      slider.value = current;
+      updateDate();
+    }, 1000);
+  } else {
+    clearInterval(playTimer);
+  }
+});
+
+sourceSelect.addEventListener('change', async () => {
+  const source = sourceSelect.value;
+  const res = await fetch('/api/events/sources');
+  if (res.ok) {
+    const { sources } = await res.json();
+    const s = sources.find(x => x.id === source);
+    sourceInfo.textContent = s ? `${s.count.toLocaleString()} events · latest: ${s.latest}` : 'No data for this source';
+  }
+  await loadDates(source);
+});
+
+// Init
+(async () => {
+  const res = await fetch('/api/events/sources');
+  if (res.ok) {
+    const { sources } = await res.json();
+    // Pre-select first available source
+    if (sources.length) {
+      sourceSelect.value = sources[0].id;
+      const s = sources[0];
+      sourceInfo.textContent = `${s.count.toLocaleString()} events · latest: ${s.latest}`;
+    }
+  }
+  await loadDates(sourceSelect.value);
+})();
+
+// ---- animation loop ----
+let slowSpin = true; // gentle auto-rotation when not interacting
+controls.addEventListener('start', () => { slowSpin = false; });
+controls.addEventListener('end',   () => { setTimeout(() => { slowSpin = true; }, 8000); });
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  if (slowSpin) earth.rotation.y += 0.0008;
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
