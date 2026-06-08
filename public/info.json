@@ -4,6 +4,14 @@
   "description": "Recent activity",
   "feed": [
     {
+      "ref": "/orbital/world-events",
+      "date": "2026-06-07"
+    },
+    {
+      "ref": "/orbital/hormuz",
+      "date": "2026-06-05"
+    },
+    {
       "ref": "/orbital/ipcc",
       "date": "2026-06-04"
     },
