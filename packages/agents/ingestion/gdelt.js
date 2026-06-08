@@ -105,7 +105,7 @@ async function getLatestFileUrl() {
   const text = await res.text();
   // First line is the export (events) file
   const line = text.trim().split('\n')[0];
-  return line.split(' ')[1]; // "SIZE URL"
+  return line.split(' ')[2]; // format: "SIZE MD5 URL"
 }
 
 // ---------- stream and filter GDELT events ----------
