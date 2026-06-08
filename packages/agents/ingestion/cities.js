@@ -152,6 +152,18 @@ const citiesAgent = {
       console.log(`[cities] ready: ${count} cities${count === 0 ? ' (syncing…)' : ''}`);
       return;
     }
+    if (event.cities_query) {
+      const q = event.cities_query;
+      if (!bus.cities) return null;
+      if (q.near)              return bus.cities.near(q.near.lon, q.near.lat, q.near.radius ?? 100);
+      if (q.search  != null)   return bus.cities.search(q.search);
+      if (q.byCountry != null) return bus.cities.byCountry(q.byCountry);
+      if (q.largest != null)   return bus.cities.largest(q.largest);
+      if (q.count)             return bus.cities.count();
+      if (q.all)               return bus.cities.all();
+      return null;
+    }
+
     if (event.tick && !_syncing && Date.now() - _lastSync > this.ttlMs) sync(getDb());
   },
 };

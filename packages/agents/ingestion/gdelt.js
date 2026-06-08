@@ -29,7 +29,7 @@ import unzipper            from 'unzipper';
 import { getDb }           from '../lib/db.js';
 
 // GDELT 2.0 endpoints
-const GDELT_LASTUPDATE = 'http://data.gdelt.org/gdeltv2/lastupdate.txt';
+const GDELT_LASTUPDATE = 'https://data.gdelt.org/gdeltv2/lastupdate.txt';
 
 // Gulf country codes (FIPS 10-4 standard used by GDELT)
 const GULF_FIPS = new Set(['IR','IZ','SA','KU','BA','QA','AE','MU','YE','SY']);
@@ -252,6 +252,13 @@ const gdeltAgent = {
           return rows.filter(r => haversine(lat, lon, r.latitude, r.longitude) <= radiusKm);
         },
 
+        events_on: (isoDate) => {
+          const ymd = isoDate.replace(/-/g, '');
+          return db.prepare(
+            'SELECT * FROM gdelt_events WHERE event_date = ? ORDER BY num_mentions DESC LIMIT 2000'
+          ).all(ymd);
+        },
+
         events_since: (isoDate) => {
           const ymd = isoDate.replace(/-/g, '');
           return db.prepare(
@@ -265,6 +272,13 @@ const gdeltAgent = {
           const d = db.prepare('SELECT MAX(event_date) d FROM gdelt_events').get()?.d;
           return d ? `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}` : null;
         },
+
+        available_dates: () => db.prepare(
+          'SELECT DISTINCT event_date d FROM gdelt_events ORDER BY d'
+        ).all().map(r => {
+          const s = String(r.d);
+          return `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`;
+        }),
 
         // Simple grid-based hot-spot summary (1° cells)
         hot_spots: () => db.prepare(`
@@ -281,6 +295,18 @@ const gdeltAgent = {
       const count = db.prepare('SELECT COUNT(*) c FROM gdelt_events').get()?.c ?? 0;
       console.log(`[gdelt] ready: ${count} events in ${WINDOW_DAYS}-day Gulf window (syncing…)`);
       return;
+    }
+
+    if (event.gdelt_query) {
+      const q = event.gdelt_query;
+      if (!bus.gdelt) return null;
+      if (q.date)    return bus.gdelt.events_on(q.date);
+      if (q.since)   return bus.gdelt.events_since(q.since);
+      if (q.near)    return bus.gdelt.events_near(q.near.lon, q.near.lat, q.near.radius ?? 200);
+      if (q.dates)   return bus.gdelt.available_dates();
+      if (q.count)   return bus.gdelt.count();
+      if (q.latest)  return bus.gdelt.latest_date();
+      return null;
     }
 
     // Realtime: refresh every 15 minutes

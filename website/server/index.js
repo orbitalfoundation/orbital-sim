@@ -15,9 +15,8 @@ import { fileURLToPath } from 'node:url';
 import { access, readFile, stat } from 'node:fs/promises';
 import { constants }     from 'node:fs';
 import { makeAreas }     from './areas.js';
-import { startSim, stopSim, listSims, getSim, simEvents } from './sims.js';
+import { startSim, stopSim, listSims, getSim, simEvents, worldBus } from './sims.js';
 import { createSession, getSession, deleteSession } from './sessions.js';
-import { queryEventsByDate, queryAvailableDates, queryCities, availableSources } from './events.js';
 
 const __dirname   = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, '../..');
@@ -54,28 +53,6 @@ fastify.get('/orbital-client.js', async (req, reply) => {
   const p = join(projectRoot, 'packages/server/orbital-client.js');
   if (await fileExists(p)) return reply.type('application/javascript').send(await readFile(p, 'utf8'));
   return reply.code(404).send();
-});
-
-// --- API: events (geo-intelligence) ---
-
-fastify.get('/api/events', async (req) => {
-  const { source = 'gdelt', date } = req.query;
-  if (!date) return { events: [], error: 'date required (YYYY-MM-DD)' };
-  return { events: queryEventsByDate(source, date) };
-});
-
-fastify.get('/api/events/dates', async (req) => {
-  const { source = 'gdelt' } = req.query;
-  return { dates: queryAvailableDates(source) };
-});
-
-fastify.get('/api/events/sources', async () => {
-  return { sources: availableSources() };
-});
-
-fastify.get('/api/cities', async (req) => {
-  const minPop = Number(req.query.min_pop ?? 100_000);
-  return { cities: queryCities(minPop) };
 });
 
 // --- API: home feed ---
@@ -249,6 +226,23 @@ io.on('connection', socket => {
     // socket.io has already removed the socket from rooms by this point.
     for (const id of joined) {
       if ((io.sockets.adapter.rooms.get(id)?.size ?? 0) === 0) scheduleIdleStop(id);
+    }
+  });
+
+  // Bus query protocol: one handler for every service, no per-route barnacles.
+  // Only *_query keys are allowed — data queries, not actions.
+  // Usage: socket.emit('query', { id, key: 'gdelt_query', args: { date: '2026-06-07' } })
+  //        socket.once(`response:${id}`, ({ ok, result, error }) => { ... })
+  socket.on('query', async ({ id, key, args }) => {
+    if (!id || typeof key !== 'string' || !key.endsWith('_query')) {
+      if (id) socket.emit(`response:${id}`, { ok: false, error: 'invalid query key' });
+      return;
+    }
+    try {
+      const result = await worldBus.resolve({ [key]: args ?? {} });
+      socket.emit(`response:${id}`, { ok: true, result: result ?? null });
+    } catch (err) {
+      socket.emit(`response:${id}`, { ok: false, error: err.message });
     }
   });
 });

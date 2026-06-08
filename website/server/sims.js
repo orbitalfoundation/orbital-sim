@@ -1,9 +1,26 @@
 // sims — bus instance lifecycle.
-// Thin bridge: creates bus instances, taps observable state after each tick,
-// streams frame buffers. No domain knowledge — just wiring.
+// Exports:
+//   worldBus — persistent infrastructure bus (cities, events, geo data).
+//              Starts at server init; agents self-initialise and sync in background.
+//              Clients query it via socket: emit('query', { id, key, args })
+//
+//   startSim / stopSim / getSim / listSims — per-session simulation buses.
 
 import { createBus } from '@orbital/bus';
-import { EventEmitter } from 'node:events';
+import { resolve, join, dirname } from 'node:path';
+import { fileURLToPath }          from 'node:url';
+import { EventEmitter }           from 'node:events';
+
+const _dir      = dirname(fileURLToPath(import.meta.url));
+const repoRoot  = resolve(_dir, '../..');
+const worldManifest = join(repoRoot, 'public/orbital/world/manifest.js');
+
+// ---------- world bus (singleton, server lifetime) ----------
+
+export const worldBus = createBus({ description: 'world bus — infrastructure agents' });
+await worldBus.resolve({ load: worldManifest });
+
+// ---------- per-session sim buses ----------
 
 export const simEvents = new EventEmitter();
 const sims = new Map();
@@ -28,7 +45,6 @@ export async function startSim(manifestPath, { hz = 1, dt = 3600, maxTicks = nul
           co2:    bus.atmosphere?.co2_ppm?.()        ?? null,
           deltaT: bus.atmosphere?.global_delta_t?.() ?? null,
         });
-        // Auto-stop after maxTicks — deferred so the current tick completes first.
         if (maxTicks && tickCount >= maxTicks) {
           setImmediate(() => stopSim(id));
         }

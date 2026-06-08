@@ -261,33 +261,49 @@ function renderEvents(events) {
   document.getElementById('stat-verbal').textContent   = `${nVerbal} verbal conflict`;
 }
 
+// ---- bus query protocol ----
+// One mechanism for all data — no per-resource REST endpoints.
+const socket = io();
+
+function busQuery(key, args = {}) {
+  return new Promise((resolve, reject) => {
+    const id = Math.random().toString(36).slice(2);
+    const timer = setTimeout(() => reject(new Error('query timeout')), 15_000);
+    socket.once(`response:${id}`, ({ ok, result, error }) => {
+      clearTimeout(timer);
+      ok ? resolve(result) : reject(new Error(error));
+    });
+    socket.emit('query', { id, key, args });
+  });
+}
+
 // ---- city dots ----
 async function loadCities() {
   try {
-    const res = await fetch('/api/cities?min_pop=500000');
-    if (!res.ok) return;
-    const { cities } = await res.json();
+    const cities = await busQuery('cities_query', { largest: 500 });
+    if (!cities?.length) return;
     const pos = [], col = [];
     const c = new THREE.Color(0x0fd4bc);
     for (const city of cities) {
+      if ((city.population ?? 0) < 500_000) continue;
       const p = latlonToXYZ(city.latitude, city.longitude, 1.012);
       pos.push(p.x, p.y, p.z);
       col.push(c.r, c.g, c.b);
     }
+    if (!pos.length) return;
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     geo.setAttribute('color',    new THREE.Float32BufferAttribute(col, 3));
-    const mat = new THREE.PointsMaterial({ size: 0.004, vertexColors: true });
-    scene.add(new THREE.Points(geo, mat));
-  } catch {}
+    scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.004, vertexColors: true })));
+  } catch (e) { console.warn('[cities]', e.message); }
 }
 loadCities();
 
 // ---- date slider ----
-const slider      = document.getElementById('slider');
-const dateLabel   = document.getElementById('date-label');
-const playBtn     = document.getElementById('play-btn');
-const sourceInfo  = document.getElementById('source-info');
+const slider       = document.getElementById('slider');
+const dateLabel    = document.getElementById('date-label');
+const playBtn      = document.getElementById('play-btn');
+const sourceInfo   = document.getElementById('source-info');
 const sourceSelect = document.getElementById('source-select');
 
 let dates    = [];
@@ -296,9 +312,10 @@ let playing  = false;
 let playTimer= null;
 
 async function loadDates(source) {
-  const res = await fetch(`/api/events/dates?source=${source}`);
-  if (!res.ok) return;
-  dates = (await res.json()).dates ?? [];
+  try {
+    const key = `${source}_query`;
+    dates = await busQuery(key, { dates: true }) ?? [];
+  } catch { dates = []; }
   slider.max   = Math.max(0, dates.length - 1);
   slider.value = slider.max;
   current      = dates.length - 1;
@@ -307,14 +324,14 @@ async function loadDates(source) {
 }
 
 async function updateDate() {
-  if (!dates.length) { dateLabel.textContent = 'No data — run a GDELT or UCDP agent first'; return; }
+  if (!dates.length) { dateLabel.textContent = 'No data — world bus agents are syncing…'; return; }
   const date = dates[current];
   dateLabel.textContent = date;
-  const source = sourceSelect.value;
   try {
-    const res = await fetch(`/api/events?source=${source}&date=${date}`);
-    if (res.ok) renderEvents((await res.json()).events ?? []);
-  } catch {}
+    const key    = `${sourceSelect.value}_query`;
+    const events = await busQuery(key, { date }) ?? [];
+    renderEvents(events);
+  } catch (e) { console.warn('[events]', e.message); }
 }
 
 slider.addEventListener('input', () => {
@@ -336,31 +353,18 @@ playBtn.addEventListener('click', () => {
   }
 });
 
-sourceSelect.addEventListener('change', async () => {
-  const source = sourceSelect.value;
-  const res = await fetch('/api/events/sources');
-  if (res.ok) {
-    const { sources } = await res.json();
-    const s = sources.find(x => x.id === source);
-    sourceInfo.textContent = s ? `${s.count.toLocaleString()} events · latest: ${s.latest}` : 'No data for this source';
-  }
-  await loadDates(source);
-});
+sourceSelect.addEventListener('change', () => loadDates(sourceSelect.value));
 
-// Init
-(async () => {
-  const res = await fetch('/api/events/sources');
-  if (res.ok) {
-    const { sources } = await res.json();
-    // Pre-select first available source
-    if (sources.length) {
-      sourceSelect.value = sources[0].id;
-      const s = sources[0];
-      sourceInfo.textContent = `${s.count.toLocaleString()} events · latest: ${s.latest}`;
-    }
-  }
+// Init — wait for socket connection, then load dates
+socket.on('connect', async () => {
+  try {
+    const count = await busQuery(`${sourceSelect.value}_query`, { count: true });
+    const latest = await busQuery(`${sourceSelect.value}_query`, { latest: true });
+    if (count > 0) sourceInfo.textContent = `${count.toLocaleString()} events · latest: ${latest ?? '—'}`;
+    else sourceInfo.textContent = 'World bus is syncing data — check back shortly';
+  } catch {}
   await loadDates(sourceSelect.value);
-})();
+});
 
 // ---- animation loop ----
 let slowSpin = true; // gentle auto-rotation when not interacting

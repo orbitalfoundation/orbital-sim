@@ -128,51 +128,6 @@ function setVersion(db, version) {
   db.prepare("INSERT OR REPLACE INTO ucdp_meta(key,value) VALUES('version',?)").run(version);
 }
 
-function insertEvents(db, rows) {
-  const stmt = db.prepare(`
-    INSERT OR IGNORE INTO ucdp_events
-      (id, year, type_of_violence, conflict_name, side_a, side_b, country,
-       adm_1, where_description, latitude, longitude,
-       date_start, date_end, date_prec, where_prec,
-       deaths_best, deaths_low, deaths_high, deaths_civilians, version)
-    VALUES
-      (@id, @year, @type, @conflict, @side_a, @side_b, @country,
-       @adm_1, @where_desc, @lat, @lon,
-       @date_start, @date_end, @date_prec, @where_prec,
-       @deaths_best, @deaths_low, @deaths_high, @deaths_civilians, @version)
-  `);
-  const tx = db.transaction(batch => { for (const r of batch) stmt.run(r); });
-
-  let batch = [], total = 0;
-  for (const r of rows) {
-    batch.push({
-      id:            Number(r.id),
-      year:          Number(r.year),
-      type:          Number(r.type_of_violence) || null,
-      conflict:      r.conflict_name ?? null,
-      side_a:        r.side_a ?? null,
-      side_b:        r.side_b ?? null,
-      country:       r.country ?? null,
-      adm_1:         r.adm_1 ?? null,
-      where_desc:    r.where_description ?? null,
-      lat:           parseFloat(r.latitude),
-      lon:           parseFloat(r.longitude),
-      date_start:    r.date_start ?? null,
-      date_end:      r.date_end ?? null,
-      date_prec:     Number(r.date_prec) || null,
-      where_prec:    Number(r.where_prec) || null,
-      deaths_best:   Number(r.best) || 0,
-      deaths_low:    Number(r.low)  || 0,
-      deaths_high:   Number(r.high) || 0,
-      deaths_civilians: Number(r.deaths_civilians) || 0,
-      version:       UCDP_VERSION,
-    });
-    if (batch.length >= 500) { tx(batch); total += batch.length; batch = []; }
-  }
-  if (batch.length) { tx(batch); total += batch.length; }
-  return total;
-}
-
 // ---------- sync ----------
 
 async function sync(db) {
@@ -194,8 +149,6 @@ async function sync(db) {
     let inserted = 0;
     for await (const entry of zip) {
       if (entry.path.toLowerCase().endsWith('.csv')) {
-        inserted = insertEvents(db, streamGulfEvents(entry));
-        // insertEvents expects sync iterator; wrap async generator
         inserted = await insertEventsAsync(db, entry);
       } else {
         entry.autodrain();
@@ -312,6 +265,17 @@ const ucdpAgent = {
       const count = db.prepare('SELECT COUNT(*) c FROM ucdp_events').get()?.c ?? 0;
       console.log(`[ucdp] ready: ${count} Gulf events (version ${storedVersion ?? 'syncing…'})`);
       return;
+    }
+
+    if (event.ucdp_query) {
+      const q = event.ucdp_query;
+      if (!bus.ucdp) return null;
+      if (q.near)    return bus.ucdp.events_near(q.near.lon, q.near.lat, q.near.radius ?? 200);
+      if (q.since)   return bus.ucdp.events_since(q.since);
+      if (q.count)   return bus.ucdp.count();
+      if (q.latest)  return bus.ucdp.latest_year();
+      if (q.summary) return bus.ucdp.summary();
+      return null;
     }
 
     if (event.tick && !_syncing && Date.now() - _lastSync > this.ttlMs) {

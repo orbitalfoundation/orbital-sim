@@ -301,6 +301,19 @@ const acledAgent = {
       return;
     }
 
+    if (event.acled_query) {
+      const q = event.acled_query;
+      if (!bus.acled) return null;
+      if (q.date)    return bus.acled.events_since(q.date).filter(e => e.event_date === q.date);
+      if (q.since)   return bus.acled.events_since(q.since);
+      if (q.near)    return bus.acled.events_near(q.near.lon, q.near.lat, q.near.radius ?? 200);
+      if (q.country) return bus.acled.events_in(Array.isArray(q.country) ? q.country : [q.country]);
+      if (q.count)   return bus.acled.count();
+      if (q.latest)  return bus.acled.latest_date();
+      if (q.summary) return bus.acled.summary();
+      return null;
+    }
+
     // Realtime mode: trigger background refresh when stale
     if (event.tick) {
       const key   = process.env.ACLED_KEY;
