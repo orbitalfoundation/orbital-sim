@@ -27,7 +27,7 @@ const blockade = parseFloat(process.env.BLOCKADE ?? '0');
 // Requires ACLED_KEY + ACLED_EMAIL in .env. Starts cleanly without credentials
 // but serves an empty dataset. Register at https://acleddata.com/ (free, research).
 export const acled = {
-  inherits: '@orbital/agents/acled.js',
+  inherits: '@orbital/agents/ingestion/acled.js',
   countries: [
     'Iran', 'Iraq', 'Saudi Arabia', 'Kuwait', 'Bahrain',
     'Qatar', 'United Arab Emirates', 'Oman', 'Yemen',
