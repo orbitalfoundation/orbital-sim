@@ -307,7 +307,7 @@ async function loadCities() {
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false,
       vertexShader: `
-        attribute float size; attribute vec3 color; varying vec3 vColor;
+        attribute float size; varying vec3 vColor;
         void main() {
           vColor = color;
           vec4 mv = modelViewMatrix * vec4(position, 1.0);
