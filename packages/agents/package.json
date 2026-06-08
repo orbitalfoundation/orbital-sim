@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@orbital/utils": "*",
+    "better-sqlite3": "^9",
     "pngjs": "^7"
   }
 }

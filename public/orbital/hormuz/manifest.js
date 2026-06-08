@@ -23,6 +23,18 @@
 
 const blockade = parseFloat(process.env.BLOCKADE ?? '0');
 
+// ACLED conflict events — provides bus.acled for querying incidents near Hormuz.
+// Requires ACLED_KEY + ACLED_EMAIL in .env. Starts cleanly without credentials
+// but serves an empty dataset. Register at https://acleddata.com/ (free, research).
+export const acled = {
+  inherits: '@orbital/agents/acled.js',
+  countries: [
+    'Iran', 'Iraq', 'Saudi Arabia', 'Kuwait', 'Bahrain',
+    'Qatar', 'United Arab Emirates', 'Oman', 'Yemen',
+  ],
+  sinceYears: 2,
+};
+
 export const flows = {
   inherits: '@orbital/agents/hormuz/flows.js',
   blockade,
