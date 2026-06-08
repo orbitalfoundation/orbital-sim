@@ -1,5 +1,8 @@
 # World events, geo-intelligence, and the bus query protocol — June 7 2026
 
+Backtracked a bit away from hormuz - to get some basic data ingestion in and test.
+Will then go back to hormuz once we have some data.
+
 Session log. Started focused on the Strait of Hormuz simulation, then
 broadened into data ingestion infrastructure, globe visualization, and a
 foundational architectural clarification.
