@@ -145,19 +145,23 @@ const sun = new THREE.DirectionalLight(0xffffff, 1.0);
 sun.position.set(5, 3, 5);
 scene.add(sun);
 
+// ---- globe group — earth + atmosphere + cities all rotate together ----
+const globe = new THREE.Group();
+scene.add(globe);
+
 // ---- earth ----
 const earthGeo = new THREE.SphereGeometry(1, 64, 64);
 const earthTex = new THREE.TextureLoader().load('/assets/earth.jpg');
 const earthMat = new THREE.MeshPhongMaterial({ map: earthTex, specular: 0x111122, shininess: 8 });
 const earth    = new THREE.Mesh(earthGeo, earthMat);
-scene.add(earth);
+globe.add(earth);
 
 // ---- atmosphere glow ----
 const atmGeo = new THREE.SphereGeometry(1.015, 32, 32);
 const atmMat = new THREE.MeshPhongMaterial({
   color: 0x3399ff, transparent: true, opacity: 0.08, side: THREE.FrontSide, depthWrite: false,
 });
-scene.add(new THREE.Mesh(atmGeo, atmMat));
+globe.add(new THREE.Mesh(atmGeo, atmMat));
 
 // ---- stars ----
 {
@@ -278,24 +282,49 @@ function busQuery(key, args = {}) {
   });
 }
 
-// ---- city dots ----
+// ---- city dots (added to globe group so they rotate with earth) ----
 async function loadCities() {
   try {
-    const cities = await busQuery('cities_query', { largest: 500 });
+    const cities = await busQuery('cities_query', { largest: 1000 });
     if (!cities?.length) return;
-    const pos = [], col = [];
-    const c = new THREE.Color(0x0fd4bc);
+    const pos = [], col = [], sizes = [];
+    const baseColor = new THREE.Color(0x0fd4bc);
     for (const city of cities) {
-      if ((city.population ?? 0) < 500_000) continue;
-      const p = latlonToXYZ(city.latitude, city.longitude, 1.012);
+      const pop = city.population ?? 0;
+      if (pop < 100_000) continue;
+      const p = latlonToXYZ(city.latitude, city.longitude, 1.013);
       pos.push(p.x, p.y, p.z);
-      col.push(c.r, c.g, c.b);
+      col.push(baseColor.r, baseColor.g, baseColor.b);
+      // Log-scale size: 100K → 0.004, 1M → 0.010, 10M → 0.020
+      const s = 0.003 + 0.017 * Math.max(0, Math.log10(pop) - 5) / 2.5;
+      sizes.push(Math.min(0.022, Math.max(0.004, s)));
     }
     if (!pos.length) return;
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     geo.setAttribute('color',    new THREE.Float32BufferAttribute(col, 3));
-    scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.004, vertexColors: true })));
+    geo.setAttribute('size',     new THREE.Float32BufferAttribute(sizes, 1));
+    const mat = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false,
+      vertexShader: `
+        attribute float size; attribute vec3 color; varying vec3 vColor;
+        void main() {
+          vColor = color;
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = size * (600.0 / -mv.z);
+          gl_Position = projectionMatrix * mv;
+        }`,
+      fragmentShader: `
+        varying vec3 vColor;
+        void main() {
+          float d = length(gl_PointCoord - vec2(0.5));
+          if (d > 0.5) discard;
+          float alpha = (1.0 - smoothstep(0.2, 0.5, d)) * 0.7;
+          gl_FragColor = vec4(vColor, alpha);
+        }`,
+      vertexColors: true,
+    });
+    globe.add(new THREE.Points(geo, mat)); // child of globe → rotates with earth
   } catch (e) { console.warn('[cities]', e.message); }
 }
 loadCities();
@@ -357,13 +386,24 @@ playBtn.addEventListener('click', () => {
 sourceSelect.addEventListener('change', () => loadDates(sourceSelect.value));
 
 // Init — wait for socket connection, then load dates
-socket.on('connect', async () => {
+async function refreshStatus() {
   try {
-    const count = await busQuery(`${sourceSelect.value}_query`, { count: true });
-    const latest = await busQuery(`${sourceSelect.value}_query`, { latest: true });
-    if (count > 0) sourceInfo.textContent = `${count.toLocaleString()} events · latest: ${latest ?? '—'}`;
-    else sourceInfo.textContent = 'World bus is syncing data — check back shortly';
+    const source = sourceSelect.value;
+    const [count, latest, cityCount] = await Promise.all([
+      busQuery(`${source}_query`, { count: true }),
+      busQuery(`${source}_query`, { latest: true }),
+      busQuery('cities_query', { count: true }),
+    ]);
+    const evtStr  = count > 0
+      ? `${count.toLocaleString()} events · latest: ${latest ?? '—'}`
+      : 'syncing events…';
+    const cityStr = cityCount > 0 ? `${cityCount.toLocaleString()} cities` : 'syncing cities…';
+    sourceInfo.textContent = `${evtStr}   ·   ${cityStr}`;
   } catch {}
+}
+
+socket.on('connect', async () => {
+  await refreshStatus();
   await loadDates(sourceSelect.value);
 });
 
@@ -375,7 +415,7 @@ controls.addEventListener('end',   () => { setTimeout(() => { slowSpin = true; }
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
-  if (slowSpin) earth.rotation.y += 0.0008;
+  if (slowSpin) globe.rotation.y += 0.0002;
   renderer.render(scene, camera);
 }
 animate();
