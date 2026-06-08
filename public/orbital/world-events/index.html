@@ -226,7 +226,7 @@ function renderEvents(events) {
 
     // Size by severity signal
     const mentions = e.num_mentions ?? e.deaths_best ?? e.fatalities ?? 1;
-    sizes.push(Math.min(0.035, Math.max(0.006, Math.sqrt(mentions + 1) * 0.004)));
+    sizes.push(Math.min(0.06, Math.max(0.018, Math.sqrt(mentions + 1) * 0.006)));
   }
 
   const geo = new THREE.BufferGeometry();
@@ -239,7 +239,6 @@ function renderEvents(events) {
     transparent: true, depthWrite: false,
     vertexShader: `
       attribute float size;
-      attribute vec3 color;
       varying vec3 vColor;
       void main() {
         vColor = color;

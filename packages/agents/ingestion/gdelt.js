@@ -97,15 +97,28 @@ let _initialised = false;
 let _syncing     = false;
 let _lastSync    = 0;
 
-// ---------- parse GDELT last-update file ----------
+// ---------- parse GDELT file lists ----------
 
 async function getLatestFileUrl() {
   const res  = await fetch(GDELT_LASTUPDATE, { signal: AbortSignal.timeout(10_000) });
   if (!res.ok) throw new Error(`lastupdate fetch HTTP ${res.status}`);
   const text = await res.text();
-  // First line is the export (events) file
+  // First line is the export (events) file. Format: "SIZE MD5 URL"
   const line = text.trim().split('\n')[0];
-  return line.split(' ')[2]; // format: "SIZE MD5 URL"
+  return line.split(' ')[2];
+}
+
+// Returns one export file URL per day for the last N days (the midnight update).
+// GDELT files are named YYYYMMDDHHMMSS — midnight = 000000.
+async function getBackfillUrls(days = 30) {
+  const urls = [];
+  const now = new Date();
+  for (let i = 1; i <= days; i++) {
+    const d = new Date(now - i * 86400 * 1000);
+    const ts = d.toISOString().slice(0,10).replace(/-/g,'') + '000000';
+    urls.push(`http://data.gdeltproject.org/gdeltv2/${ts}.export.CSV.zip`);
+  }
+  return urls;
 }
 
 // ---------- stream and filter GDELT events ----------
@@ -199,17 +212,38 @@ async function sync(db) {
   if (_syncing) return;
   _syncing = true;
   try {
-    console.log(`[gdelt] checking ${GDELT_LASTUPDATE}`);
-    const zipUrl  = await getLatestFileUrl();
-    const ts      = zipUrl.match(/(\d{14})/)?.[1] ?? 'unknown';
-    console.log(`[gdelt] fetching update ${ts} from ${zipUrl}`);
+    const isEmpty = (db.prepare('SELECT COUNT(*) c FROM gdelt_events').get()?.c ?? 0) === 0;
 
+    if (isEmpty) {
+      // First run — backfill last 30 days of daily midnight files before live update
+      console.log(`[gdelt] empty DB — backfilling last ${WINDOW_DAYS} days…`);
+      const backfillUrls = await getBackfillUrls(WINDOW_DAYS);
+      let totalInserted = 0;
+      for (const url of backfillUrls) {
+        const ts = url.match(/(\d{14})/)?.[1] ?? '?';
+        try {
+          const n = await insertEvents(db, streamGulfConflicts(url));
+          totalInserted += n;
+          if (n > 0) console.log(`[gdelt] backfill ${ts}: +${n}`);
+        } catch (e) {
+          // Some historical files may be missing — skip quietly
+        }
+        await new Promise(r => setTimeout(r, 500)); // polite pacing
+      }
+      console.log(`[gdelt] backfill complete: ${totalInserted} events`);
+    }
+
+    // Always fetch the latest 15-min update
+    console.log(`[gdelt] checking ${GDELT_LASTUPDATE}`);
+    const zipUrl = await getLatestFileUrl();
+    const ts     = zipUrl.match(/(\d{14})/)?.[1] ?? 'unknown';
+    console.log(`[gdelt] fetching update ${ts}`);
     const inserted = await insertEvents(db, streamGulfConflicts(zipUrl));
+
     pruneOldEvents(db);
     _lastSync = Date.now();
-
     const total = db.prepare('SELECT COUNT(*) c FROM gdelt_events').get()?.c ?? 0;
-    console.log(`[gdelt] +${inserted} events (${total} total in ${WINDOW_DAYS}-day window)`);
+    console.log(`[gdelt] +${inserted} new (${total} total in ${WINDOW_DAYS}-day window)`);
   } catch (err) {
     console.error(`[gdelt] sync failed: ${err.message}`);
   } finally {
