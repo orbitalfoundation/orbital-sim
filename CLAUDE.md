@@ -37,6 +37,18 @@ The accent mint-teal is the **primary brand color** — the one color that shoul
 
 ---
 
+## Engineering principles
+
+Before implementing any new feature, ask two questions:
+
+1. **Does this expand the surface area?** Every new route, module, or abstraction is something a developer must understand. If the feature can be expressed through an existing system — the bus query protocol, the manifest pattern, the info.json content model — use it. Adding a new mechanism should require a convincing reason why the existing ones genuinely cannot serve.
+
+2. **Is there an existing architectural system that can absorb this?** The bus event/query pattern, the worldBus service registry, the manifest loader, the SWR cache — these were built to be general. A new data source is a new agent with a `*_query` handler, not a new REST endpoint. A new scenario is a new manifest, not new server code. Reach for the existing system first.
+
+The failure mode to avoid: feature explosion where each addition creates a new concept the user must learn, a new file pattern, a new interface. This happened with per-resource REST routes (`/api/events`, `/api/cities`) added alongside the bus — they bypassed the existing query architecture and created redundant surface. When caught, they were removed and collapsed back into the bus protocol.
+
+---
+
 ## Design principles
 
 - **No decorative lines.** Prefer space over borders to separate content. Avoid single narrow lines — they read as noisy and busy. 1px borders only where structurally necessary.
