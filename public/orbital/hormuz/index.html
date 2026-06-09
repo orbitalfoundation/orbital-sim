@@ -195,7 +195,7 @@ import * as THREE        from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // ---- countries data (loaded once for centroid lookup) ----
-import COUNTRIES_RAW from './data/countries.json' with { type: 'json' };
+const COUNTRIES_RAW = await fetch('./data/countries.json').then(r => r.json());
 const COUNTRY_MAP = Object.fromEntries(COUNTRIES_RAW.countries.map(c => [c.id, c]));
 
 // ---- commodity flow arcs (fixed geography) ----
