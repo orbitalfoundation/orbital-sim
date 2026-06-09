@@ -10,6 +10,14 @@ export const cities = {
   inherits: '@orbital/agents/ingestion/cities.js',
 };
 
+export const naturalEarth = {
+  inherits: '@orbital/agents/ingestion/natural-earth.js',
+};
+
+export const fsi = {
+  inherits: '@orbital/agents/ingestion/fsi.js',
+};
+
 export const gdelt = {
   inherits: '@orbital/agents/ingestion/gdelt.js',
 };

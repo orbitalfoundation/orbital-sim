@@ -10,6 +10,7 @@
   "dependencies": {
     "@orbital/utils": "*",
     "better-sqlite3": "^9",
+    "xlsx": "^0.18.5",
     "unzipper": "^0.12",
     "pngjs": "^7"
   }
