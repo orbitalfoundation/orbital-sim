@@ -115,6 +115,12 @@ const naturalEarthAgent = {
           const f = _byIso3?.get(iso3?.toUpperCase());
           return f ? bboxCentroid(f) : null;
         },
+        // All country centroids as a lightweight array for map marker placement
+        centroids:  ()      => (_geojson?.features ?? []).map(f => {
+          const iso3 = f.properties?.ISO_A3 === '-99'
+            ? f.properties?.ADM0_A3 : f.properties?.ISO_A3;
+          return { iso3, name: f.properties?.NAME, ...bboxCentroid(f) };
+        }).filter(c => c.iso3 && c.lat != null),
         count:      ()      => _geojson?.features?.length ?? 0,
       });
       return;
@@ -124,6 +130,7 @@ const naturalEarthAgent = {
       const q = event.geo_query;
       if (!bus.geo) return null;
       if (q.countries)        return bus.geo.countries();
+      if (q.centroids)        return bus.geo.centroids();
       if (q.country != null)  return bus.geo.country(q.country);
       if (q.centroid != null) return bus.geo.centroid(q.centroid);
       if (q.count)            return bus.geo.count();

@@ -27,7 +27,7 @@ console.log('[worldBus] ready —', worldBus.list().map(a => a.id).join(', '));
 export const simEvents = new EventEmitter();
 const sims = new Map();
 
-export async function startSim(manifestPath, { hz = 1, dt = 3600, maxTicks = null } = {}) {
+export async function startSim(manifestPath, { hz = 1, dt = 3600, maxTicks = null, init = {} } = {}) {
   const id = crypto.randomUUID();
   const bus = createBus();
 
@@ -60,10 +60,22 @@ export async function startSim(manifestPath, { hz = 1, dt = 3600, maxTicks = nul
           buf:  event.frame.buf,
         });
       }
+
+      // Generic observe: agents emit { observe: {...} } to report state.
+      // The tap captures and forwards to the client without domain knowledge.
+      if (event.observe) {
+        simEvents.emit('observe', { id, ...event.observe });
+      }
     },
   });
 
   await bus.resolve({ load: manifestPath });
+
+  // Fire startup parameters as an init event so manifests can read them
+  // without relying on environment variables (enables web-configurable scenarios).
+  if (Object.keys(init).length) {
+    await bus.resolve({ init });
+  }
   const runner = await bus.resolve({ run: 'realtime', hz, dt });
 
   const entry = { id, bus, manifestPath, runner, hz, dt, startedAt: Date.now() };

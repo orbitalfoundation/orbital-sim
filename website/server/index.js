@@ -98,10 +98,10 @@ fastify.post('/api/areas/:name/:project', async (req, reply) => {
 // --- API: sims ---
 
 fastify.post('/api/sim', async (req, reply) => {
-  const { manifest, hz, dt, maxTicks } = req.body ?? {};
+  const { manifest, hz, dt, maxTicks, init } = req.body ?? {};
   if (!manifest) return reply.code(400).send({ error: 'manifest required' });
   try {
-    const sim = await startSim(manifest, { hz, dt, maxTicks: maxTicks ?? null });
+    const sim = await startSim(manifest, { hz, dt, maxTicks: maxTicks ?? null, init: init ?? {} });
     return { id: sim.id };
   } catch (err) {
     fastify.log.error(err);
@@ -249,6 +249,7 @@ io.on('connection', socket => {
 
 simEvents.on('tick',    ({ id, ...data }) => io.to(id).emit('tick',    data));
 simEvents.on('frame',   ({ id, ...data }) => io.to(id).emit('frame',   data));
+simEvents.on('observe', ({ id, ...data }) => io.to(id).emit('observe', data));
 simEvents.on('stopped', ({ id })          => {
   clearIdleTimer(id);      // sim ended — no need to wait for the timer
   io.to(id).emit('stopped', {});

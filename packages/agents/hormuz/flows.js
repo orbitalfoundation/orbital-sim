@@ -80,6 +80,13 @@ const flowsAgent = {
       return;
     }
 
+    // Allow web clients to set blockade via POST /api/sim body: { init: { blockade } }
+    if (event.init && event.init.blockade != null) {
+      this.blockade = Number(event.init.blockade);
+      console.log(`[flows] blockade set via init: ${(this.blockade * 100).toFixed(0)}%`);
+      return;
+    }
+
     if (event.tick) {
       this.day = Math.round(event.dt / 86400) || 1; // approximate days per tick
       this._updateRamps(event.dt);

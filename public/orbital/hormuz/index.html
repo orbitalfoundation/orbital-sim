@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Strait of Hormuz — Orbital</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #07070e; --surface: #0f0f1c; --border: #1e1e30;
+    --accent: #0fd4bc; --text: #dcdce8; --muted: #9090b0;
+    --red: #ef4444; --amber: #f59e0b; --green: #22c55e;
+    --mono: ui-monospace, monospace; --sans: ui-sans-serif, system-ui, sans-serif;
+  }
+  html, body { width:100%; height:100%; background:var(--bg); color:var(--text);
+    font-family:var(--sans); font-size:13px; overflow:hidden; }
+
+  #app { display:flex; flex-direction:column; height:100dvh; }
+
+  /* ---- header ---- */
+  header { display:flex; align-items:center; gap:14px; padding:10px 18px;
+    border-bottom:1px solid var(--border); flex-shrink:0; }
+  .wordmark { font-family:var(--mono); font-size:10px; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--muted); text-decoration:none; }
+  .htitle { font-size:13px; color:var(--text); opacity:.7; }
+  .hcontrols { margin-left:auto; display:flex; align-items:center; gap:10px; }
+  select, button {
+    font-family:var(--mono); font-size:11px; background:var(--surface);
+    color:var(--text); border:1px solid var(--border); padding:4px 10px; cursor:pointer;
+  }
+  button.primary { border-color:var(--accent); color:var(--accent); }
+  button.primary:hover { background:var(--accent); color:var(--bg); }
+  button.stop { border-color:var(--muted); color:var(--muted); }
+  button.stop:hover { background:var(--muted); color:var(--bg); }
+  button:disabled { opacity:.3; cursor:default; }
+
+  /* ---- body: map + cascade ---- */
+  #body { display:flex; flex:1; overflow:hidden; }
+
+  #map-container { position:relative; flex:1; }
+  #map-container canvas { position:absolute; inset:0; }
+
+  /* ---- cascade panel ---- */
+  #cascade {
+    width:300px; flex-shrink:0; overflow-y:auto;
+    border-left:1px solid var(--border);
+    display:flex; flex-direction:column; gap:0;
+  }
+
+  .c-section { padding:12px 16px; border-bottom:1px solid var(--border); }
+  .c-label { font-family:var(--mono); font-size:9px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+
+  /* big metric */
+  .metric { display:flex; flex-direction:column; gap:2px; margin-bottom:8px; }
+  .metric-val { font-family:var(--mono); font-size:20px; color:var(--text); }
+  .metric-sub { font-family:var(--mono); font-size:10px; color:var(--muted); }
+
+  /* cascade row */
+  .crow { display:flex; justify-content:space-between; align-items:baseline;
+    padding:4px 0; border-bottom:1px solid var(--border); }
+  .crow:last-child { border-bottom:none; }
+  .crow-name { color:var(--muted); font-size:11px; }
+  .crow-val  { font-family:var(--mono); font-size:12px; color:var(--text); }
+  .crow-val.warn  { color:var(--amber); }
+  .crow-val.crit  { color:var(--red); }
+  .crow-val.good  { color:var(--green); }
+
+  /* stress bar */
+  .stress-bar { height:4px; background:var(--border); border-radius:2px; margin-top:4px; }
+  .stress-fill { height:100%; border-radius:2px; transition:width .5s, background .5s; }
+
+  /* helium countdown */
+  .helium-clock { font-family:var(--mono); font-size:18px; color:var(--amber); }
+  .helium-clock.critical { color:var(--red); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* country list */
+  .country-row { display:flex; justify-content:space-between; padding:3px 0; }
+  .c-name { color:var(--muted); font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .c-badge { font-family:var(--mono); font-size:10px; padding:1px 5px; border-radius:2px; }
+  .lvl-0 { background:#1e1e30; color:var(--muted); }
+  .lvl-1 { background:#2d2a00; color:#fbbf24; }
+  .lvl-2 { background:#3d1500; color:#fb923c; }
+  .lvl-3 { background:#450a0a; color:#f87171; }
+  .lvl-4 { background:#7f1d1d; color:#fca5a5; }
+
+  #status-bar { padding:5px 16px; font-family:var(--mono); font-size:10px;
+    color:var(--muted); border-top:1px solid var(--border); flex-shrink:0; }
+
+  /* legend */
+  #legend { position:absolute; bottom:16px; left:16px;
+    background:rgba(7,7,14,.8); border:1px solid var(--border);
+    padding:8px 12px; font-family:var(--mono); font-size:10px; color:var(--muted); }
+  .leg-row { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
+  .leg-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .leg-line { width:20px; height:3px; flex-shrink:0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <a href="/" class="wordmark">Orbital</a>
+    <span class="htitle">Strait of Hormuz — Cascade Model</span>
+    <div class="hcontrols">
+      <select id="scenario-select">
+        <option value="0">Baseline — open</option>
+        <option value="0.5">Partial closure (50%)</option>
+        <option value="0.8" selected>Crisis (80%)</option>
+        <option value="1.0">Full blockade (100%)</option>
+      </select>
+      <button id="btn-run" class="primary">Run ▶</button>
+      <button id="btn-stop" class="stop" style="display:none">Stop ■</button>
+    </div>
+  </header>
+
+  <div id="body">
+    <div id="map-container"><!-- Three.js renders here --></div>
+
+    <div id="cascade">
+      <!-- Blockade -->
+      <div class="c-section">
+        <div class="c-label">Scenario</div>
+        <div class="metric">
+          <div class="metric-val" id="v-blockade">0%</div>
+          <div class="metric-sub">Hormuz blockade intensity</div>
+        </div>
+        <div class="c-label">Week</div>
+        <div class="metric-val" id="v-week" style="font-size:14px">—</div>
+      </div>
+
+      <!-- Flows -->
+      <div class="c-section">
+        <div class="c-label">Commodity Flows</div>
+        <div class="crow"><span class="crow-name">Oil (Hormuz)</span><span class="crow-val" id="v-oil">100%</span></div>
+        <div class="crow"><span class="crow-name">LNG</span><span class="crow-val" id="v-lng">100%</span></div>
+        <div class="crow"><span class="crow-name">Helium</span><span class="crow-val" id="v-he">100%</span></div>
+      </div>
+
+      <!-- Energy -->
+      <div class="c-section">
+        <div class="c-label">Energy Prices</div>
+        <div class="crow"><span class="crow-name">Brent crude</span><span class="crow-val" id="v-brent">$80</span></div>
+        <div class="crow"><span class="crow-name">LNG-JKM</span><span class="crow-val" id="v-lng-price">$12</span></div>
+        <div class="crow"><span class="crow-name">SPR drawn</span><span class="crow-val" id="v-spr">0%</span></div>
+      </div>
+
+      <!-- Fertilizer -->
+      <div class="c-section">
+        <div class="c-label">Fertilizer Cascade</div>
+        <div class="crow"><span class="crow-name">Plant utilization</span><span class="crow-val" id="v-plants">100%</span></div>
+        <div class="crow"><span class="crow-name">Urea price</span><span class="crow-val" id="v-urea">1.0×</span></div>
+        <div class="crow"><span class="crow-name">N-application</span><span class="crow-val" id="v-napp">100%</span></div>
+      </div>
+
+      <!-- Agriculture -->
+      <div class="c-section">
+        <div class="c-label">Agriculture &amp; Food</div>
+        <div class="crow"><span class="crow-name">Wheat yield</span><span class="crow-val" id="v-wheat">100%</span></div>
+        <div class="crow"><span class="crow-name">Food production</span><span class="crow-val" id="v-food">100%</span></div>
+        <div class="crow"><span class="crow-name">People at risk</span><span class="crow-val" id="v-people">0M</span></div>
+      </div>
+
+      <!-- Helium -->
+      <div class="c-section">
+        <div class="c-label">Helium — 45-day boiloff clock</div>
+        <div class="helium-clock" id="v-helium-days">—</div>
+        <div class="metric-sub" style="margin-top:4px">days Qatar offline</div>
+        <div class="crow" style="margin-top:6px"><span class="crow-name">Semiconductor impact</span><span class="crow-val" id="v-semi">0%</span></div>
+        <div class="crow"><span class="crow-name">Supply destroyed</span><span class="crow-val" id="v-he-dest">0 MMcm</span></div>
+      </div>
+
+      <!-- Country stress -->
+      <div class="c-section" style="flex:1">
+        <div class="c-label">Country Stress</div>
+        <div id="country-list"><!-- populated by JS --></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="status-bar">Ready. Select a scenario and press Run.</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three":         "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE        from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ---- countries data (loaded once for centroid lookup) ----
+import COUNTRIES_RAW from './data/countries.json' with { type: 'json' };
+const COUNTRY_MAP = Object.fromEntries(COUNTRIES_RAW.countries.map(c => [c.id, c]));
+
+// ---- commodity flow arcs (fixed geography) ----
+const FLOWS = [
+  // Oil flows from Gulf exporters
+  { id: 'oil-india',  from:[26.64,50.17], to:[22.3,69.9],   commodity:'oil', label:'Ras Tanura → Jamnagar' },
+  { id: 'oil-korea',  from:[26.64,50.17], to:[35.5,129.4],  commodity:'oil', label:'Ras Tanura → Ulsan' },
+  { id: 'oil-rott',   from:[26.64,50.17], to:[51.9,4.1],    commodity:'oil', label:'Ras Tanura → Rotterdam' },
+  { id: 'oil-japan',  from:[29.0,47.9],   to:[35.4,139.7],  commodity:'oil', label:'Burgan → Japan' },
+  { id: 'oil-sing',   from:[30.5,47.4],   to:[1.3,103.7],   commodity:'oil', label:'Rumaila → Singapore' },
+  // LNG flows from Qatar
+  { id: 'lng-japan',  from:[25.89,51.55], to:[35.4,139.7],  commodity:'lng', label:'Ras Laffan → Japan' },
+  { id: 'lng-korea',  from:[25.89,51.55], to:[35.5,129.4],  commodity:'lng', label:'Ras Laffan → Korea' },
+  { id: 'lng-eu',     from:[25.89,51.55], to:[51.9,4.1],    commodity:'lng', label:'Ras Laffan → Europe' },
+];
+
+// Infrastructure nodes
+const NODES = [
+  { lat:25.89, lon:51.55, type:'lng',   label:'Ras Laffan',  size:1.4 },
+  { lat:26.64, lon:50.17, type:'oil',   label:'Ras Tanura',  size:1.6 },
+  { lat:26.6,  lon:56.3,  type:'choke', label:'Hormuz',      size:2.0 },
+  { lat:29.0,  lon:47.9,  type:'oil',   label:'Burgan',      size:1.2 },
+  { lat:30.5,  lon:47.4,  type:'oil',   label:'Rumaila',     size:1.2 },
+  { lat:25.1,  lon:49.4,  type:'oil',   label:'Ghawar',      size:1.4 },
+  { lat:22.3,  lon:69.9,  type:'ref',   label:'Jamnagar',    size:1.0 },
+  { lat:51.9,  lon:4.1,   type:'ref',   label:'Rotterdam',   size:1.0 },
+  { lat:35.5,  lon:129.4, type:'ref',   label:'Ulsan',       size:0.9 },
+];
+
+const NODE_COLORS = { oil: 0xf59e0b, lng: 0x60a5fa, ref: 0xfb923c, choke: 0xef4444 };
+const FLOW_COLORS  = { oil: 0xf59e0b, lng: 0x60a5fa };
+
+// ---- Three.js setup ----
+const container = document.getElementById('map-container');
+const renderer  = new THREE.WebGLRenderer({ antialias: true });
+renderer.setClearColor(0x040408);
+renderer.setPixelRatio(devicePixelRatio);
+container.appendChild(renderer.domElement);
+
+const scene  = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 50);
+
+// Orbit mode: camera above Persian Gulf (~3000km altitude)
+// lat:26°N lon:55°E — mouth of Hormuz
+{
+  const DEG = Math.PI / 180;
+  const lat = 26, lon = 55, r = 1.47; // r = 1 + ~3000/6371
+  const phi   = (90 - lat) * DEG;
+  const theta = (lon + 180) * DEG;
+  camera.position.set(
+    -r * Math.sin(phi) * Math.cos(theta),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta),
+  );
+}
+camera.lookAt(0, 0, 0);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping  = true;
+controls.dampingFactor  = 0.08;
+controls.minDistance    = 1.05;
+controls.maxDistance    = 6;
+controls.enablePan      = false;
+
+// Lights
+scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+sun.position.set(5, 3, 5);
+scene.add(sun);
+
+// Globe group — everything rotatable together
+const globe = new THREE.Group();
+scene.add(globe);
+
+// Earth sphere
+const earthTex = new THREE.TextureLoader().load('/assets/earth.jpg');
+globe.add(new THREE.Mesh(
+  new THREE.SphereGeometry(1, 64, 64),
+  new THREE.MeshPhongMaterial({ map: earthTex, specular: 0x111122, shininess: 6 }),
+));
+
+// Atmosphere
+globe.add(new THREE.Mesh(
+  new THREE.SphereGeometry(1.015, 32, 32),
+  new THREE.MeshPhongMaterial({ color: 0x3399ff, transparent: true, opacity: 0.06, depthWrite: false }),
+));
+
+// ---- helpers ----
+const DEG = Math.PI / 180;
+function latlonToVec3(lat, lon, r = 1.01) {
+  const phi = (90 - lat) * DEG, theta = (lon + 180) * DEG;
+  return new THREE.Vector3(
+    -r * Math.sin(phi) * Math.cos(theta),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta),
+  );
+}
+
+// ---- arc drawing ----
+const arcMeshes = new Map();
+
+function buildArc(fromLatLon, toLatLon, color, radius) {
+  const start = latlonToVec3(...fromLatLon, 1.0);
+  const end   = latlonToVec3(...toLatLon, 1.0);
+  const mid   = start.clone().add(end).normalize().multiplyScalar(1.18);
+  const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+  const tube  = new THREE.TubeGeometry(curve, 60, Math.max(0.001, radius), 6, false);
+  const mat   = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.75 });
+  return new THREE.Mesh(tube, mat);
+}
+
+function updateArcs(oilRate, lngRate) {
+  // Remove old arcs
+  arcMeshes.forEach(m => { globe.remove(m); m.geometry.dispose(); });
+  arcMeshes.clear();
+
+  for (const f of FLOWS) {
+    const rate  = f.commodity === 'oil' ? oilRate : lngRate;
+    const r     = 0.004 * rate + 0.0005; // min visible even at zero
+    const color = FLOW_COLORS[f.commodity];
+    const mesh  = buildArc(f.from, f.to, color, r);
+    globe.add(mesh);
+    arcMeshes.set(f.id, mesh);
+  }
+}
+
+// Initialize arcs at full flow
+updateArcs(1, 1);
+
+// ---- infrastructure nodes ----
+{
+  const pos = [], col = [], sizes = [];
+  for (const n of NODES) {
+    const v = latlonToVec3(n.lat, n.lon, 1.012);
+    pos.push(v.x, v.y, v.z);
+    const c = new THREE.Color(NODE_COLORS[n.type] ?? 0xffffff);
+    col.push(c.r, c.g, c.b);
+    sizes.push(n.size * 0.012);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute('color',    new THREE.Float32BufferAttribute(col, 3));
+  geo.setAttribute('size',     new THREE.Float32BufferAttribute(sizes, 1));
+  const mat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, vertexColors: true,
+    vertexShader: `attribute float size; varying vec3 vColor;
+      void main() { vColor=color; vec4 mv=modelViewMatrix*vec4(position,1.);
+        gl_PointSize=size*(600./-mv.z); gl_Position=projectionMatrix*mv; }`,
+    fragmentShader: `varying vec3 vColor;
+      void main() { float d=length(gl_PointCoord-vec2(.5));
+        if(d>.5)discard; gl_FragColor=vec4(vColor,(1.-smoothstep(.3,.5,d))*.9); }`,
+  });
+  globe.add(new THREE.Points(geo, mat));
+}
+
+// ---- country stress dots ----
+let stressMesh = null;
+function updateCountryStress(countryUpdates) {
+  if (stressMesh) { globe.remove(stressMesh); stressMesh.geometry.dispose(); stressMesh = null; }
+
+  const LEVEL_COLORS = [0x1e1e30, 0x92400e, 0x9a3412, 0x7f1d1d, 0x450a0a];
+  const pos = [], col = [], sizes = [];
+
+  for (const u of countryUpdates) {
+    const country = COUNTRY_MAP[u.id];
+    if (!country?.lat || !country?.lon) continue;
+    const v = latlonToVec3(country.lat, country.lon, 1.02);
+    pos.push(v.x, v.y, v.z);
+    const c = new THREE.Color(LEVEL_COLORS[u.insecurity] ?? 0x1e1e30);
+    col.push(c.r, c.g, c.b);
+    const pop = (country.population_millions ?? 10);
+    sizes.push(Math.min(0.03, Math.max(0.006, Math.sqrt(pop) * 0.002 + u.stress * 0.01)));
+  }
+  if (!pos.length) return;
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute('color',    new THREE.Float32BufferAttribute(col, 3));
+  geo.setAttribute('size',     new THREE.Float32BufferAttribute(sizes, 1));
+  const mat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, vertexColors: true,
+    vertexShader: `attribute float size; varying vec3 vColor;
+      void main() { vColor=color; vec4 mv=modelViewMatrix*vec4(position,1.);
+        gl_PointSize=size*(600./-mv.z); gl_Position=projectionMatrix*mv; }`,
+    fragmentShader: `varying vec3 vColor;
+      void main() { float d=length(gl_PointCoord-vec2(.5));
+        if(d>.5)discard; gl_FragColor=vec4(vColor,(1.-smoothstep(.2,.5,d))*.8); }`,
+  });
+  stressMesh = new THREE.Points(geo, mat);
+  globe.add(stressMesh);
+}
+
+// ---- resize ----
+function onResize() {
+  const w = container.clientWidth, h = container.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+onResize();
+new ResizeObserver(onResize).observe(container);
+
+// ---- animation ----
+(function loop() {
+  requestAnimationFrame(loop);
+  controls.update();
+  renderer.render(scene, camera);
+})();
+
+// ---- socket + sim ----
+const socket  = io();
+let simId     = null;
+const MANIFEST = 'public/orbital/hormuz/manifest.js';
+const HZ       = 2;
+const DT       = 604800;   // 1 week
+const MAX_TICKS = 52;      // 1 year
+
+const btnRun  = document.getElementById('btn-run');
+const btnStop = document.getElementById('btn-stop');
+const statusEl = document.getElementById('status-bar');
+
+function status(msg) { statusEl.textContent = msg; }
+
+// Bus query helper (worldBus queries)
+function busQuery(key, args = {}) {
+  return new Promise((resolve, reject) => {
+    const id = Math.random().toString(36).slice(2);
+    const t  = setTimeout(() => reject(new Error('timeout')), 15_000);
+    socket.once(`response:${id}`, ({ ok, result, error }) => {
+      clearTimeout(t); ok ? resolve(result) : reject(new Error(error));
+    });
+    socket.emit('query', { id, key, args });
+  });
+}
+
+// ---- cascade panel update ----
+function pct(f) { return (f * 100).toFixed(0) + '%'; }
+function cls(f, good = false) {
+  if (good) return f < 0.8 ? 'crit' : f < 0.95 ? 'warn' : 'good';
+  return f > 0.8 ? 'crit' : f > 0.5 ? 'warn' : 'good';
+}
+
+function updateCascade(d) {
+  document.getElementById('v-blockade').textContent = pct(d.blockade ?? 0);
+  document.getElementById('v-week').textContent     = `Week ${d.week ?? '—'}`;
+
+  const oilEl = document.getElementById('v-oil');
+  oilEl.textContent = pct(d.oil_flow ?? 1);
+  oilEl.className = 'crow-val ' + cls(d.oil_flow ?? 1, true);
+
+  document.getElementById('v-lng').textContent = pct(d.lng_flow ?? 1);
+  document.getElementById('v-he').textContent  = pct(d.helium_flow ?? 1);
+
+  const brent = document.getElementById('v-brent');
+  brent.textContent = `$${Math.round(d.brent ?? 80)}/bbl`;
+  brent.className = 'crow-val ' + ((d.brent ?? 80) > 150 ? 'crit' : (d.brent ?? 80) > 100 ? 'warn' : '');
+
+  document.getElementById('v-lng-price').textContent = `$${(d.lng_price ?? 12).toFixed(1)}/MMBtu`;
+  document.getElementById('v-spr').textContent       = pct(d.spr_drawn ?? 0);
+
+  const plants = document.getElementById('v-plants');
+  plants.textContent = pct(d.plant_util ?? 1);
+  plants.className = 'crow-val ' + cls(d.plant_util ?? 1, true);
+
+  document.getElementById('v-urea').textContent = `${(d.urea_price_index ?? 1).toFixed(2)}×`;
+  document.getElementById('v-napp').textContent = pct(d.n_application ?? 1);
+
+  document.getElementById('v-wheat').textContent = pct(d.wheat_yield ?? 1);
+  document.getElementById('v-food').textContent  = pct(d.food_production ?? 1);
+
+  const pplEl = document.getElementById('v-people');
+  const ppl = d.people_at_risk ?? 0;
+  pplEl.textContent = ppl > 0 ? `${Math.round(ppl)}M` : '0';
+  pplEl.className = 'crow-val ' + (ppl > 500 ? 'crit' : ppl > 100 ? 'warn' : '');
+
+  // Helium clock
+  const daysEl = document.getElementById('v-helium-days');
+  const days   = Math.round(d.helium_days_offline ?? 0);
+  daysEl.textContent = days > 0 ? String(days) : '—';
+  daysEl.className = 'helium-clock' + (days > 30 ? ' critical' : '');
+  document.getElementById('v-semi').textContent    = pct(d.semiconductor_impact ?? 0);
+  document.getElementById('v-he-dest').textContent = `${(d.helium_destroyed ?? 0).toFixed(1)} MMcm`;
+
+  // Country stress
+  if (d.countries?.length) {
+    updateCountryStress(d.countries);
+    const sorted = [...d.countries].filter(c => c.insecurity >= 1)
+      .sort((a, b) => b.stress - a.stress).slice(0, 12);
+    const LABELS = ['stable','stressed','acute','crisis','emergency'];
+    document.getElementById('country-list').innerHTML = sorted.map(c => {
+      const name = COUNTRY_MAP[c.id]?.name ?? c.id;
+      return `<div class="country-row">
+        <span class="c-name">${name}</span>
+        <span class="c-badge lvl-${c.insecurity}">${LABELS[c.insecurity] ?? '?'}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Update arc thickness
+  updateArcs(d.oil_flow ?? 1, d.lng_flow ?? 1);
+}
+
+async function startRun() {
+  btnRun.disabled = true;
+  const blockade = parseFloat(document.getElementById('scenario-select').value);
+  status(`Starting simulation — blockade ${(blockade * 100).toFixed(0)}%…`);
+
+  try {
+    const res = await fetch('/api/sim', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ manifest: MANIFEST, hz: HZ, dt: DT, maxTicks: MAX_TICKS,
+                             init: { blockade } }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    simId = (await res.json()).id;
+  } catch (err) {
+    status('Error: ' + err.message);
+    btnRun.disabled = false;
+    return;
+  }
+
+  socket.emit('subscribe', simId);
+  btnRun.style.display = 'none';
+  btnStop.style.display = '';
+  status('Running…');
+}
+
+async function stopRun() {
+  if (!simId) return;
+  btnStop.disabled = true;
+  await fetch(`/api/sim/${simId}`, { method: 'DELETE' });
+}
+
+socket.on('observe', data => {
+  updateCascade(data);
+  status(`Running — week ${data.week ?? '?'}`);
+});
+
+socket.on('stopped', () => {
+  status('Complete.');
+  simId = null;
+  btnRun.disabled = false;
+  btnStop.disabled = false;
+  btnStop.style.display = 'none';
+  btnRun.style.display  = '';
+  socket.emit('unsubscribe', simId);
+});
+
+btnRun.addEventListener('click', startRun);
+btnStop.addEventListener('click', stopRun);
+</script>
+</body>
+</html>
