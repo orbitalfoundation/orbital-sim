@@ -10,7 +10,7 @@
 import Fastify           from 'fastify';
 import fastifyStatic     from '@fastify/static';
 import { Server as IO }  from 'socket.io';
-import { resolve, join, dirname } from 'node:path';
+import { resolve, join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { access, readFile, stat } from 'node:fs/promises';
 import { constants }     from 'node:fs';
@@ -39,6 +39,27 @@ async function fileExists(p) {
 
 async function isFile(p) {
   try { return (await stat(p)).isFile(); } catch { return false; }
+}
+
+// Minimal MIME map for static files served by the catch-all. Browsers enforce
+// strict MIME types for ES module scripts (.js must be a JS type, not octet-stream).
+const MIME = {
+  '.js':   'text/javascript',
+  '.mjs':  'text/javascript',
+  '.json': 'application/json',
+  '.css':  'text/css',
+  '.html': 'text/html',
+  '.svg':  'image/svg+xml',
+  '.png':  'image/png',
+  '.jpg':  'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.geojson': 'application/json',
+  '.wasm': 'application/wasm',
+  '.map':  'application/json',
+};
+function mimeFor(path) {
+  return MIME[extname(path).toLowerCase()] ?? 'application/octet-stream';
 }
 
 // Serve built Svelte assets at /_app/* (content-hashed filenames from Vite)
@@ -162,7 +183,7 @@ fastify.get('/*', async (req, reply) => {
   const publicFile = join(publicRoot, path);
   if (path && await isFile(publicFile)) {
     const buf = await readFile(publicFile);
-    return reply.send(buf);
+    return reply.type(mimeFor(publicFile)).send(buf);
   }
 
   // 3. Serve the Svelte SPA (client-side routing handles the rest)
