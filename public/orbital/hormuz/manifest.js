@@ -14,6 +14,16 @@
 // CLI: read blockade from env var; web: read from { init } event (see flows.js)
 const blockade = parseFloat(process.env.BLOCKADE ?? '0');
 
+// Geographic reference agents — needed by the web page for country centroids
+// and FSI fragility scores (tipping point model).
+export const naturalEarth = {
+  inherits: '@orbital/agents/ingestion/natural-earth.js',
+};
+
+export const fsi = {
+  inherits: '@orbital/agents/ingestion/fsi.js',
+};
+
 export const flows = {
   inherits: '@orbital/agents/hormuz/flows.js',
   blockade,

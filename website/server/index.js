@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { access, readFile, stat } from 'node:fs/promises';
 import { constants }     from 'node:fs';
 import { makeAreas }     from './areas.js';
-import { startSim, stopSim, listSims, getSim, simEvents, worldBus } from './sims.js';
+import { startSim, stopSim, listSims, getSim, simEvents } from './sims.js';
 import { createSession, getSession, deleteSession } from './sessions.js';
 
 const __dirname   = dirname(fileURLToPath(import.meta.url));
@@ -229,17 +229,27 @@ io.on('connection', socket => {
     }
   });
 
-  // Bus query protocol: one handler for every service, no per-route barnacles.
-  // Only *_query keys are allowed — data queries, not actions.
-  // Usage: socket.emit('query', { id, key: 'gdelt_query', args: { date: '2026-06-07' } })
-  //        socket.once(`response:${id}`, ({ ok, result, error }) => { ... })
+  // Bus query protocol — routes to this socket's own session bus.
+  // The client must be subscribed to a sim before querying. If the agent
+  // isn't in their manifest the query returns null. No fallback to other buses.
+  // Only *_query keys are permitted — data queries, not actions.
   socket.on('query', async ({ id, key, args }) => {
     if (!id || typeof key !== 'string' || !key.endsWith('_query')) {
       if (id) socket.emit(`response:${id}`, { ok: false, error: 'invalid query key' });
       return;
     }
+    if (!joined.size) {
+      socket.emit(`response:${id}`, { ok: false, error: 'no active session — subscribe to a simulation first' });
+      return;
+    }
     try {
-      const result = await worldBus.resolve({ [key]: args ?? {} });
+      let result = undefined;
+      for (const simId of joined) {
+        const sim = getSim(simId);
+        if (!sim) continue;
+        result = await sim.bus.resolve({ [key]: args ?? {} });
+        if (result !== undefined) break;
+      }
       socket.emit(`response:${id}`, { ok: true, result: result ?? null });
     } catch (err) {
       socket.emit(`response:${id}`, { ok: false, error: err.message });

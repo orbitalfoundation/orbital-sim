@@ -401,9 +401,37 @@ async function refreshStatus() {
   } catch {}
 }
 
+// Start the world-events sim on connect so this session has its own bus
+// with all the data agents loaded. Queries are routed to that bus.
+let _worldSimId = null;
+
 socket.on('connect', async () => {
+  if (!_worldSimId) {
+    try {
+      const res = await fetch('/api/sim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          manifest: 'public/orbital/world-events/manifest.js',
+          hz: 1/300,   // one tick per 5 minutes — just enough for SWR refreshes
+          dt: 1,
+        }),
+      });
+      if (res.ok) {
+        _worldSimId = (await res.json()).id;
+        socket.emit('subscribe', _worldSimId);
+      }
+    } catch (e) { console.warn('[world-events] could not start sim:', e.message); }
+  }
+  // Small delay so agents have time to register before first query
+  await new Promise(r => setTimeout(r, 500));
   await refreshStatus();
   await loadDates(sourceSelect.value);
+});
+
+socket.on('disconnect', () => {
+  // Server idle timeout handles cleanup; clear local ref
+  _worldSimId = null;
 });
 
 // ---- animation loop ----

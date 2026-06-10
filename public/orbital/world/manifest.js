@@ -1,10 +1,12 @@
-// World bus — infrastructure agents that run for the lifetime of the server.
-// These are data services, not simulations. They populate SQLite and respond
-// to *_query events from any bus instance or from socket clients.
+// Reference manifest — all geo-intelligence ingestion agents.
 //
-// Add agents here to make them universally available.
-// Each agent installs its bus service on registration and handles its own
-// background sync lifecycle (SWR pattern with per-agent TTL).
+// This is NOT loaded automatically by the server. It exists as a convenience
+// template: copy agent declarations from here into scenario manifests that
+// need them. Each scenario declares the agents it requires in its own manifest.
+//
+// Example: a scenario that needs cities and conflict events would add:
+//   export const cities = { inherits: '@orbital/agents/ingestion/cities.js' };
+//   export const gdelt  = { inherits: '@orbital/agents/ingestion/gdelt.js'  };
 
 export const cities = {
   inherits: '@orbital/agents/ingestion/cities.js',

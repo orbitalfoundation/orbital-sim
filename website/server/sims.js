@@ -1,28 +1,13 @@
-// sims — bus instance lifecycle.
-// Exports:
-//   worldBus — persistent infrastructure bus (cities, events, geo data).
-//              Starts at server init; agents self-initialise and sync in background.
-//              Clients query it via socket: emit('query', { id, key, args })
+// sims — per-session simulation bus lifecycle.
 //
-//   startSim / stopSim / getSim / listSims — per-session simulation buses.
+// Each client session maps to exactly one bus instance, started when the
+// client calls POST /api/sim and loaded from a manifest. The bus holds the
+// agents that session declared — simulation agents, ingestion agents, or both.
+// Queries from the client are routed to their own session bus; if the agent
+// isn't in their manifest the query returns null. No shared background buses.
 
 import { createBus } from '@orbital/bus';
-import { resolve, join, dirname } from 'node:path';
-import { fileURLToPath }          from 'node:url';
-import { EventEmitter }           from 'node:events';
-
-const _dir      = dirname(fileURLToPath(import.meta.url));
-const repoRoot  = resolve(_dir, '../..');
-const worldManifest = join(repoRoot, 'public/orbital/world/manifest.js');
-
-// ---------- world bus (singleton, server lifetime) ----------
-
-export const worldBus = createBus({ description: 'world bus — infrastructure agents' });
-console.log('[worldBus] starting — loading', worldManifest);
-await worldBus.resolve({ load: worldManifest });
-console.log('[worldBus] ready —', worldBus.list().map(a => a.id).join(', '));
-
-// ---------- per-session sim buses ----------
+import { EventEmitter } from 'node:events';
 
 export const simEvents = new EventEmitter();
 const sims = new Map();
@@ -53,16 +38,10 @@ export async function startSim(manifestPath, { hz = 1, dt = 3600, maxTicks = nul
       }
 
       if (event.frame) {
-        simEvents.emit('frame', {
-          id,
-          year: event.frame.year,
-          tick: event.frame.tick,
-          buf:  event.frame.buf,
-        });
+        simEvents.emit('frame', { id, year: event.frame.year, tick: event.frame.tick, buf: event.frame.buf });
       }
 
       // Generic observe: agents emit { observe: {...} } to report state.
-      // The tap captures and forwards to the client without domain knowledge.
       if (event.observe) {
         simEvents.emit('observe', { id, ...event.observe });
       }
@@ -71,11 +50,11 @@ export async function startSim(manifestPath, { hz = 1, dt = 3600, maxTicks = nul
 
   await bus.resolve({ load: manifestPath });
 
-  // Fire startup parameters as an init event so manifests can read them
-  // without relying on environment variables (enables web-configurable scenarios).
+  // Startup parameters for scenarios that need runtime config (e.g. blockade intensity).
   if (Object.keys(init).length) {
     await bus.resolve({ init });
   }
+
   const runner = await bus.resolve({ run: 'realtime', hz, dt });
 
   const entry = { id, bus, manifestPath, runner, hz, dt, startedAt: Date.now() };
