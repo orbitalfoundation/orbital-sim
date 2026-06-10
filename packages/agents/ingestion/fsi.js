@@ -25,7 +25,13 @@ import { fileURLToPath }             from 'node:url';
 
 const _dir     = dirname(fileURLToPath(import.meta.url));
 const REPO     = join(_dir, '../../..');
-const PRIMARY  = join(REPO, 'public/_cached_data/fragile-2006-2024/fragile-states.json');
+// Primary: fetch from orbital-data GitHub repo (auto-downloaded, cached locally)
+const PRIMARY_URL = 'https://raw.githubusercontent.com/anselm/orbital-data/main/fragile-states/fsi-2006-2024.json';
+const PRIMARY_SHA = 'bf84e02eb5b2572bba097dd080b9cc8c1c1b5503f443b547486bdec825aff33d';
+// Local cache path (same bind-mount as other .data files)
+const PRIMARY  = join(DATA_DIR, 'geo/fsi-2006-2024.json');
+// Legacy path — kept for backwards compat during transition
+const LEGACY   = join(REPO, 'public/_cached_data/fragile-2006-2024/fragile-states.json');
 const DATA_DIR = process.env.ORBITAL_DATA_DIR ?? join(REPO, 'public/.data');
 const CACHE    = join(DATA_DIR, 'geo/fsi.json');
 
@@ -121,22 +127,31 @@ function lookup(q) {
 
 // ---------- load / sync ----------
 async function load() {
-  // 1. Prefer the committed cached JSON
-  if (existsSync(PRIMARY)) {
-    try {
-      const raw = JSON.parse(await readFile(PRIMARY, 'utf8'));
-      processRecords(raw);
-      console.log(`[fsi] loaded ${_records.length} countries from cached JSON (${_records[0]?.year})`);
-      return true;
-    } catch (e) { console.warn('[fsi] cached JSON error:', e.message); }
+  // 1. Local cache (previously fetched from GitHub or written by sync)
+  for (const path of [PRIMARY, LEGACY]) {
+    if (existsSync(path)) {
+      try {
+        const raw = JSON.parse(await readFile(path, 'utf8'));
+        processRecords(raw);
+        console.log(`[fsi] loaded ${_records.length} countries from local cache (${_records[0]?.year})`);
+        return true;
+      } catch (e) { console.warn('[fsi] cache read error:', e.message); }
+    }
   }
-  // 2. Try the data-dir cache
+  // 2. Fetch from orbital-data GitHub repo
   try {
-    const raw = JSON.parse(await readFile(CACHE, 'utf8'));
-    processRecords(raw);
-    console.log(`[fsi] loaded ${_records.length} countries from data cache`);
-    return true;
-  } catch { /* not found */ }
+    console.log('[fsi] fetching from orbital-data repo…');
+    const res = await fetch(PRIMARY_URL, { signal: AbortSignal.timeout(30_000) });
+    if (res.ok) {
+      const text = await res.text();
+      const raw  = JSON.parse(text);
+      processRecords(raw);
+      await mkdir(join(DATA_DIR, 'geo'), { recursive: true });
+      await writeFile(PRIMARY, text, 'utf8');
+      console.log(`[fsi] loaded ${_records.length} countries from GitHub (${_records[0]?.year})`);
+      return true;
+    }
+  } catch (e) { console.warn('[fsi] GitHub fetch failed:', e.message); }
   return false;
 }
 

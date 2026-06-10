@@ -28,5 +28,8 @@ public/.data
 # viz build output — regenerate with npm run build:viz
 public/assets/viz/
 
+# local data cache — hosted in orbital-data repo, fetched by agents on first run
+public/_cached_data/
+
 # lets not share this - mostly local claude config
 .claude/

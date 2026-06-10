@@ -188,8 +188,9 @@ async function processManifest(manifestPath, opts, stats) {
 
   for (const a of assets) {
     const label = `${a._entity}.${a._component}`;
-    const dest = a.target
-      ? resolve(ROOT, a.target)
+    // path takes precedence over target; both are resolved relative to repo root
+    const dest = (a.path || a.target)
+      ? resolve(ROOT, a.path ?? a.target)
       : join(dir, '.data', a._entity);
     const have = await exists(dest);
 
