@@ -67,8 +67,13 @@ export async function createGlobe(container, options = {}) {
   // ---- globe / tiles ----
   let tiles    = null;
   let controls = null;
-  const overlayGroup = new THREE.Group(); // points, arcs — added to scene or tiles.group
-  scene.add(overlayGroup);
+  // `globe` is the rotatable visual root. In fallback mode it holds the earth,
+  // atmosphere, and all overlays so they rotate together. In cesium mode the
+  // geo-referenced tiles.group is the overlay parent instead.
+  const globe = new THREE.Group();
+  scene.add(globe);
+  const overlayGroup = new THREE.Group(); // points & arcs
+  let overlayRoot = globe;                 // where overlays/points attach
 
   if (cesiumToken) {
     // -- Cesium Ion 3D tiles (real satellite imagery) --
@@ -118,6 +123,7 @@ export async function createGlobe(container, options = {}) {
     }
 
     scene.add(tiles.group);
+    overlayRoot = tiles.group;        // overlays are geo-referenced in cesium mode
     tiles.group.add(overlayGroup);
     tiles.setResolutionFromRenderer(camera, renderer);
     tiles.setCamera(camera);
@@ -128,8 +134,8 @@ export async function createGlobe(container, options = {}) {
     const tex = new THREE.TextureLoader().load(fallbackTexture);
     const mat = new THREE.MeshPhongMaterial({ map: tex, specular: 0x111122, shininess: 8 });
     const earth = new THREE.Mesh(geo, mat);
-    scene.add(earth);
-    overlayGroup.scale.setScalar(1.01); // sit just above surface
+    globe.add(earth);                 // earth rotates with the globe group
+    globe.add(overlayGroup);          // points/arcs rotate with earth
 
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping  = true;
@@ -144,7 +150,7 @@ export async function createGlobe(container, options = {}) {
       new THREE.SphereGeometry(1.015, 32, 32),
       new THREE.MeshPhongMaterial({ color: 0x3399ff, transparent: true, opacity: 0.08, depthWrite: false }),
     );
-    scene.add(atm);
+    globe.add(atm);
 
     // Stars
     if (options.stars !== false) {
@@ -246,7 +252,7 @@ export async function createGlobe(container, options = {}) {
           new THREE.SphereGeometry(cesiumToken ? EARTH_RADIUS * 1.001 : 1.003, 64, 64),
           new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity, depthWrite: false }),
         );
-        (globe ?? scene).add(mesh);
+        overlayRoot.add(mesh);
         overlays.set(id, mesh);
       }
     });
@@ -254,7 +260,7 @@ export async function createGlobe(container, options = {}) {
 
   function removeOverlay(id) {
     const m = overlays.get(id);
-    if (m) { (globe ?? scene).remove(m); m.geometry.dispose(); m.material.dispose(); overlays.delete(id); }
+    if (m) { overlayRoot.remove(m); m.geometry.dispose(); m.material.dispose(); overlays.delete(id); }
   }
 
   // ---- point clouds ----
