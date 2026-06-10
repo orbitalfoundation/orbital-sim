@@ -33,7 +33,7 @@ export async function createGlobe(container, options = {}) {
 
   // ---- Three.js setup ----
   const THREE = await import('three');
-  const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls.js');
+  const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setClearColor(0x001a33);
@@ -80,7 +80,7 @@ export async function createGlobe(container, options = {}) {
     ] = await Promise.all([
       import('3d-tiles-renderer'),
       import('3d-tiles-renderer/plugins'),
-      import('three/examples/jsm/loaders/DRACOLoader.js'),
+      import('three/addons/loaders/DRACOLoader.js'),
     ]);
 
     const { GlobeControls } = await import('3d-tiles-renderer');
