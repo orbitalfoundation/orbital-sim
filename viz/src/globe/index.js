@@ -228,6 +228,35 @@ export async function createGlobe(container, options = {}) {
     );
   }
 
+  // ---- image overlays (e.g. IPCC temperature raster) ----
+  const overlays = new Map();
+
+  function setOverlay(id, buffer, { opacity = 0.85 } = {}) {
+    const blob = new Blob([buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer)],
+                          { type: 'image/png' });
+    const url  = URL.createObjectURL(blob);
+    new THREE.TextureLoader().load(url, (texture) => {
+      URL.revokeObjectURL(url);
+      const existing = overlays.get(id);
+      if (existing) {
+        existing.material.map = texture;
+        existing.material.needsUpdate = true;
+      } else {
+        const mesh = new THREE.Mesh(
+          new THREE.SphereGeometry(cesiumToken ? EARTH_RADIUS * 1.001 : 1.003, 64, 64),
+          new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity, depthWrite: false }),
+        );
+        (globe ?? scene).add(mesh);
+        overlays.set(id, mesh);
+      }
+    });
+  }
+
+  function removeOverlay(id) {
+    const m = overlays.get(id);
+    if (m) { (globe ?? scene).remove(m); m.geometry.dispose(); m.material.dispose(); overlays.delete(id); }
+  }
+
   // ---- point clouds ----
   const pointGroups = new Map();
 
@@ -331,5 +360,5 @@ export async function createGlobe(container, options = {}) {
     container.removeChild(renderer.domElement);
   }
 
-  return { addPoints, removePoints, focusOn, dispose };
+  return { addPoints, removePoints, setOverlay, removeOverlay, focusOn, dispose };
 }

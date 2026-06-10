@@ -105,17 +105,6 @@
     overflow: hidden;
   }
 
-  #map {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-
-  #map.visible { opacity: 1; }
-
   /* placeholder shown before first frame */
   #placeholder {
     position: absolute;
@@ -234,7 +223,7 @@
 </header>
 
 <main>
-  <img id="map" alt="Temperature anomaly map">
+  <!-- globe mounts here via createGlobe() -->
 
   <div id="placeholder">
     <div style="font-size:11px;opacity:0.5">Temperature anomaly relative to pre-industrial (1850) baseline</div>
@@ -272,99 +261,75 @@
 <div id="status-bar">Ready.</div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script>
-const MANIFEST   = 'public/orbital/ipcc/manifest.js';
-const HZ         = 4;          // ticks per second — 76 years in ~19 s
-const DT         = 31536000;   // seconds per year
-const MAX_TICKS  = 76;         // 2024–2099; sim auto-stops at the end
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/" } }
+</script>
+<script type="module">
+import { createGlobe } from '/assets/viz/globe.js';
 
-const map        = document.getElementById('map');
-const placeholder= document.getElementById('placeholder');
-const btnRun     = document.getElementById('btn-run');
-const btnStop    = document.getElementById('btn-stop');
-const statusBar  = document.getElementById('status-bar');
-const valYear    = document.getElementById('val-year');
-const valCo2     = document.getElementById('val-co2');
-const valDt      = document.getElementById('val-dt');
+const MANIFEST  = 'public/orbital/ipcc/manifest.js';
+const HZ        = 4;
+const DT        = 31536000;
+const MAX_TICKS = 76;
 
-let simId    = null;
-let socket   = null;
-let prevBlobUrl = null;
+// ---- globe ----
+const mainEl = document.querySelector('main');
+const globe  = await createGlobe(mainEl, {
+  fallbackTexture: '/assets/earth.jpg',
+  mode:            'globe',
+  autoRotate:      true,
+  autoRotateSpeed: 0.0001,
+  stars:           true,
+});
+
+const placeholder = document.getElementById('placeholder');
+const btnRun      = document.getElementById('btn-run');
+const btnStop     = document.getElementById('btn-stop');
+const statusBar   = document.getElementById('status-bar');
+const valYear     = document.getElementById('val-year');
+const valCo2      = document.getElementById('val-co2');
+const valDt       = document.getElementById('val-dt');
+
+let simId = null;
 
 function status(msg) { statusBar.textContent = msg; }
 
 function showFrame(buf) {
-  const blob = new Blob([buf], { type: 'image/png' });
-  const url  = URL.createObjectURL(blob);
-  map.onload = () => {
-    if (prevBlobUrl) URL.revokeObjectURL(prevBlobUrl);
-    prevBlobUrl = url;
-    map.classList.add('visible');
-    placeholder.classList.add('hidden');
-  };
-  map.src = url;
+  globe.setOverlay('temperature', buf, { opacity: 0.88 });
+  placeholder.classList.add('hidden');
 }
 
 function updateStats({ year, co2, deltaT }) {
-  if (year  != null) valYear.textContent = year;
-  if (co2   != null) valCo2.textContent  = Math.round(co2) + ' ppm';
-  if (deltaT != null) {
-    const sign = deltaT >= 0 ? '+' : '';
-    valDt.textContent = sign + deltaT.toFixed(2) + '°C';
-  }
+  if (year   != null) valYear.textContent = year;
+  if (co2    != null) valCo2.textContent  = Math.round(co2) + ' ppm';
+  if (deltaT != null) valDt.textContent   = (deltaT >= 0 ? '+' : '') + deltaT.toFixed(2) + '°C';
 }
+
+const socket = io();
 
 async function startRun() {
   btnRun.disabled = true;
   status('Starting simulation…');
-
-  let res;
   try {
-    res = await fetch('/api/sim', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ manifest: MANIFEST, hz: HZ, dt: DT, maxTicks: MAX_TICKS }),
+    const res = await fetch('/api/sim', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ manifest: MANIFEST, hz: HZ, dt: DT, maxTicks: MAX_TICKS }),
     });
-  } catch (err) {
-    status('Error: ' + err.message);
-    btnRun.disabled = false;
-    return;
-  }
+    if (!res.ok) throw new Error(await res.text());
+    simId = (await res.json()).id;
+  } catch (err) { status('Error: ' + err.message); btnRun.disabled = false; return; }
 
-  if (!res.ok) {
-    status('Error: ' + await res.text());
-    btnRun.disabled = false;
-    return;
-  }
-
-  const { id } = await res.json();
-  simId = id;
-
-  socket = io();
-  socket.emit('subscribe', id);
-
-  socket.on('tick', data => {
-    updateStats({ year: data.year, co2: data.co2, deltaT: data.deltaT });
-    if (data.year) status(`Running — ${data.year}`);
-  });
-
-  socket.on('frame', ({ year, buf }) => {
-    showFrame(buf);
-    status(`Frame: ${year}`);
-  });
-
+  socket.emit('subscribe', simId);
+  socket.on('tick',  data => { updateStats({ year: data.year, co2: data.co2, deltaT: data.deltaT });
+                                if (data.year) status(`Running — ${data.year}`); });
+  socket.on('frame', ({ year, buf }) => { showFrame(buf); status(`${year}`); });
   socket.on('stopped', () => {
-    status('Stopped.');
-    simId = null;
-    btnRun.disabled = false;
-    btnStop.style.display = 'none';
-    btnRun.style.display  = '';
-    socket?.disconnect();
-    socket = null;
+    status('Complete.'); simId = null; btnRun.disabled = false;
+    btnStop.style.display = 'none'; btnRun.style.display = '';
   });
 
-  btnStop.style.display = '';
-  btnRun.style.display  = 'none';
+  btnStop.style.display = ''; btnRun.style.display = 'none';
   status('Running…');
 }
 
@@ -372,7 +337,6 @@ async function stopRun() {
   if (!simId) return;
   btnStop.disabled = true;
   await fetch(`/api/sim/${simId}`, { method: 'DELETE' });
-  // stopped event will fire and clean up
 }
 
 btnRun.addEventListener('click', startRun);
