@@ -114,151 +114,44 @@
 <script type="importmap">
 {
   "imports": {
-    "three":          "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
-    "three/addons/":  "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+    "three":         "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
   }
 }
 </script>
 <script type="module">
-import * as THREE            from 'three';
-import { OrbitControls }     from 'three/addons/controls/OrbitControls.js';
+import { createGlobe } from '/assets/viz/globe.js';
 
-// ---- renderer ----
-const canvas   = document.getElementById('canvas');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(devicePixelRatio);
+// ---- globe (via shared viz package) ----
+const container = document.getElementById('canvas').parentElement;
+document.getElementById('canvas').remove(); // viz creates its own canvas
 
-const scene  = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-camera.position.set(0, 0, 2.8);
-
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping  = true;
-controls.dampingFactor  = 0.08;
-controls.minDistance    = 1.2;
-controls.maxDistance    = 8;
-controls.enablePan      = false; // panning doesn't make sense on a globe
-
-// ---- lights ----
-scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-const sun = new THREE.DirectionalLight(0xffffff, 1.0);
-sun.position.set(5, 3, 5);
-scene.add(sun);
-
-// ---- globe group — earth + atmosphere + cities all rotate together ----
-const globe = new THREE.Group();
-scene.add(globe);
-
-// ---- earth ----
-const earthGeo = new THREE.SphereGeometry(1, 64, 64);
-const earthTex = new THREE.TextureLoader().load('/assets/earth.jpg');
-const earthMat = new THREE.MeshPhongMaterial({ map: earthTex, specular: 0x111122, shininess: 8 });
-const earth    = new THREE.Mesh(earthGeo, earthMat);
-globe.add(earth);
-
-// ---- atmosphere glow ----
-const atmGeo = new THREE.SphereGeometry(1.015, 32, 32);
-const atmMat = new THREE.MeshPhongMaterial({
-  color: 0x3399ff, transparent: true, opacity: 0.08, side: THREE.FrontSide, depthWrite: false,
+const globe = await createGlobe(container, {
+  fallbackTexture: '/assets/earth.jpg',
+  mode:            'globe',
+  autoRotate:      true,
+  autoRotateSpeed: 0.0002,
+  stars:           true,
 });
-globe.add(new THREE.Mesh(atmGeo, atmMat));
-
-// ---- stars ----
-{
-  const starGeo = new THREE.BufferGeometry();
-  const pos     = new Float32Array(3000);
-  for (let i = 0; i < 3000; i += 3) {
-    const phi   = Math.acos(2 * Math.random() - 1);
-    const theta = 2 * Math.PI * Math.random();
-    const r     = 50 + Math.random() * 50;
-    pos[i]   = r * Math.sin(phi) * Math.cos(theta);
-    pos[i+1] = r * Math.cos(phi);
-    pos[i+2] = r * Math.sin(phi) * Math.sin(theta);
-  }
-  starGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 })));
-}
-
-// ---- resize ----
-function onResize() {
-  renderer.setSize(innerWidth, innerHeight);
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-}
-onResize();
-window.addEventListener('resize', onResize);
-
-// ---- lat/lon to XYZ ----
-function latlonToXYZ(lat, lon, r = 1.015) {
-  const phi   = (90 - lat)  * Math.PI / 180;
-  const theta = (lon + 180) * Math.PI / 180;
-  return new THREE.Vector3(
-    -r * Math.sin(phi) * Math.cos(theta),
-     r * Math.cos(phi),
-     r * Math.sin(phi) * Math.sin(theta),
-  );
-}
-
-// ---- event points ----
-let eventMesh = null;
 
 function renderEvents(events) {
-  if (eventMesh) { globe.remove(eventMesh); eventMesh.geometry.dispose(); }
-  if (!events.length) { eventMesh = null; return; }
-
-  const positions = [], colors = [], sizes = [];
   let nMaterial = 0, nVerbal = 0;
-
-  for (const e of events) {
+  const points = events.map(e => {
     const lat = e.latitude ?? e.ActionGeo_Lat;
     const lon = e.longitude ?? e.ActionGeo_Long;
-    if (!lat || !lon) continue;
-
-    const pos   = latlonToXYZ(lat, lon);
-    positions.push(pos.x, pos.y, pos.z);
-
-    // Colour by conflict type
-    const quad = e.quad_class ?? e.QuadClass ?? (e.type_of_violence ? 4 : 3);
+    if (!lat || !lon) return null;
+    const quad     = e.quad_class ?? e.QuadClass ?? (e.type_of_violence ? 4 : 3);
     const material = quad === 4;
     if (material) nMaterial++; else nVerbal++;
-    const col = material ? new THREE.Color(0xef4444) : new THREE.Color(0xf59e0b);
-    colors.push(col.r, col.g, col.b);
-
-    // Size by severity signal
     const mentions = e.num_mentions ?? e.deaths_best ?? e.fatalities ?? 1;
-    sizes.push(Math.min(0.06, Math.max(0.018, Math.sqrt(mentions + 1) * 0.006)));
-  }
+    return {
+      lat, lon,
+      color: material ? 0xef4444 : 0xf59e0b,
+      size:  Math.min(0.06, Math.max(0.018, Math.sqrt(mentions + 1) * 0.006)),
+    };
+  }).filter(Boolean);
 
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geo.setAttribute('color',    new THREE.Float32BufferAttribute(colors,    3));
-  geo.setAttribute('size',     new THREE.Float32BufferAttribute(sizes,     1));
-
-  // Custom shader so each point can have its own size
-  const mat = new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false,
-    vertexShader: `
-      attribute float size;
-      varying vec3 vColor;
-      void main() {
-        vColor = color;
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = size * (600.0 / -mv.z);
-        gl_Position = projectionMatrix * mv;
-      }`,
-    fragmentShader: `
-      varying vec3 vColor;
-      void main() {
-        float d = length(gl_PointCoord - vec2(0.5));
-        if (d > 0.5) discard;
-        float alpha = 1.0 - smoothstep(0.3, 0.5, d);
-        gl_FragColor = vec4(vColor, alpha * 0.85);
-      }`,
-    vertexColors: true,
-  });
-
-  eventMesh = new THREE.Points(geo, mat);
-  globe.add(eventMesh);
+  globe.addPoints('events', points);
 
   document.getElementById('stat-count').textContent    = events.length;
   document.getElementById('stat-material').textContent = `${nMaterial} material conflict`;
@@ -281,49 +174,20 @@ function busQuery(key, args = {}) {
   });
 }
 
-// ---- city dots (added to globe group so they rotate with earth) ----
+// ---- city dots (via viz globe addPoints) ----
 async function loadCities() {
   try {
     const cities = await busQuery('cities_query', { largest: 1000 });
     if (!cities?.length) return;
-    const pos = [], col = [], sizes = [];
-    const baseColor = new THREE.Color(0x0fd4bc);
-    for (const city of cities) {
-      const pop = city.population ?? 0;
-      if (pop < 100_000) continue;
-      const p = latlonToXYZ(city.latitude, city.longitude, 1.013);
-      pos.push(p.x, p.y, p.z);
-      col.push(baseColor.r, baseColor.g, baseColor.b);
-      // Log-scale size: 100K → 0.004, 1M → 0.010, 10M → 0.020
-      const s = 0.003 + 0.017 * Math.max(0, Math.log10(pop) - 5) / 2.5;
-      sizes.push(Math.min(0.022, Math.max(0.004, s)));
-    }
-    if (!pos.length) return;
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    geo.setAttribute('color',    new THREE.Float32BufferAttribute(col, 3));
-    geo.setAttribute('size',     new THREE.Float32BufferAttribute(sizes, 1));
-    const mat = new THREE.ShaderMaterial({
-      transparent: true, depthWrite: false,
-      vertexShader: `
-        attribute float size; varying vec3 vColor;
-        void main() {
-          vColor = color;
-          vec4 mv = modelViewMatrix * vec4(position, 1.0);
-          gl_PointSize = size * (600.0 / -mv.z);
-          gl_Position = projectionMatrix * mv;
-        }`,
-      fragmentShader: `
-        varying vec3 vColor;
-        void main() {
-          float d = length(gl_PointCoord - vec2(0.5));
-          if (d > 0.5) discard;
-          float alpha = (1.0 - smoothstep(0.2, 0.5, d)) * 0.7;
-          gl_FragColor = vec4(vColor, alpha);
-        }`,
-      vertexColors: true,
-    });
-    globe.add(new THREE.Points(geo, mat)); // child of globe → rotates with earth
+    const points = cities
+      .filter(c => (c.population ?? 0) >= 100_000)
+      .map(c => {
+        const pop = c.population ?? 0;
+        const s = 0.003 + 0.017 * Math.max(0, Math.log10(pop) - 5) / 2.5;
+        return { lat: c.latitude, lon: c.longitude, color: 0x0fd4bc,
+                 size: Math.min(0.022, Math.max(0.004, s)) };
+      });
+    globe.addPoints('cities', points);
   } catch (e) { console.warn('[cities]', e.message); }
 }
 loadCities();
@@ -434,18 +298,7 @@ socket.on('disconnect', () => {
   _worldSimId = null;
 });
 
-// ---- animation loop ----
-let slowSpin = true; // gentle auto-rotation when not interacting
-controls.addEventListener('start', () => { slowSpin = false; });
-controls.addEventListener('end',   () => { setTimeout(() => { slowSpin = true; }, 8000); });
-
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  if (slowSpin) globe.rotation.y += 0.0002;
-  renderer.render(scene, camera);
-}
-animate();
+// Animation loop is handled by the viz globe.
 </script>
 </body>
 </html>

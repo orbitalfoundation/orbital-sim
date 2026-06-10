@@ -145,6 +145,21 @@ export async function createGlobe(container, options = {}) {
       new THREE.MeshPhongMaterial({ color: 0x3399ff, transparent: true, opacity: 0.08, depthWrite: false }),
     );
     scene.add(atm);
+
+    // Stars
+    if (options.stars !== false) {
+      const starPos = new Float32Array(3000);
+      for (let i = 0; i < 3000; i += 3) {
+        const phi = Math.acos(2 * Math.random() - 1), theta = 2 * Math.PI * Math.random();
+        const r   = 50 + Math.random() * 50;
+        starPos[i]   = r * Math.sin(phi) * Math.cos(theta);
+        starPos[i+1] = r * Math.cos(phi);
+        starPos[i+2] = r * Math.sin(phi) * Math.sin(theta);
+      }
+      const sg = new THREE.BufferGeometry();
+      sg.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+      scene.add(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 })));
+    }
   }
 
   // ---- resize ----
@@ -158,12 +173,29 @@ export async function createGlobe(container, options = {}) {
   const ro = new ResizeObserver(onResize);
   ro.observe(container);
 
+  // ---- auto-rotation (fallback mode only) ----
+  const autoRotate      = !cesiumToken && (options.autoRotate ?? false);
+  const autoRotateSpeed = options.autoRotateSpeed ?? 0.0002;
+  let _userInteracting  = false;
+  let _idleTimer        = null;
+
+  if (autoRotate && controls) {
+    controls.addEventListener('start', () => {
+      _userInteracting = true;
+      clearTimeout(_idleTimer);
+    });
+    controls.addEventListener('end', () => {
+      _idleTimer = setTimeout(() => { _userInteracting = false; }, 8000);
+    });
+  }
+
   // ---- animation loop ----
   let alive = true;
   const loop = () => {
     if (!alive) return;
     requestAnimationFrame(loop);
     controls?.update();
+    if (globe && autoRotate && !_userInteracting) globe.rotation.y += autoRotateSpeed;
     if (tiles) {
       tiles.setResolutionFromRenderer(camera, renderer);
       tiles.setCamera(camera);
