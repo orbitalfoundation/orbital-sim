@@ -25,5 +25,8 @@ public/.data
 # simulation output — runtime artifacts, regenerate with node packages/bus/run.js
 **/output/
 
+# viz build output — regenerate with npm run build:viz
+public/assets/viz/
+
 # lets not share this - mostly local claude config
 .claude/

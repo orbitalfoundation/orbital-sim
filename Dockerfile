@@ -11,6 +11,7 @@ COPY website/client/package.json website/client/package-lock.json ./website/clie
 COPY packages/bus/package.json packages/bus/
 COPY packages/utils/package.json packages/utils/
 COPY packages/agents/package.json packages/agents/
+COPY viz/package.json viz/
 
 RUN npm install --include=dev
 
@@ -19,6 +20,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Build viz first (outputs to public/assets/viz/), then build the Svelte client
+RUN cd viz && npm run build
 RUN cd website/client && npm install --legacy-peer-deps && npm run build
 
 FROM node:20-bullseye-slim AS runner
