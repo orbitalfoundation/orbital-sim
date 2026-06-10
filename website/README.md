@@ -71,94 +71,55 @@ HTTPS automatically; without them it falls back to plain HTTP.
 
 ## Scenario data
 
-Simulation scenarios require large geographic datasets that are too big for git
-and are not included in the repository. They live in `public/.data/` (gitignored).
+Simulation scenarios use geographic datasets too large for the main git repo.
+These are **fetched automatically on first run** — no manual preparation is
+needed for a fresh deployment. Local copies are cached in `public/.data/`
+(gitignored).
 
-@todo currently some of this has to be fetched by hand - plan is to automate this.
+### How data is sourced
 
-### What's needed
+| Dataset | Size | Source | When fetched |
+|---|---|---|---|
+| GEBCO elevation raster (`global_5arcmin.i16`) | 18 MB | [orbital-data](https://github.com/anselm/orbital-data) repo | by `fetch-data.mjs` (declared `url` + `sha256` in manifests) |
+| Fragile States Index | 284 KB | orbital-data repo | by the `fsi` agent on first run |
+| Natural Earth boundaries | 3 MB | nvkelso GitHub mirror | by the `natural-earth` agent |
+| World cities | ~2 MB | GeoNames | by the `cities` agent |
+| GDELT / UCDP / ACLED events | varies | source APIs | by their ingestion agents |
 
-| File / directory | Size | Used by |
-|---|---|---|
-| `public/.data/elevation/global_5arcmin.i16` | 18 MB | All current scenarios — land/sea mask and elevation at 5 arc-minute resolution |
-| `public/.data/elevation/global_15arcsec.i16/` | 7 GB | GeoTIFF tiles at full 15 arc-second resolution — source material for the downsampler, and available for future high-precision scenarios |
+Most data agents follow a stale-while-revalidate pattern: they serve cached
+data immediately and refresh in the background per their own TTL.
 
-### Where the 18 MB raster comes from
+### Fetching declared assets
 
-The file `global_5arcmin.i16` is not a raw download — it is generated from the
-full-resolution GEBCO 2026 tiles by averaging 20×20 pixel blocks (15 arc-sec →
-5 arc-min). The pipeline is:
-
-**Step 1 — download and extract the GEBCO 2026 tiles** (~3 GB zip, expands to ~7 GB):
-
-```sh
-bash scripts/fetch-gebco.sh
-# downloads zip from CEDA/BODC, extracts 8 tiles to public/.data/elevation/global_15arcsec.i16/
-```
-
-Or manually: download the zip directly from
-`https://dap.ceda.ac.uk/bodc/gebco/global/gebco_2026/ice_surface_elevation/geotiff/gebco_2026_geotiff.zip?download=1`
-and unzip the `.tif` files into `public/.data/elevation/global_15arcsec.i16/`.
-
-**Step 2 — run the downsampler:**
+For scenario manifests that declare an asset with `url` + `sha256` (e.g. the
+GEBCO raster), the fetch script downloads and verifies them:
 
 ```sh
-node scripts/gebco-downsample.mjs
-# reads:  public/.data/elevation/global_15arcsec.i16/*.tif
-# writes: public/.data/elevation/global_5arcmin.i16  (~18 MB, ~30 s)
-```
-
-The output is a raw little-endian Int16 array, 4320×2160, north-up
-equirectangular, elevation in metres. This is what all current scenarios use.
-The full 7 GB tile set is only needed if you want full 15 arc-second resolution
-(future high-precision scenarios) — it is not required for IPCC or the current
-insolation baseline.
-
-### Populating locally (other assets)
-
-For assets declared in a manifest with a `url` and `sha256`, the fetch script
-handles them automatically:
-
-```sh
-node scripts/fetch-data.mjs          # fetch all declared assets
+node scripts/fetch-data.mjs          # fetch any missing declared assets
 node scripts/fetch-data.mjs --list   # inventory without downloading
 node scripts/fetch-data.mjs --verify # checksum existing files against manifests
 ```
 
-The GEBCO raster is a local-path-only reference (no `url` in the manifest) so
-this script will flag it as present or missing but cannot download it — follow
-the two-step process above instead.
+### Regenerating the GEBCO raster (rare)
 
-### Pushing data to the remote server
-
-The production container mounts `~/orbital-sim-data` as a bind mount at
-`/app/public/.data`. Data is not baked into the Docker image — it must be
-synced separately.
-
-Run this **from your local machine** (not on the server):
+The 18 MB raster is a downsample of the full-resolution GEBCO tiles (~7 GB).
+This only needs regenerating when GEBCO publishes a new yearly release:
 
 ```sh
-bash scripts/sync-data.sh                        # push to default server (party-whiskey.exe.xyz)
-bash scripts/sync-data.sh user@other-host        # push to a different server
-bash scripts/sync-data.sh user@host /custom/dir  # custom remote data path
+bash scripts/fetch-gebco.sh         # download full tiles from CEDA/BODC (~3 GB zip)
+node scripts/gebco-downsample.mjs   # average 20×20 blocks → 18 MB raster (~30 s)
+# then update the sha256 in manifests and push the new raster to orbital-data
 ```
 
-rsync is incremental — only changed files transfer after the first run.
-The first sync of the full dataset (including the 7 GB tile set if present)
-can take 1–2 hours. The 18 MB raster alone syncs in seconds.
+Output is a raw little-endian Int16 array, 4320×2160, north-up equirectangular,
+elevation in metres. The full tile set is never needed at runtime.
 
-No container restart is needed after a sync — the bind mount is live.
+### Production persistence
 
-### Verifying data on the server
-
-The deploy script reports the data directory size at the end of each build:
-
-```
-[...] Data directory: /home/exedev/orbital-sim-data (4.2G)
-```
-
-A warning instead of a size means the directory is empty or missing — run
-`sync-data.sh` from your local machine to fix it.
+The production container mounts `~/orbital-sim-data` as a bind mount at
+`/app/public/.data`, so fetched data survives container rebuilds. On a fresh
+server the agents and `fetch-data.mjs` populate it automatically on first run;
+no manual sync step is required.
 
 ## Public asset paths
 

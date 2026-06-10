@@ -31,12 +31,21 @@ npm run start
 
 See [website/README.md § Scenario data](website/README.md) for more details.
 
-## A note regarding scenario data for some scenarios:
+## Scenario data
 
-At the moment GEBCO (world elevation data) is too large to fetch ahead of time. Other datasets are fetched dynamically. We have a utility for scenarios requiring geographic datasets not included in the repository (gitignored, too large). @todo revisit - try automate.
+Large reference datasets are hosted in a separate [orbital-data](https://github.com/anselm/orbital-data) repo and fetched automatically on first run — no manual preparation needed for deployment. This includes the downsampled GEBCO elevation raster (18 MB), Fragile States Index, and other shared geo resources. Other datasets (Natural Earth boundaries, GDELT/UCDP events, world cities) are fetched dynamically by their ingestion agents.
 
 ```sh
-node scripts/fetch-data.mjs   # download declared assets locally
-bash scripts/sync-data.sh     # push local data to the remote server
+node scripts/fetch-data.mjs   # fetch any declared assets not present locally
 ```
+
+The only data requiring manual work is regenerating the GEBCO raster from full-resolution source tiles (~7 GB), which is only needed when GEBCO publishes a new yearly release:
+
+```sh
+bash scripts/fetch-gebco.sh         # download full tiles from CEDA
+node scripts/gebco-downsample.mjs   # regenerate the 18 MB raster
+# then update the sha256 in manifests and push to the orbital-data repo
+```
+
+See [website/README.md § Scenario data](website/README.md) for full details.
 
