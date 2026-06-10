@@ -80,7 +80,7 @@ needed for a fresh deployment. Local copies are cached in `public/.data/`
 
 | Dataset | Size | Source | When fetched |
 |---|---|---|---|
-| GEBCO elevation raster (`global_5arcmin.i16`) | 18 MB | [orbital-data](https://github.com/anselm/orbital-data) repo | by `fetch-data.mjs` (declared `url` + `sha256` in manifests) |
+| GEBCO elevation raster (`global_5arcmin.i16`) | 18 MB | [orbital-data](https://github.com/orbitalfoundation/orbital-data) repo | by `fetch-data.mjs` (declared `url` + `sha256` in manifests) |
 | Fragile States Index | 284 KB | orbital-data repo | by the `fsi` agent on first run |
 | Natural Earth boundaries | 3 MB | nvkelso GitHub mirror | by the `natural-earth` agent |
 | World cities | ~2 MB | GeoNames | by the `cities` agent |

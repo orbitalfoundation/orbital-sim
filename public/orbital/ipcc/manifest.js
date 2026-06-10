@@ -18,7 +18,7 @@ const scenario = process.env.SCENARIO ?? 'SSP2-4.5';
 export const gebco = {
   elevation: {
     path:   'public/.data/elevation/global_5arcmin.i16',
-    url:    'https://raw.githubusercontent.com/anselm/orbital-data/main/elevation/global_5arcmin.i16',
+    url:    'https://raw.githubusercontent.com/orbitalfoundation/orbital-data/main/elevation/global_5arcmin.i16',
     sha256: 'f94162f550d2292313209e68202d963f7a320878d2f87852c6adb15a90720794',
     width:  4320,
     height: 2160,

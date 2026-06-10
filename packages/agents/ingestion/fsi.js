@@ -26,8 +26,7 @@ import { fileURLToPath }             from 'node:url';
 const _dir     = dirname(fileURLToPath(import.meta.url));
 const REPO     = join(_dir, '../../..');
 // Primary: fetch from orbital-data GitHub repo (auto-downloaded, cached locally)
-const PRIMARY_URL = 'https://raw.githubusercontent.com/anselm/orbital-data/main/fragile-states/fsi-2006-2024.json';
-const PRIMARY_SHA = 'bf84e02eb5b2572bba097dd080b9cc8c1c1b5503f443b547486bdec825aff33d';
+const PRIMARY_URL = 'https://raw.githubusercontent.com/orbitalfoundation/orbital-data/main/fragile-states/fsi-2006-2024.json';
 // Local cache path (same bind-mount as other .data files)
 const PRIMARY  = join(DATA_DIR, 'geo/fsi-2006-2024.json');
 // Legacy path — kept for backwards compat during transition

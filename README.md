@@ -33,7 +33,7 @@ See [website/README.md § Scenario data](website/README.md) for more details.
 
 ## Scenario data
 
-Large reference datasets are hosted in a separate [orbital-data](https://github.com/anselm/orbital-data) repo and fetched automatically on first run — no manual preparation needed for deployment. This includes the downsampled GEBCO elevation raster (18 MB), Fragile States Index, and other shared geo resources. Other datasets (Natural Earth boundaries, GDELT/UCDP events, world cities) are fetched dynamically by their ingestion agents.
+Large reference datasets are hosted in a separate [orbital-data](https://github.com/orbitalfoundation/orbital-data) repo and fetched automatically on first run — no manual preparation needed for deployment. This includes the downsampled GEBCO elevation raster (18 MB), Fragile States Index, and other shared geo resources. Other datasets (Natural Earth boundaries, GDELT/UCDP events, world cities) are fetched dynamically by their ingestion agents.
 
 ```sh
 node scripts/fetch-data.mjs   # fetch any declared assets not present locally
