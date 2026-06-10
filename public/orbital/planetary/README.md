@@ -1,6 +1,6 @@
 # orbital/planetary
 
-@todo June 7 2026 - this is still a work in progress, we ended up focusing on ../IPCC first and will circle back to this.
+@todo June 7 2026 - this is still a work in progress, we ended up focusing on ../IPCC first and will circle back to this. The goal here is a larger simulation beyond merely warming, to explore other geological processes.
 
 Abiotic baseline agents — solar forcing, elevation, surface fields — that
 other simulations build on top of. Each agent is a field-style process: one

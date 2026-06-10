@@ -3,6 +3,8 @@
 Svelte 5 + Tailwind v4 frontend (`website/client`) served by a Fastify backend
 (`website/server`). Static scenario pages in `public/` take priority over the SPA.
 
+Note the root folder will dockerize and publish this as a whole - but here we're just concerned with running and testing locally, as well as making sure all the data is loaded.
+
 ## Running
 
 ```sh
@@ -25,13 +27,17 @@ Or both at once:
 npm run dev          # concurrently: Fastify + Vite dev server
 ```
 
-## Local HTTPS (required for Web3Auth sign-in)
+## Local HTTPS Testing
 
-Web3Auth mainnet requires a whitelisted non-localhost domain over HTTPS.
-`crypto.subtle` (used internally by the SDK) is also unavailable on plain HTTP
-for non-localhost origins.
+**One-time setup for local testing:**
 
-**One-time setup:**
+1) Add 'orbital.local' to `/etc/hosts`:
+
+```
+127.0.0.1    orbital.local
+```
+
+2) Make a local cert so you can visit the site as https without triggering a warning:
 
 ```sh
 brew install mkcert
@@ -41,19 +47,17 @@ mv orbital.local.pem     website/server/
 mv orbital.local-key.pem website/server/
 ```
 
-Add to `/etc/hosts`:
+3) Whitelist `https://orbital.local:3000` in your Web3Auth dashboard project.
 
-```
-127.0.0.1    orbital.local
-```
-
-Whitelist `https://orbital.local:3000` in your Web3Auth dashboard project.
+Web3Auth mainnet requires a whitelisted non-localhost domain over HTTPS.
+`crypto.subtle` (used internally by the SDK) is also unavailable on plain HTTP
+for non-localhost origins.
 
 The server reads `TLS_CERT` and `TLS_KEY` from `website/server/.env` — they are
 already set to point at these files. When the certs are present the server starts
 HTTPS automatically; without them it falls back to plain HTTP.
 
-Access the app at `https://orbital.local:3000`.
+4) Access the app at `https://orbital.local:3000`.
 
 ## Environment variables
 
@@ -69,6 +73,8 @@ Access the app at `https://orbital.local:3000`.
 
 Simulation scenarios require large geographic datasets that are too big for git
 and are not included in the repository. They live in `public/.data/` (gitignored).
+
+@todo currently some of this has to be fetched by hand - plan is to automate this.
 
 ### What's needed
 

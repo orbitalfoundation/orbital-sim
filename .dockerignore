@@ -17,7 +17,6 @@ public/*/*/.data/
 .vscode
 .idea
 .claude
-notes
 
 # TLS certs — injected via env vars or secrets at runtime, not baked in
 website/server/*.pem
