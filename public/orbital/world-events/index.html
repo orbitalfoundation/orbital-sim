@@ -190,7 +190,6 @@ async function loadCities() {
     globe.addPoints('cities', points);
   } catch (e) { console.warn('[cities]', e.message); }
 }
-loadCities();
 
 // ---- date slider ----
 const slider       = document.getElementById('slider');
@@ -291,6 +290,7 @@ socket.on('connect', async () => {
   await new Promise(r => setTimeout(r, 500));
   await refreshStatus();
   await loadDates(sourceSelect.value);
+  await loadCities();
 });
 
 socket.on('disconnect', () => {
