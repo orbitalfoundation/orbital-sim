@@ -17,7 +17,7 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOCAL_DATA="$REPO_DIR/public/.data"
 
-REMOTE_HOST="${1:-party-whiskey.exe.xyz}"
+REMOTE_HOST="${1:-orbital-sim.exe.xyz}"
 REMOTE_DIR="${2:-~/orbital-sim-data}"
 
 if [ ! -d "$LOCAL_DATA" ]; then
