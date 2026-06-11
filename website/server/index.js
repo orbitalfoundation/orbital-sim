@@ -57,6 +57,8 @@ const MIME = {
   '.geojson': 'application/json',
   '.wasm': 'application/wasm',
   '.map':  'application/json',
+  '.pdf':  'application/pdf',
+  '.epub': 'application/epub+zip',
 };
 function mimeFor(path) {
   return MIME[extname(path).toLowerCase()] ?? 'application/octet-stream';

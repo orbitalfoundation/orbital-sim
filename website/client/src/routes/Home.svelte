@@ -53,6 +53,15 @@
       Publish the results as interactive documents.
       Replace speculation with evidence.
     </p>
+    <a
+      href="/primer/simulate-the-world.pdf"
+      target="_blank"
+      rel="noopener"
+      class="mono text-sm tracking-wide text-[var(--accent)] hover:underline w-fit inline-flex items-center gap-2"
+    >
+      Read the primer
+      <span class="text-[10px] opacity-70">PDF ↗</span>
+    </a>
   </div>
 
   <section>
