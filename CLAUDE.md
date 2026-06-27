@@ -78,10 +78,12 @@ A minimal circle with a thin orbital ring — SVG TBD. For now the wordmark "ORB
 ## Stack
 
 - **Frontend**: Svelte 5 (runes mode), Tailwind CSS v4, Vite 6
-- **Backend**: Fastify, Node.js, Socket.io
-- **Simulation kernel**: `packages/bus` (pub/sub), `packages/spatial`, `packages/world`, `packages/elevation`
+- **Backend**: Fastify, Node.js (24+), Socket.io
+- **Simulation kernel**: `@orbitalfoundation/bus` (pub/sub, published npm package) + `packages/agents` (spatial indexing, elevation, insolation, ingestion)
+- **Storage**: built-in `node:sqlite` (`DatabaseSync`) for data/ingestion agents — see `packages/agents/lib/db.js`. No native deps; requires Node 24+.
 - **Auth**: Web3Auth v9 no-modal, Google OAuth, redirect flow, `CommonPrivateKeyProvider` with `CHAIN_NAMESPACES.OTHER`
 - **3D globe**: Three.js — `website/client/src/lib/Globe.svelte`
+- **Deploy**: Docker container on an exe.dev VM (`orbital-sim.exe.xyz`); cron-polled auto-deploy via `scripts/deploy.sh`. See orbital-thinking `development/20260604-docker-deployment-notes.md`.
 
 ---
 
@@ -90,6 +92,8 @@ A minimal circle with a thin orbital ring — SVG TBD. For now the wordmark "ORB
 - `public/` — scenario assets, served at `/` by Fastify
 - `website/client/` — Svelte SPA, builds to `dist/`
 - `website/server/` — Fastify (serves dist + public + API + TLS)
-- `packages/` — simulation engine packages
-- `wiki/` — theory essays and implementation notes (not served)
+- `packages/agents/` — canonical agents (spatial, elevation, insolation, reporting) + data ingestion (`ingestion/`, `lib/db.js`); the bus itself is the `@orbitalfoundation/bus` npm package
+- `viz/` — framework-agnostic globe + chart visualization library
+- `scripts/` — data fetch (GEBCO) and deployment (`deploy.sh`, `sync-data.sh`, `setup.sh`)
+- theory/design notes live in the separate **orbital-thinking** repo (no longer in this repo)
 - `CLAUDE.md` — this file; single source of truth
