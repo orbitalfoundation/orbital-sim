@@ -6,7 +6,7 @@
 // Queries from the client are routed to their own session bus; if the agent
 // isn't in their manifest the query returns null. No shared background buses.
 
-import { createBus } from '@orbital/bus';
+import { createBus } from '@orbitalfoundation/bus';
 import { EventEmitter } from 'node:events';
 
 export const simEvents = new EventEmitter();

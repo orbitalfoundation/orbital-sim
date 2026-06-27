@@ -7,7 +7,7 @@
 // Query via bus:    await bus.resolve({ spatial_query: { near: [lon,lat], radius: 5000 } })
 // Query directly:   bus.spatial.query({ near: [lon,lat], radius: 5000 })
 
-import logger from '@orbital/utils';
+import logger from '@orbitalfoundation/utils';
 
 const DEG_PER_CELL = 1;
 const METERS_PER_DEG = 111_000;

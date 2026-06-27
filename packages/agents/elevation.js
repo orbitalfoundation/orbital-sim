@@ -12,7 +12,7 @@
 
 import { readFile, readdir } from 'node:fs/promises';
 import { resolve as resolvePath, isAbsolute, join } from 'node:path';
-import logger from '@orbital/utils';
+import logger from '@orbitalfoundation/utils';
 
 // Parse width, height, and pixel-data byte offset from an uncompressed stripped TIFF buffer.
 // Handles tag 256 (ImageWidth), 257 (ImageLength), 273 (StripOffsets).

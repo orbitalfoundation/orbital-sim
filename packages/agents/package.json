@@ -8,10 +8,12 @@
     "test": "node --test test/agents.test.js"
   },
   "dependencies": {
-    "@orbital/utils": "*",
-    "better-sqlite3": "^9",
+    "@orbitalfoundation/utils": "^2",
     "xlsx": "^0.18.5",
     "unzipper": "^0.12",
     "pngjs": "^7"
+  },
+  "devDependencies": {
+    "@orbitalfoundation/bus": "^2"
   }
 }

@@ -12,8 +12,6 @@
     "docker:run": "docker run --rm -p 3000:3000 orbital-sim"
   },
   "workspaces": [
-    "packages/bus",
-    "packages/utils",
     "packages/agents",
     "viz",
     "website/server"

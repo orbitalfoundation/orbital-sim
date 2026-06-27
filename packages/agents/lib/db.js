@@ -5,7 +5,7 @@
 // DB file: $ORBITAL_DATA_DIR/db/signals.db  (production, bind-mounted)
 //          public/.data/db/signals.db        (dev fallback)
 
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,10 +25,27 @@ let _db = null;
 export function getDb() {
   if (_db) return _db;
   mkdirSync(join(DATA_DIR, 'db'), { recursive: true });
-  _db = new Database(DB_PATH);
-  _db.pragma('journal_mode = WAL');   // concurrent reads + writes
-  _db.pragma('synchronous = NORMAL'); // safe with WAL, faster than FULL
-  _db.pragma('foreign_keys = ON');
-  _db.pragma('temp_store = MEMORY');
+  _db = new DatabaseSync(DB_PATH);
+  _db.exec('PRAGMA journal_mode = WAL');   // concurrent reads + writes
+  _db.exec('PRAGMA synchronous = NORMAL'); // safe with WAL, faster than FULL
+  _db.exec('PRAGMA foreign_keys = ON');
+  _db.exec('PRAGMA temp_store = MEMORY');
+
+  // better-sqlite3 compatibility shim: db.transaction(fn) returns a callable that
+  // runs fn inside BEGIN/COMMIT (ROLLBACK on throw). node:sqlite has no built-in
+  // equivalent. Bare named parameters (@name bound from object keys without the
+  // prefix) and positional ? params work natively, so call sites are unchanged.
+  _db.transaction = (fn) => (...args) => {
+    _db.exec('BEGIN');
+    try {
+      const result = fn(...args);
+      _db.exec('COMMIT');
+      return result;
+    } catch (err) {
+      _db.exec('ROLLBACK');
+      throw err;
+    }
+  };
+
   return _db;
 }

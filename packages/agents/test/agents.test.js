@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createBus } from '@orbital/bus';
+import { createBus } from '@orbitalfoundation/bus';
 import { spatialHandler } from '../spatial.js';
 import elevationAgent from '../elevation.js';
 import insolationAgent from '../insolation.js';
