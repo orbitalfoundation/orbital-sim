@@ -2,23 +2,30 @@
 
 ## Overview
 
-There are many simulation engines, but the focus of Orbital is specifically civic engagement. Features:
+https://github.com/orbitalfoundation/orbital-sim presents a multiuser website over a collection of simulation and modeling tools for building digital twins of civic issues. It's more intended to showcase the idea of civic modeling than to be a robust modeling framework. That said the sims are run on the server side and could arguably scale.
 
-	- model reasonably complex real world scenarios for ordinary people
-	- make models simple enough for anybody to understand and explore
-	- agent based simulations; brute force numerical integration over time
-	- llm based simulations as well (in the future)
-	- shared data; from many sources; world boundaries, world events, maps
-	- digital twins / predictive models regression tested against historical data
-	- operate at three scales: local, bioregional, macro or world scale
+Features include:
 
-	- server side simulation core to allow for millions of agents to be simulated
-	- web interface; maps, charts, graphs, time sliders - extremely pretty
-	- multiplayer emphasis; jupyter notebooks style
+- should be easy and fun to use
+- agent based models
+- public data
+- simulate scenarios at local, regional and macro scale
 
-	- user authentication can use web3 so users own their own data
-	- dockerized; with inter-docker data/state persistence between reloads
-	- modular; not monolithic code base
+Technical:
+
+- brute force simulations over time (not llm driven)
+- server side simulations
+- user authentication can use web3 so users own their own data
+- dockerized; with inter-docker data/state persistence between reloads
+- modular; not monolithic code base
+
+Future Goals
+
+- llm supported agent creation
+- shared data; from many sources; world boundaries, world events, maps
+- digital twins / predictive models regression tested against historical data
+- web interface; maps, charts, graphs, time sliders - extremely pretty
+- multiplayer emphasis; jupyter notebooks style
 
 ## Running
 
