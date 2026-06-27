@@ -22,7 +22,10 @@ export default defineConfig({
     nodePolyfills({
       globals:         { Buffer: true, global: true, process: true },
       protocolImports: true,
-      exclude:         ['vm'],   // vm-browserify uses eval — we don't need vm
+      // vm: vm-browserify uses eval — we don't need it.
+      // module: vite 8's rolldown runtime imports createRequire from 'node:module';
+      //   polyfilling it to an empty mock breaks dev dep-optimization. Leave it native.
+      exclude:         ['vm', 'module'],
     }),
   ],
   build: {
