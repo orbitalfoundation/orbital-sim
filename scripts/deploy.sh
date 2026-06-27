@@ -1,7 +1,8 @@
 #!/bin/bash
-# Minimal auto-deploy script for orbital-sim
-# Polls git for changes, rebuilds Docker image, restarts container on the exe.dev remote
-# Install on remote: crontab -e, add: * * * * * /home/exedev/terrasim/scripts/deploy.sh >> /tmp/orbital-sim-deploy.log 2>&1
+# Minimal auto-deploy script for orbital-sim.
+# Polls git for changes, rebuilds the Docker image, and restarts the container on a remote host.
+# This is one deployment option (see DEPLOY.md) — not the only way to run Orbital.
+# Install on remote: crontab -e, add: * * * * * /path/to/orbital-sim/scripts/deploy.sh >> /tmp/orbital-sim-deploy.log 2>&1
 # Or run manually: ./scripts/deploy.sh
 
 set -e

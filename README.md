@@ -23,6 +23,7 @@ There are many simulation engines, but the focus of Orbital is specifically civi
 ## Running
 
 See [website/README.md](website/README.md) for full setup including local HTTPS (required for sign-in).
+For deployment (Docker, data persistence, auto-deploy — one worked example among many), see [DEPLOY.md](DEPLOY.md). Requires Node 24+ (the server uses the built-in `node:sqlite`).
 
 ```sh
 npm run build

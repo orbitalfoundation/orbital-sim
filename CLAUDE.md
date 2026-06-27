@@ -83,7 +83,7 @@ A minimal circle with a thin orbital ring — SVG TBD. For now the wordmark "ORB
 - **Storage**: built-in `node:sqlite` (`DatabaseSync`) for data/ingestion agents — see `packages/agents/lib/db.js`. No native deps; requires Node 24+.
 - **Auth**: Web3Auth v9 no-modal, Google OAuth, redirect flow, `CommonPrivateKeyProvider` with `CHAIN_NAMESPACES.OTHER`
 - **3D globe**: Three.js — `website/client/src/lib/Globe.svelte`
-- **Deploy**: Docker container on an exe.dev VM (`orbital-sim.exe.xyz`); cron-polled auto-deploy via `scripts/deploy.sh`. See orbital-thinking `development/20260604-docker-deployment-notes.md`.
+- **Deploy**: standard Node 24 / Docker app; runs anywhere. Reference setup is a Docker container on an exe.dev VM (`orbital-sim.exe.xyz`) with cron-polled auto-deploy via `scripts/deploy.sh`. See [DEPLOY.md](DEPLOY.md) (and, privately, orbital-thinking `development/20260604-docker-deployment-notes.md`).
 
 ---
 
