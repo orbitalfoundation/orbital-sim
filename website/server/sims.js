@@ -8,9 +8,24 @@
 
 import { createBus } from '@orbitalfoundation/bus';
 import { EventEmitter } from 'node:events';
+import { resolve, isAbsolute, sep } from 'node:path';
 
 export const simEvents = new EventEmitter();
 const sims = new Map();
+
+// Resolve a client-supplied manifest path to an absolute filesystem path.
+// The bus manifest loader treats a bare path like 'public/x/manifest.js' as an
+// npm package specifier (and silently fails to load it), so relative manifests
+// must be resolved against the project root first. The path is untrusted client
+// input that ends up in import(), so it is also constrained to the project root.
+function resolveManifestPath(manifestPath) {
+  const root = process.cwd();
+  const abs = isAbsolute(manifestPath) ? manifestPath : resolve(root, manifestPath);
+  if (abs !== root && !abs.startsWith(root + sep)) {
+    throw new Error(`manifest path escapes project root: ${manifestPath}`);
+  }
+  return abs;
+}
 
 export async function startSim(manifestPath, { hz = 1, dt = 3600, maxTicks = null, init = {} } = {}) {
   const id = crypto.randomUUID();
@@ -48,7 +63,7 @@ export async function startSim(manifestPath, { hz = 1, dt = 3600, maxTicks = nul
     },
   });
 
-  await bus.resolve({ load: manifestPath });
+  await bus.resolve({ load: resolveManifestPath(manifestPath) });
 
   // Startup parameters for scenarios that need runtime config (e.g. blockade intensity).
   if (Object.keys(init).length) {
